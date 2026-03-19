@@ -9,8 +9,11 @@ data/features/
 *.db
 *.sqlite
 
-# Results
+# Results & Reports
 results/
+reports/
+logs/
+strategies/saved/
 
 # Python
 __pycache__/
