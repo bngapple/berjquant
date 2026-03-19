@@ -1,0 +1,46 @@
+# Data files
+data/raw/
+data/processed/
+data/features/
+*.parquet
+*.csv
+
+# Database
+*.db
+*.sqlite
+
+# Results
+results/
+
+# Python
+__pycache__/
+*.py[cod]
+*$py.class
+*.egg-info/
+dist/
+build/
+.eggs/
+*.egg
+
+# Virtual environments
+.venv/
+venv/
+env/
+
+# IDE
+.idea/
+.vscode/
+*.swp
+*.swo
+
+# Environment
+.env
+.env.local
+credentials.json
+
+# OS
+.DS_Store
+Thumbs.db
+
+# Jupyter
+.ipynb_checkpoints/

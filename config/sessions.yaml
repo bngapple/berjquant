@@ -1,0 +1,24 @@
+# Trading Session Definitions (US/Eastern)
+
+timezone: "US/Eastern"
+
+sessions:
+  pre_market:
+    start: "08:00"
+    end: "09:30"
+    label: "pre_market"
+  core:
+    start: "09:30"
+    end: "16:00"
+    label: "core"
+  post_close:
+    start: "16:00"
+    end: "17:00"
+    label: "post_close"
+
+active_window:
+  start: "08:00"
+  end: "17:00"
+
+# All positions must be flat by this time
+flat_by: "17:00"

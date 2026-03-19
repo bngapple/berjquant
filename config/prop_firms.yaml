@@ -1,0 +1,53 @@
+# Prop Firm Rule Profiles
+# Verify exact values against each firm's current rules before going live.
+
+topstep_50k:
+  firm_name: "Topstep"
+  account_size: 50000
+  daily_loss_limit: -1000
+  max_drawdown: -2000
+  drawdown_type: "trailing"  # "trailing" | "eod" | "static"
+  max_contracts:
+    MNQ: 15
+    NQ: 3
+  consistency_rule:
+    enabled: true
+    max_single_day_pct: 30  # no single day > 30% of monthly profit
+  scaling_plan:
+    enabled: true
+  commission_per_contract_rt: 0.62   # round-trip per micro
+  exchange_fees_per_contract_rt: 1.18
+
+apex_50k:
+  firm_name: "Apex Trader Funding"
+  account_size: 50000
+  daily_loss_limit: -1100
+  max_drawdown: -2500
+  drawdown_type: "trailing"
+  max_contracts:
+    MNQ: 20
+    NQ: 4
+  consistency_rule:
+    enabled: false
+    max_single_day_pct: 100
+  scaling_plan:
+    enabled: false
+  commission_per_contract_rt: 0.62
+  exchange_fees_per_contract_rt: 1.18
+
+lucid_50k:
+  firm_name: "Lucid"
+  account_size: 50000
+  daily_loss_limit: -1000
+  max_drawdown: -2000
+  drawdown_type: "trailing"
+  max_contracts:
+    MNQ: 15
+    NQ: 3
+  consistency_rule:
+    enabled: true
+    max_single_day_pct: 30
+  scaling_plan:
+    enabled: false
+  commission_per_contract_rt: 0.62
+  exchange_fees_per_contract_rt: 1.18

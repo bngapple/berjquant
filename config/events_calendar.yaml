@@ -1,0 +1,67 @@
+# Economic Event Blackout Calendar
+# No new entries within blackout_buffer_minutes before/after events
+
+blackout_buffer_minutes: 5
+
+# Recurring event patterns (for auto-generating dates)
+recurring_events:
+  - type: "NFP"
+    description: "Non-Farm Payrolls"
+    schedule: "first_friday"
+    time: "08:30"
+    timezone: "US/Eastern"
+
+  - type: "CPI"
+    description: "Consumer Price Index"
+    schedule: "monthly"
+    time: "08:30"
+    timezone: "US/Eastern"
+
+  - type: "PPI"
+    description: "Producer Price Index"
+    schedule: "monthly"
+    time: "08:30"
+    timezone: "US/Eastern"
+
+# Specific scheduled events (add as known)
+events:
+  # 2026 FOMC Meetings (update annually)
+  - date: "2026-01-28"
+    time: "14:00"
+    type: "FOMC"
+    description: "FOMC Rate Decision"
+
+  - date: "2026-03-18"
+    time: "14:00"
+    type: "FOMC"
+    description: "FOMC Rate Decision"
+
+  - date: "2026-05-06"
+    time: "14:00"
+    type: "FOMC"
+    description: "FOMC Rate Decision"
+
+  - date: "2026-06-17"
+    time: "14:00"
+    type: "FOMC"
+    description: "FOMC Rate Decision"
+
+  - date: "2026-07-29"
+    time: "14:00"
+    type: "FOMC"
+    description: "FOMC Rate Decision"
+
+  - date: "2026-09-16"
+    time: "14:00"
+    type: "FOMC"
+    description: "FOMC Rate Decision"
+
+  - date: "2026-11-04"
+    time: "14:00"
+    type: "FOMC"
+    description: "FOMC Rate Decision"
+
+  - date: "2026-12-16"
+    time: "14:00"
+    type: "FOMC"
+    description: "FOMC Rate Decision"
