@@ -476,13 +476,13 @@ class SignalRegistry:
         self._register(SignalDefinition(
             name="delta_divergence",
             category="orderflow",
-            signal_type="entry",
+            signal_type="filter",
             module="signals.orderflow",
             function="delta_divergence",
             parameters={
                 "lookback": {"type": "int", "min": 5, "max": 20, "step": 1, "default": 10},
             },
-            entry_columns=["entry_long_delta_div", "entry_short_delta_div"],
+            filter_columns=["signal_delta_div_bullish", "signal_delta_div_bearish"],
             requires=["volume_delta"],
             description="Delta divergence: price makes new high/low but cumulative delta diverges. Signals potential reversal.",
         ))
@@ -494,11 +494,10 @@ class SignalRegistry:
             module="signals.orderflow",
             function="absorption",
             parameters={
-                "lookback": {"type": "int", "min": 3, "max": 10, "step": 1, "default": 5},
                 "volume_threshold": {"type": "float", "min": 1.5, "max": 3.0, "step": 0.5, "default": 2.0},
+                "price_threshold": {"type": "float", "min": 0.1, "max": 0.5, "step": 0.1, "default": 0.3},
             },
-            filter_columns=["signal_absorption_bid", "signal_absorption_ask"],
-            requires=["volume_delta"],
+            filter_columns=["signal_absorption", "signal_absorption_bullish", "signal_absorption_bearish"],
             description="Absorption detection: high volume with minimal price movement indicates large passive orders absorbing aggressive flow.",
         ))
 
@@ -509,8 +508,8 @@ class SignalRegistry:
             module="signals.orderflow",
             function="exhaustion",
             parameters={
-                "lookback": {"type": "int", "min": 3, "max": 10, "step": 1, "default": 5},
-                "delta_threshold": {"type": "float", "min": 1.5, "max": 3.0, "step": 0.5, "default": 2.0},
+                "delta_lookback": {"type": "int", "min": 10, "max": 40, "step": 5, "default": 20},
+                "threshold": {"type": "float", "min": 1.5, "max": 3.0, "step": 0.5, "default": 2.0},
             },
             filter_columns=["signal_exhaustion_long", "signal_exhaustion_short"],
             requires=["volume_delta"],
@@ -538,8 +537,8 @@ class SignalRegistry:
             module="signals.orderflow",
             function="large_trade_detection",
             parameters={
-                "lookback": {"type": "int", "min": 20, "max": 100, "step": 10, "default": 50},
-                "std_mult": {"type": "float", "min": 2.0, "max": 4.0, "step": 0.5, "default": 3.0},
+                "volume_lookback": {"type": "int", "min": 20, "max": 100, "step": 10, "default": 50},
+                "threshold": {"type": "float", "min": 2.0, "max": 4.0, "step": 0.5, "default": 3.0},
             },
             filter_columns=["signal_large_trade"],
             description="Detects abnormally large single-bar volume relative to rolling statistics. Proxy for institutional activity.",
@@ -568,26 +567,23 @@ class SignalRegistry:
             module="signals.orderflow",
             function="footprint_imbalance",
             parameters={
-                "lookback": {"type": "int", "min": 3, "max": 10, "step": 1, "default": 5},
-                "imbalance_ratio": {"type": "float", "min": 2.0, "max": 5.0, "step": 0.5, "default": 3.0},
+                "stacked_threshold": {"type": "int", "min": 2, "max": 6, "step": 1, "default": 3},
             },
-            filter_columns=["signal_footprint_bid_imbalance", "signal_footprint_ask_imbalance"],
-            requires=["volume_delta"],
+            filter_columns=["signal_stacked_buy", "signal_stacked_sell"],
             description="Consecutive bar imbalance stacking. Flags clusters of aggressive buying or selling.",
         ))
 
         self._register(SignalDefinition(
             name="trapped_traders",
             category="orderflow",
-            signal_type="entry",
+            signal_type="filter",
             module="signals.orderflow",
             function="trapped_traders",
             parameters={
                 "lookback": {"type": "int", "min": 3, "max": 10, "step": 1, "default": 5},
-                "delta_threshold": {"type": "float", "min": 1.5, "max": 3.0, "step": 0.5, "default": 2.0},
+                "retrace_pct": {"type": "float", "min": 0.3, "max": 0.7, "step": 0.1, "default": 0.5},
             },
-            entry_columns=["entry_long_trapped", "entry_short_trapped"],
-            requires=["volume_delta"],
+            filter_columns=["signal_trapped_longs", "signal_trapped_shorts"],
             description="Trapped traders: aggressive buyers/sellers get stuck as price reverses against them. Entry on the reversal side.",
         ))
 
