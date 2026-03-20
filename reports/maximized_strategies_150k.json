@@ -1,0 +1,3764 @@
+[
+  {
+    "name": "STOCHASTIC|IMBALANCE|max_f863bc",
+    "strategy": {
+      "name": "STOCHASTIC|IMBALANCE|max_f863bc",
+      "entry_signals": [
+        {
+          "signal_name": "stochastic",
+          "module": "signals.momentum",
+          "function": "stochastic",
+          "params": {
+            "k_period": 8,
+            "d_period": 2,
+            "overbought": 36.6836,
+            "oversold": 23.2408
+          },
+          "columns": {
+            "long": "entry_long_stoch",
+            "short": "entry_short_stoch"
+          }
+        }
+      ],
+      "entry_filters": [
+        {
+          "signal_name": "imbalance",
+          "module": "signals.orderflow",
+          "function": "imbalance",
+          "params": {
+            "ratio_threshold": 1.7862
+          },
+          "column": "signal_buy_imbalance"
+        }
+      ],
+      "exit_rules": {
+        "stop_loss_type": "fixed_points",
+        "stop_loss_value": 31.3,
+        "take_profit_type": "fixed_points",
+        "take_profit_value": 232.1,
+        "trailing_stop": false,
+        "trailing_activation": 4.0,
+        "trailing_distance": 2.0,
+        "time_exit_minutes": null
+      },
+      "sizing_rules": {
+        "method": "fixed",
+        "fixed_contracts": 4,
+        "risk_pct": 0.01,
+        "atr_risk_multiple": 2.0
+      },
+      "primary_timeframe": "1m",
+      "require_all_entries": true
+    },
+    "fitness": 55124.01009128361,
+    "trades": 602,
+    "win_rate": 32.55813953488372,
+    "profit_factor": 1.7222323063325014,
+    "sharpe": 2.470987940324012,
+    "total_pnl": 73212.40000000157,
+    "max_drawdown": -4568.80000000025,
+    "avg_monthly": 7321.240000000149,
+    "max_monthly": 23160.40000000004,
+    "min_monthly": -2797.5999999998294,
+    "mc_median": 71291.780182571,
+    "mc_p_profit": 1.0,
+    "mc_5th": 45751.99496378717,
+    "mc_95th": 99654.15274004819
+  },
+  {
+    "name": "STOCHASTIC|IMBALANCE|max_8391d2",
+    "strategy": {
+      "name": "STOCHASTIC|IMBALANCE|max_8391d2",
+      "entry_signals": [
+        {
+          "signal_name": "stochastic",
+          "module": "signals.momentum",
+          "function": "stochastic",
+          "params": {
+            "k_period": 8,
+            "d_period": 2,
+            "overbought": 37.4109,
+            "oversold": 23.3806
+          },
+          "columns": {
+            "long": "entry_long_stoch",
+            "short": "entry_short_stoch"
+          }
+        }
+      ],
+      "entry_filters": [
+        {
+          "signal_name": "imbalance",
+          "module": "signals.orderflow",
+          "function": "imbalance",
+          "params": {
+            "ratio_threshold": 1.8065
+          },
+          "column": "signal_buy_imbalance"
+        }
+      ],
+      "exit_rules": {
+        "stop_loss_type": "fixed_points",
+        "stop_loss_value": 31.6,
+        "take_profit_type": "fixed_points",
+        "take_profit_value": 235.8,
+        "trailing_stop": false,
+        "trailing_activation": 4.0,
+        "trailing_distance": 2.0,
+        "time_exit_minutes": null
+      },
+      "sizing_rules": {
+        "method": "fixed",
+        "fixed_contracts": 4,
+        "risk_pct": 0.01,
+        "atr_risk_multiple": 2.0
+      },
+      "primary_timeframe": "1m",
+      "require_all_entries": true
+    },
+    "fitness": 53967.09468296699,
+    "trades": 646,
+    "win_rate": 31.424148606811148,
+    "profit_factor": 1.6760508786034913,
+    "sharpe": 2.4001262793694673,
+    "total_pnl": 75345.60000000444,
+    "max_drawdown": -4670.800000000047,
+    "avg_monthly": 6849.600000000396,
+    "max_monthly": 24658.800000000396,
+    "min_monthly": -2287.1999999996606,
+    "mc_median": 72736.08027502277,
+    "mc_p_profit": 1.0,
+    "mc_5th": 45525.686397989804,
+    "mc_95th": 102331.75883540479
+  },
+  {
+    "name": "STOCHASTIC|IMBALANCE|max_2c3db5",
+    "strategy": {
+      "name": "STOCHASTIC|IMBALANCE|max_2c3db5",
+      "entry_signals": [
+        {
+          "signal_name": "stochastic",
+          "module": "signals.momentum",
+          "function": "stochastic",
+          "params": {
+            "k_period": 8,
+            "d_period": 2,
+            "overbought": 36.053,
+            "oversold": 23.4461
+          },
+          "columns": {
+            "long": "entry_long_stoch",
+            "short": "entry_short_stoch"
+          }
+        }
+      ],
+      "entry_filters": [
+        {
+          "signal_name": "imbalance",
+          "module": "signals.orderflow",
+          "function": "imbalance",
+          "params": {
+            "ratio_threshold": 1.7177
+          },
+          "column": "signal_buy_imbalance"
+        }
+      ],
+      "exit_rules": {
+        "stop_loss_type": "fixed_points",
+        "stop_loss_value": 31.8,
+        "take_profit_type": "fixed_points",
+        "take_profit_value": 220.0,
+        "trailing_stop": false,
+        "trailing_activation": 4.0,
+        "trailing_distance": 2.0,
+        "time_exit_minutes": null
+      },
+      "sizing_rules": {
+        "method": "fixed",
+        "fixed_contracts": 3,
+        "risk_pct": 0.01,
+        "atr_risk_multiple": 2.0
+      },
+      "primary_timeframe": "1m",
+      "require_all_entries": true
+    },
+    "fitness": 53544.92817089016,
+    "trades": 811,
+    "win_rate": 31.56596794081381,
+    "profit_factor": 1.635736640127692,
+    "sharpe": 2.742131406041314,
+    "total_pnl": 67887.90000000228,
+    "max_drawdown": -3975.899999999441,
+    "avg_monthly": 5222.146153846329,
+    "max_monthly": 16955.400000000158,
+    "min_monthly": -627.5999999998862,
+    "mc_median": 64781.410187932895,
+    "mc_p_profit": 1.0,
+    "mc_5th": 42858.250510449165,
+    "mc_95th": 89398.97047143767
+  },
+  {
+    "name": "STOCHASTIC|IMBALANCE|breed_900682",
+    "strategy": {
+      "name": "STOCHASTIC|IMBALANCE|breed_900682",
+      "entry_signals": [
+        {
+          "signal_name": "stochastic",
+          "module": "signals.momentum",
+          "function": "stochastic",
+          "params": {
+            "k_period": 8,
+            "d_period": 2,
+            "overbought": 37.3493,
+            "oversold": 23.5006
+          },
+          "columns": {
+            "long": "entry_long_stoch",
+            "short": "entry_short_stoch"
+          }
+        }
+      ],
+      "entry_filters": [
+        {
+          "signal_name": "imbalance",
+          "module": "signals.orderflow",
+          "function": "imbalance",
+          "params": {
+            "ratio_threshold": 1.7888
+          },
+          "column": "signal_buy_imbalance"
+        }
+      ],
+      "exit_rules": {
+        "stop_loss_type": "fixed_points",
+        "stop_loss_value": 31.8,
+        "take_profit_type": "fixed_points",
+        "take_profit_value": 228.0,
+        "trailing_stop": false,
+        "trailing_activation": 4.0,
+        "trailing_distance": 2.0,
+        "time_exit_minutes": null
+      },
+      "sizing_rules": {
+        "method": "fixed",
+        "fixed_contracts": 4,
+        "risk_pct": 0.01,
+        "atr_risk_multiple": 2.0
+      },
+      "primary_timeframe": "1m",
+      "require_all_entries": true
+    },
+    "fitness": 53490.61825975127,
+    "trades": 603,
+    "win_rate": 32.33830845771145,
+    "profit_factor": 1.702851047323543,
+    "sharpe": 2.4823622445005737,
+    "total_pnl": 72478.00000000218,
+    "max_drawdown": -4708.800000000221,
+    "avg_monthly": 7247.8000000002085,
+    "max_monthly": 22038.000000000233,
+    "min_monthly": -2395.999999999835,
+    "mc_median": 70462.43651950537,
+    "mc_p_profit": 1.0,
+    "mc_5th": 43599.97323609236,
+    "mc_95th": 97566.32605882856
+  },
+  {
+    "name": "STOCHASTIC|IMBALANCE|max_55d4b6",
+    "strategy": {
+      "name": "STOCHASTIC|IMBALANCE|max_55d4b6",
+      "entry_signals": [
+        {
+          "signal_name": "stochastic",
+          "module": "signals.momentum",
+          "function": "stochastic",
+          "params": {
+            "k_period": 8,
+            "d_period": 2,
+            "overbought": 37.3493,
+            "oversold": 23.5006
+          },
+          "columns": {
+            "long": "entry_long_stoch",
+            "short": "entry_short_stoch"
+          }
+        }
+      ],
+      "entry_filters": [
+        {
+          "signal_name": "imbalance",
+          "module": "signals.orderflow",
+          "function": "imbalance",
+          "params": {
+            "ratio_threshold": 1.7888
+          },
+          "column": "signal_buy_imbalance"
+        }
+      ],
+      "exit_rules": {
+        "stop_loss_type": "fixed_points",
+        "stop_loss_value": 31.8,
+        "take_profit_type": "fixed_points",
+        "take_profit_value": 228.0,
+        "trailing_stop": false,
+        "trailing_activation": 4.0,
+        "trailing_distance": 2.0,
+        "time_exit_minutes": null
+      },
+      "sizing_rules": {
+        "method": "fixed",
+        "fixed_contracts": 4,
+        "risk_pct": 0.01,
+        "atr_risk_multiple": 2.0
+      },
+      "primary_timeframe": "1m",
+      "require_all_entries": true
+    },
+    "fitness": 53359.62088452275,
+    "trades": 603,
+    "win_rate": 32.33830845771145,
+    "profit_factor": 1.702851047323543,
+    "sharpe": 2.4823622445005737,
+    "total_pnl": 72478.00000000218,
+    "max_drawdown": -4708.800000000221,
+    "avg_monthly": 7247.8000000002085,
+    "max_monthly": 22038.000000000233,
+    "min_monthly": -2395.999999999835,
+    "mc_median": 70200.44176904835,
+    "mc_p_profit": 1.0,
+    "mc_5th": 44197.876785680506,
+    "mc_95th": 98198.91917044041
+  },
+  {
+    "name": "STOCHASTIC|IMBALANCE|max_8e1038",
+    "strategy": {
+      "name": "STOCHASTIC|IMBALANCE|max_8e1038",
+      "entry_signals": [
+        {
+          "signal_name": "stochastic",
+          "module": "signals.momentum",
+          "function": "stochastic",
+          "params": {
+            "k_period": 8,
+            "d_period": 2,
+            "overbought": 35.869,
+            "oversold": 23.6348
+          },
+          "columns": {
+            "long": "entry_long_stoch",
+            "short": "entry_short_stoch"
+          }
+        }
+      ],
+      "entry_filters": [
+        {
+          "signal_name": "imbalance",
+          "module": "signals.orderflow",
+          "function": "imbalance",
+          "params": {
+            "ratio_threshold": 1.7064
+          },
+          "column": "signal_buy_imbalance"
+        }
+      ],
+      "exit_rules": {
+        "stop_loss_type": "fixed_points",
+        "stop_loss_value": 31.6,
+        "take_profit_type": "fixed_points",
+        "take_profit_value": 221.7,
+        "trailing_stop": false,
+        "trailing_activation": 4.0,
+        "trailing_distance": 2.0,
+        "time_exit_minutes": null
+      },
+      "sizing_rules": {
+        "method": "fixed",
+        "fixed_contracts": 3,
+        "risk_pct": 0.01,
+        "atr_risk_multiple": 2.0
+      },
+      "primary_timeframe": "1m",
+      "require_all_entries": true
+    },
+    "fitness": 52957.567650752644,
+    "trades": 810,
+    "win_rate": 31.11111111111111,
+    "profit_factor": 1.6215962124155587,
+    "sharpe": 2.653021052850082,
+    "total_pnl": 66249.60000000491,
+    "max_drawdown": -3970.7999999999884,
+    "avg_monthly": 5096.1230769234535,
+    "max_monthly": 16988.40000000045,
+    "min_monthly": -596.3999999997728,
+    "mc_median": 64300.427609194885,
+    "mc_p_profit": 1.0,
+    "mc_5th": 42247.821528129054,
+    "mc_95th": 88013.7958540282
+  },
+  {
+    "name": "STOCHASTIC|IMBALANCE|max_b61ba2",
+    "strategy": {
+      "name": "STOCHASTIC|IMBALANCE|max_b61ba2",
+      "entry_signals": [
+        {
+          "signal_name": "stochastic",
+          "module": "signals.momentum",
+          "function": "stochastic",
+          "params": {
+            "k_period": 8,
+            "d_period": 2,
+            "overbought": 36.802,
+            "oversold": 23.2428
+          },
+          "columns": {
+            "long": "entry_long_stoch",
+            "short": "entry_short_stoch"
+          }
+        }
+      ],
+      "entry_filters": [
+        {
+          "signal_name": "imbalance",
+          "module": "signals.orderflow",
+          "function": "imbalance",
+          "params": {
+            "ratio_threshold": 1.8127
+          },
+          "column": "signal_buy_imbalance"
+        }
+      ],
+      "exit_rules": {
+        "stop_loss_type": "fixed_points",
+        "stop_loss_value": 32.7,
+        "take_profit_type": "fixed_points",
+        "take_profit_value": 222.1,
+        "trailing_stop": false,
+        "trailing_activation": 4.0,
+        "trailing_distance": 2.0,
+        "time_exit_minutes": null
+      },
+      "sizing_rules": {
+        "method": "fixed",
+        "fixed_contracts": 4,
+        "risk_pct": 0.01,
+        "atr_risk_multiple": 2.0
+      },
+      "primary_timeframe": "1m",
+      "require_all_entries": true
+    },
+    "fitness": 51519.19637950404,
+    "trades": 588,
+    "win_rate": 32.82312925170068,
+    "profit_factor": 1.6746446451531807,
+    "sharpe": 2.4388212375284244,
+    "total_pnl": 69048.79999999722,
+    "max_drawdown": -4616.400000000489,
+    "avg_monthly": 6904.879999999714,
+    "max_monthly": 21281.19999999954,
+    "min_monthly": -3039.6000000001604,
+    "mc_median": 68016.3127590199,
+    "mc_p_profit": 1.0,
+    "mc_5th": 42086.201960250524,
+    "mc_95th": 93691.00255999176
+  },
+  {
+    "name": "STOCHASTIC|IMBALANCE|max_988e60",
+    "strategy": {
+      "name": "STOCHASTIC|IMBALANCE|max_988e60",
+      "entry_signals": [
+        {
+          "signal_name": "stochastic",
+          "module": "signals.momentum",
+          "function": "stochastic",
+          "params": {
+            "k_period": 8,
+            "d_period": 2,
+            "overbought": 36.0468,
+            "oversold": 24.3131
+          },
+          "columns": {
+            "long": "entry_long_stoch",
+            "short": "entry_short_stoch"
+          }
+        }
+      ],
+      "entry_filters": [
+        {
+          "signal_name": "imbalance",
+          "module": "signals.orderflow",
+          "function": "imbalance",
+          "params": {
+            "ratio_threshold": 1.7497
+          },
+          "column": "signal_buy_imbalance"
+        }
+      ],
+      "exit_rules": {
+        "stop_loss_type": "fixed_points",
+        "stop_loss_value": 31.7,
+        "take_profit_type": "fixed_points",
+        "take_profit_value": 217.8,
+        "trailing_stop": false,
+        "trailing_activation": 4.0,
+        "trailing_distance": 2.0,
+        "time_exit_minutes": null
+      },
+      "sizing_rules": {
+        "method": "fixed",
+        "fixed_contracts": 3,
+        "risk_pct": 0.01,
+        "atr_risk_multiple": 2.0
+      },
+      "primary_timeframe": "1m",
+      "require_all_entries": true
+    },
+    "fitness": 49413.60605398143,
+    "trades": 822,
+    "win_rate": 31.143552311435524,
+    "profit_factor": 1.6290878748024062,
+    "sharpe": 2.7774752843997828,
+    "total_pnl": 68304.59999999731,
+    "max_drawdown": -4485.90000000014,
+    "avg_monthly": 5254.199999999792,
+    "max_monthly": 16639.199999999666,
+    "min_monthly": -981.6000000001176,
+    "mc_median": 66752.4428771979,
+    "mc_p_profit": 1.0,
+    "mc_5th": 42912.29494506176,
+    "mc_95th": 90151.21244985455
+  },
+  {
+    "name": "STOCHASTIC|IMBALANCE|breed_042175",
+    "strategy": {
+      "name": "STOCHASTIC|IMBALANCE|breed_042175",
+      "entry_signals": [
+        {
+          "signal_name": "stochastic",
+          "module": "signals.momentum",
+          "function": "stochastic",
+          "params": {
+            "k_period": 8,
+            "d_period": 2,
+            "overbought": 38.205,
+            "oversold": 23.7137
+          },
+          "columns": {
+            "long": "entry_long_stoch",
+            "short": "entry_short_stoch"
+          }
+        }
+      ],
+      "entry_filters": [
+        {
+          "signal_name": "imbalance",
+          "module": "signals.orderflow",
+          "function": "imbalance",
+          "params": {
+            "ratio_threshold": 1.7107
+          },
+          "column": "signal_buy_imbalance"
+        }
+      ],
+      "exit_rules": {
+        "stop_loss_type": "fixed_points",
+        "stop_loss_value": 33.5,
+        "take_profit_type": "fixed_points",
+        "take_profit_value": 216.5,
+        "trailing_stop": false,
+        "trailing_activation": 4.0,
+        "trailing_distance": 2.0,
+        "time_exit_minutes": null
+      },
+      "sizing_rules": {
+        "method": "fixed",
+        "fixed_contracts": 5,
+        "risk_pct": 0.01,
+        "atr_risk_multiple": 2.0
+      },
+      "primary_timeframe": "1m",
+      "require_all_entries": true
+    },
+    "fitness": 48795.46561622726,
+    "trades": 420,
+    "win_rate": 32.61904761904762,
+    "profit_factor": 1.6283496037916312,
+    "sharpe": 3.573044450220974,
+    "total_pnl": 58797.5,
+    "max_drawdown": -4503.5,
+    "avg_monthly": 7349.6875,
+    "max_monthly": 25265.0,
+    "min_monthly": -2364.0,
+    "mc_median": 57790.80623245452,
+    "mc_p_profit": 1.0,
+    "mc_5th": 30306.988155747815,
+    "mc_95th": 86804.57787437482
+  },
+  {
+    "name": "STOCHASTIC|IMBALANCE|breed_60709d",
+    "strategy": {
+      "name": "STOCHASTIC|IMBALANCE|breed_60709d",
+      "entry_signals": [
+        {
+          "signal_name": "stochastic",
+          "module": "signals.momentum",
+          "function": "stochastic",
+          "params": {
+            "k_period": 8,
+            "d_period": 2,
+            "overbought": 35.869,
+            "oversold": 23.6348
+          },
+          "columns": {
+            "long": "entry_long_stoch",
+            "short": "entry_short_stoch"
+          }
+        }
+      ],
+      "entry_filters": [
+        {
+          "signal_name": "imbalance",
+          "module": "signals.orderflow",
+          "function": "imbalance",
+          "params": {
+            "ratio_threshold": 1.7064
+          },
+          "column": "signal_buy_imbalance"
+        }
+      ],
+      "exit_rules": {
+        "stop_loss_type": "fixed_points",
+        "stop_loss_value": 33.5,
+        "take_profit_type": "fixed_points",
+        "take_profit_value": 216.5,
+        "trailing_stop": false,
+        "trailing_activation": 4.0,
+        "trailing_distance": 2.0,
+        "time_exit_minutes": null
+      },
+      "sizing_rules": {
+        "method": "fixed",
+        "fixed_contracts": 5,
+        "risk_pct": 0.01,
+        "atr_risk_multiple": 2.0
+      },
+      "primary_timeframe": "1m",
+      "require_all_entries": true
+    },
+    "fitness": 48791.53105273397,
+    "trades": 419,
+    "win_rate": 32.69689737470167,
+    "profit_factor": 1.6344455111530642,
+    "sharpe": 3.5935707691988528,
+    "total_pnl": 59146.5,
+    "max_drawdown": -4503.5,
+    "avg_monthly": 7393.3125,
+    "max_monthly": 25265.0,
+    "min_monthly": -2364.0,
+    "mc_median": 57521.187105467936,
+    "mc_p_profit": 1.0,
+    "mc_5th": 31131.415101751976,
+    "mc_95th": 85965.85263719228
+  },
+  {
+    "name": "STOCHASTIC|IMBALANCE|max_f554ec",
+    "strategy": {
+      "name": "STOCHASTIC|IMBALANCE|max_f554ec",
+      "entry_signals": [
+        {
+          "signal_name": "stochastic",
+          "module": "signals.momentum",
+          "function": "stochastic",
+          "params": {
+            "k_period": 8,
+            "d_period": 2,
+            "overbought": 38.205,
+            "oversold": 23.7137
+          },
+          "columns": {
+            "long": "entry_long_stoch",
+            "short": "entry_short_stoch"
+          }
+        }
+      ],
+      "entry_filters": [
+        {
+          "signal_name": "imbalance",
+          "module": "signals.orderflow",
+          "function": "imbalance",
+          "params": {
+            "ratio_threshold": 1.7107
+          },
+          "column": "signal_buy_imbalance"
+        }
+      ],
+      "exit_rules": {
+        "stop_loss_type": "fixed_points",
+        "stop_loss_value": 33.5,
+        "take_profit_type": "fixed_points",
+        "take_profit_value": 216.5,
+        "trailing_stop": false,
+        "trailing_activation": 4.0,
+        "trailing_distance": 2.0,
+        "time_exit_minutes": null
+      },
+      "sizing_rules": {
+        "method": "fixed",
+        "fixed_contracts": 5,
+        "risk_pct": 0.01,
+        "atr_risk_multiple": 2.0
+      },
+      "primary_timeframe": "1m",
+      "require_all_entries": true
+    },
+    "fitness": 48626.42143635076,
+    "trades": 420,
+    "win_rate": 32.61904761904762,
+    "profit_factor": 1.6283496037916312,
+    "sharpe": 3.573044450220974,
+    "total_pnl": 58797.5,
+    "max_drawdown": -4503.5,
+    "avg_monthly": 7349.6875,
+    "max_monthly": 25265.0,
+    "min_monthly": -2364.0,
+    "mc_median": 57452.71787270153,
+    "mc_p_profit": 1.0,
+    "mc_5th": 28821.695998172883,
+    "mc_95th": 85655.80513838984
+  },
+  {
+    "name": "STOCHASTIC|IMBALANCE|breed_955b49",
+    "strategy": {
+      "name": "STOCHASTIC|IMBALANCE|breed_955b49",
+      "entry_signals": [
+        {
+          "signal_name": "stochastic",
+          "module": "signals.momentum",
+          "function": "stochastic",
+          "params": {
+            "k_period": 8,
+            "d_period": 2,
+            "overbought": 37.4325,
+            "oversold": 23.9275
+          },
+          "columns": {
+            "long": "entry_long_stoch",
+            "short": "entry_short_stoch"
+          }
+        }
+      ],
+      "entry_filters": [
+        {
+          "signal_name": "imbalance",
+          "module": "signals.orderflow",
+          "function": "imbalance",
+          "params": {
+            "ratio_threshold": 1.6844
+          },
+          "column": "signal_buy_imbalance"
+        }
+      ],
+      "exit_rules": {
+        "stop_loss_type": "fixed_points",
+        "stop_loss_value": 33.0,
+        "take_profit_type": "fixed_points",
+        "take_profit_value": 216.3,
+        "trailing_stop": false,
+        "trailing_activation": 4.0,
+        "trailing_distance": 2.0,
+        "time_exit_minutes": null
+      },
+      "sizing_rules": {
+        "method": "fixed",
+        "fixed_contracts": 5,
+        "risk_pct": 0.01,
+        "atr_risk_multiple": 2.0
+      },
+      "primary_timeframe": "1m",
+      "require_all_entries": true
+    },
+    "fitness": 48581.00682969409,
+    "trades": 425,
+    "win_rate": 32.470588235294116,
+    "profit_factor": 1.626030188719397,
+    "sharpe": 3.616428446794124,
+    "total_pnl": 58831.49999999972,
+    "max_drawdown": -4502.5,
+    "avg_monthly": 7353.937499999965,
+    "max_monthly": 23657.999999999905,
+    "min_monthly": -2345.0000000000073,
+    "mc_median": 57278.388659388394,
+    "mc_p_profit": 1.0,
+    "mc_5th": 30313.888431588526,
+    "mc_95th": 86562.29134653544
+  },
+  {
+    "name": "STOCHASTIC|IMBALANCE|breed_042175",
+    "strategy": {
+      "name": "STOCHASTIC|IMBALANCE|breed_042175",
+      "entry_signals": [
+        {
+          "signal_name": "stochastic",
+          "module": "signals.momentum",
+          "function": "stochastic",
+          "params": {
+            "k_period": 8,
+            "d_period": 2,
+            "overbought": 38.205,
+            "oversold": 23.7137
+          },
+          "columns": {
+            "long": "entry_long_stoch",
+            "short": "entry_short_stoch"
+          }
+        }
+      ],
+      "entry_filters": [
+        {
+          "signal_name": "imbalance",
+          "module": "signals.orderflow",
+          "function": "imbalance",
+          "params": {
+            "ratio_threshold": 1.7107
+          },
+          "column": "signal_buy_imbalance"
+        }
+      ],
+      "exit_rules": {
+        "stop_loss_type": "fixed_points",
+        "stop_loss_value": 33.5,
+        "take_profit_type": "fixed_points",
+        "take_profit_value": 216.5,
+        "trailing_stop": false,
+        "trailing_activation": 4.0,
+        "trailing_distance": 2.0,
+        "time_exit_minutes": null
+      },
+      "sizing_rules": {
+        "method": "fixed",
+        "fixed_contracts": 5,
+        "risk_pct": 0.01,
+        "atr_risk_multiple": 2.0
+      },
+      "primary_timeframe": "1m",
+      "require_all_entries": true
+    },
+    "fitness": 48564.112604915485,
+    "trades": 420,
+    "win_rate": 32.61904761904762,
+    "profit_factor": 1.6283496037916312,
+    "sharpe": 3.573044450220974,
+    "total_pnl": 58797.5,
+    "max_drawdown": -4503.5,
+    "avg_monthly": 7349.6875,
+    "max_monthly": 25265.0,
+    "min_monthly": -2364.0,
+    "mc_median": 57329.60020983097,
+    "mc_p_profit": 0.9995,
+    "mc_5th": 30453.7481618785,
+    "mc_95th": 86005.77149455267
+  },
+  {
+    "name": "STOCHASTIC|IMBALANCE|breed_e8df47",
+    "strategy": {
+      "name": "STOCHASTIC|IMBALANCE|breed_e8df47",
+      "entry_signals": [
+        {
+          "signal_name": "stochastic",
+          "module": "signals.momentum",
+          "function": "stochastic",
+          "params": {
+            "k_period": 8,
+            "d_period": 2,
+            "overbought": 38.205,
+            "oversold": 23.7137
+          },
+          "columns": {
+            "long": "entry_long_stoch",
+            "short": "entry_short_stoch"
+          }
+        }
+      ],
+      "entry_filters": [
+        {
+          "signal_name": "imbalance",
+          "module": "signals.orderflow",
+          "function": "imbalance",
+          "params": {
+            "ratio_threshold": 1.7107
+          },
+          "column": "signal_buy_imbalance"
+        }
+      ],
+      "exit_rules": {
+        "stop_loss_type": "fixed_points",
+        "stop_loss_value": 33.5,
+        "take_profit_type": "fixed_points",
+        "take_profit_value": 216.5,
+        "trailing_stop": false,
+        "trailing_activation": 4.0,
+        "trailing_distance": 2.0,
+        "time_exit_minutes": null
+      },
+      "sizing_rules": {
+        "method": "fixed",
+        "fixed_contracts": 5,
+        "risk_pct": 0.01,
+        "atr_risk_multiple": 2.0
+      },
+      "primary_timeframe": "1m",
+      "require_all_entries": true
+    },
+    "fitness": 48145.569631521634,
+    "trades": 420,
+    "win_rate": 32.61904761904762,
+    "profit_factor": 1.6283496037916312,
+    "sharpe": 3.573044450220974,
+    "total_pnl": 58797.5,
+    "max_drawdown": -4503.5,
+    "avg_monthly": 7349.6875,
+    "max_monthly": 25265.0,
+    "min_monthly": -2364.0,
+    "mc_median": 56491.01426304327,
+    "mc_p_profit": 1.0,
+    "mc_5th": 30517.723685566994,
+    "mc_95th": 86074.88493561835
+  },
+  {
+    "name": "STOCHASTIC|IMBALANCE|breed_488111",
+    "strategy": {
+      "name": "STOCHASTIC|IMBALANCE|breed_488111",
+      "entry_signals": [
+        {
+          "signal_name": "stochastic",
+          "module": "signals.momentum",
+          "function": "stochastic",
+          "params": {
+            "k_period": 8,
+            "d_period": 2,
+            "overbought": 37.4325,
+            "oversold": 23.9275
+          },
+          "columns": {
+            "long": "entry_long_stoch",
+            "short": "entry_short_stoch"
+          }
+        }
+      ],
+      "entry_filters": [
+        {
+          "signal_name": "imbalance",
+          "module": "signals.orderflow",
+          "function": "imbalance",
+          "params": {
+            "ratio_threshold": 1.6844
+          },
+          "column": "signal_buy_imbalance"
+        }
+      ],
+      "exit_rules": {
+        "stop_loss_type": "fixed_points",
+        "stop_loss_value": 32.7,
+        "take_profit_type": "fixed_points",
+        "take_profit_value": 214.4,
+        "trailing_stop": false,
+        "trailing_activation": 4.0,
+        "trailing_distance": 2.0,
+        "time_exit_minutes": null
+      },
+      "sizing_rules": {
+        "method": "fixed",
+        "fixed_contracts": 5,
+        "risk_pct": 0.01,
+        "atr_risk_multiple": 2.0
+      },
+      "primary_timeframe": "1m",
+      "require_all_entries": true
+    },
+    "fitness": 45875.26566944014,
+    "trades": 429,
+    "win_rate": 32.400932400932405,
+    "profit_factor": 1.630044426515755,
+    "sharpe": 3.710560061604547,
+    "total_pnl": 59350.499999998596,
+    "max_drawdown": -4798.5,
+    "avg_monthly": 7418.8124999998245,
+    "max_monthly": 23967.499999999913,
+    "min_monthly": -2989.0000000001382,
+    "mc_median": 58685.656338881614,
+    "mc_p_profit": 1.0,
+    "mc_5th": 31487.66853201609,
+    "mc_95th": 85964.02373551592
+  },
+  {
+    "name": "STOCHASTIC|IMBALANCE|breed_ce5223",
+    "strategy": {
+      "name": "STOCHASTIC|IMBALANCE|breed_ce5223",
+      "entry_signals": [
+        {
+          "signal_name": "stochastic",
+          "module": "signals.momentum",
+          "function": "stochastic",
+          "params": {
+            "k_period": 8,
+            "d_period": 2,
+            "overbought": 37.4325,
+            "oversold": 23.9275
+          },
+          "columns": {
+            "long": "entry_long_stoch",
+            "short": "entry_short_stoch"
+          }
+        }
+      ],
+      "entry_filters": [
+        {
+          "signal_name": "imbalance",
+          "module": "signals.orderflow",
+          "function": "imbalance",
+          "params": {
+            "ratio_threshold": 1.6844
+          },
+          "column": "signal_buy_imbalance"
+        }
+      ],
+      "exit_rules": {
+        "stop_loss_type": "fixed_points",
+        "stop_loss_value": 32.7,
+        "take_profit_type": "fixed_points",
+        "take_profit_value": 214.4,
+        "trailing_stop": false,
+        "trailing_activation": 4.0,
+        "trailing_distance": 2.0,
+        "time_exit_minutes": null
+      },
+      "sizing_rules": {
+        "method": "fixed",
+        "fixed_contracts": 5,
+        "risk_pct": 0.01,
+        "atr_risk_multiple": 2.0
+      },
+      "primary_timeframe": "1m",
+      "require_all_entries": true
+    },
+    "fitness": 45264.88669099513,
+    "trades": 429,
+    "win_rate": 32.400932400932405,
+    "profit_factor": 1.630044426515755,
+    "sharpe": 3.710560061604547,
+    "total_pnl": 59350.499999998596,
+    "max_drawdown": -4798.5,
+    "avg_monthly": 7418.8124999998245,
+    "max_monthly": 23967.499999999913,
+    "min_monthly": -2989.0000000001382,
+    "mc_median": 57464.8983819916,
+    "mc_p_profit": 1.0,
+    "mc_5th": 32625.110203100296,
+    "mc_95th": 85474.65614526371
+  },
+  {
+    "name": "STOCHASTIC|IMBALANCE|max_feda13",
+    "strategy": {
+      "name": "STOCHASTIC|IMBALANCE|max_feda13",
+      "entry_signals": [
+        {
+          "signal_name": "stochastic",
+          "module": "signals.momentum",
+          "function": "stochastic",
+          "params": {
+            "k_period": 8,
+            "d_period": 2,
+            "overbought": 37.0667,
+            "oversold": 24.1717
+          },
+          "columns": {
+            "long": "entry_long_stoch",
+            "short": "entry_short_stoch"
+          }
+        }
+      ],
+      "entry_filters": [
+        {
+          "signal_name": "imbalance",
+          "module": "signals.orderflow",
+          "function": "imbalance",
+          "params": {
+            "ratio_threshold": 1.78
+          },
+          "column": "signal_buy_imbalance"
+        }
+      ],
+      "exit_rules": {
+        "stop_loss_type": "fixed_points",
+        "stop_loss_value": 32.6,
+        "take_profit_type": "fixed_points",
+        "take_profit_value": 216.5,
+        "trailing_stop": false,
+        "trailing_activation": 4.0,
+        "trailing_distance": 2.0,
+        "time_exit_minutes": null
+      },
+      "sizing_rules": {
+        "method": "fixed",
+        "fixed_contracts": 5,
+        "risk_pct": 0.01,
+        "atr_risk_multiple": 2.0
+      },
+      "primary_timeframe": "1m",
+      "require_all_entries": true
+    },
+    "fitness": 44572.47702505245,
+    "trades": 423,
+    "win_rate": 31.914893617021278,
+    "profit_factor": 1.6263652226363743,
+    "sharpe": 3.60356785036995,
+    "total_pnl": 58153.000000003856,
+    "max_drawdown": -4782.5,
+    "avg_monthly": 7269.125000000482,
+    "max_monthly": 22215.000000000553,
+    "min_monthly": -3218.9999999995925,
+    "mc_median": 57118.204050101194,
+    "mc_p_profit": 1.0,
+    "mc_5th": 30072.712215753563,
+    "mc_95th": 85685.3225934919
+  },
+  {
+    "name": "STOCHASTIC|IMBALANCE|max_3b31f8",
+    "strategy": {
+      "name": "STOCHASTIC|IMBALANCE|max_3b31f8",
+      "entry_signals": [
+        {
+          "signal_name": "stochastic",
+          "module": "signals.momentum",
+          "function": "stochastic",
+          "params": {
+            "k_period": 8,
+            "d_period": 2,
+            "overbought": 37.9332,
+            "oversold": 23.5707
+          },
+          "columns": {
+            "long": "entry_long_stoch",
+            "short": "entry_short_stoch"
+          }
+        }
+      ],
+      "entry_filters": [
+        {
+          "signal_name": "imbalance",
+          "module": "signals.orderflow",
+          "function": "imbalance",
+          "params": {
+            "ratio_threshold": 1.8437
+          },
+          "column": "signal_buy_imbalance"
+        }
+      ],
+      "exit_rules": {
+        "stop_loss_type": "fixed_points",
+        "stop_loss_value": 31.7,
+        "take_profit_type": "fixed_points",
+        "take_profit_value": 242.5,
+        "trailing_stop": false,
+        "trailing_activation": 4.0,
+        "trailing_distance": 2.0,
+        "time_exit_minutes": null
+      },
+      "sizing_rules": {
+        "method": "fixed",
+        "fixed_contracts": 3,
+        "risk_pct": 0.01,
+        "atr_risk_multiple": 2.0
+      },
+      "primary_timeframe": "1m",
+      "require_all_entries": true
+    },
+    "fitness": 44556.78757603347,
+    "trades": 789,
+    "win_rate": 30.418250950570343,
+    "profit_factor": 1.6183455316421305,
+    "sharpe": 2.4584479067574727,
+    "total_pnl": 64833.899999997746,
+    "max_drawdown": -4497.300000000134,
+    "avg_monthly": 4987.223076922902,
+    "max_monthly": 18073.199999999742,
+    "min_monthly": -2636.7000000001426,
+    "mc_median": 62948.09822899403,
+    "mc_p_profit": 1.0,
+    "mc_5th": 40134.46042248738,
+    "mc_95th": 85576.64380109723
+  },
+  {
+    "name": "STOCHASTIC|IMBALANCE|max_9c6cd7",
+    "strategy": {
+      "name": "STOCHASTIC|IMBALANCE|max_9c6cd7",
+      "entry_signals": [
+        {
+          "signal_name": "stochastic",
+          "module": "signals.momentum",
+          "function": "stochastic",
+          "params": {
+            "k_period": 8,
+            "d_period": 2,
+            "overbought": 37.9715,
+            "oversold": 23.9256
+          },
+          "columns": {
+            "long": "entry_long_stoch",
+            "short": "entry_short_stoch"
+          }
+        }
+      ],
+      "entry_filters": [
+        {
+          "signal_name": "imbalance",
+          "module": "signals.orderflow",
+          "function": "imbalance",
+          "params": {
+            "ratio_threshold": 1.7433
+          },
+          "column": "signal_buy_imbalance"
+        }
+      ],
+      "exit_rules": {
+        "stop_loss_type": "fixed_points",
+        "stop_loss_value": 33.3,
+        "take_profit_type": "fixed_points",
+        "take_profit_value": 216.2,
+        "trailing_stop": false,
+        "trailing_activation": 4.0,
+        "trailing_distance": 2.0,
+        "time_exit_minutes": null
+      },
+      "sizing_rules": {
+        "method": "fixed",
+        "fixed_contracts": 5,
+        "risk_pct": 0.01,
+        "atr_risk_multiple": 2.0
+      },
+      "primary_timeframe": "1m",
+      "require_all_entries": true
+    },
+    "fitness": 44477.606548378724,
+    "trades": 421,
+    "win_rate": 32.304038004750595,
+    "profit_factor": 1.6222517929479525,
+    "sharpe": 3.5347455802032086,
+    "total_pnl": 58218.50000000218,
+    "max_drawdown": -4822.5,
+    "avg_monthly": 7277.312500000273,
+    "max_monthly": 23460.00000000037,
+    "min_monthly": -2677.9999999998545,
+    "mc_median": 56598.83809675551,
+    "mc_p_profit": 0.9995,
+    "mc_5th": 30342.34671017323,
+    "mc_95th": 85597.04441109061
+  },
+  {
+    "name": "STOCHASTIC|IMBALANCE|max_b9db01",
+    "strategy": {
+      "name": "STOCHASTIC|IMBALANCE|max_b9db01",
+      "entry_signals": [
+        {
+          "signal_name": "stochastic",
+          "module": "signals.momentum",
+          "function": "stochastic",
+          "params": {
+            "k_period": 8,
+            "d_period": 2,
+            "overbought": 37.6501,
+            "oversold": 23.5294
+          },
+          "columns": {
+            "long": "entry_long_stoch",
+            "short": "entry_short_stoch"
+          }
+        }
+      ],
+      "entry_filters": [
+        {
+          "signal_name": "imbalance",
+          "module": "signals.orderflow",
+          "function": "imbalance",
+          "params": {
+            "ratio_threshold": 1.7337
+          },
+          "column": "signal_buy_imbalance"
+        }
+      ],
+      "exit_rules": {
+        "stop_loss_type": "fixed_points",
+        "stop_loss_value": 33.0,
+        "take_profit_type": "fixed_points",
+        "take_profit_value": 216.3,
+        "trailing_stop": false,
+        "trailing_activation": 4.0,
+        "trailing_distance": 2.0,
+        "time_exit_minutes": null
+      },
+      "sizing_rules": {
+        "method": "fixed",
+        "fixed_contracts": 5,
+        "risk_pct": 0.01,
+        "atr_risk_multiple": 2.0
+      },
+      "primary_timeframe": "1m",
+      "require_all_entries": true
+    },
+    "fitness": 44133.43721055995,
+    "trades": 425,
+    "win_rate": 31.76470588235294,
+    "profit_factor": 1.5747442252926875,
+    "sharpe": 3.3178603320026063,
+    "total_pnl": 54491.49999999972,
+    "max_drawdown": -4502.5,
+    "avg_monthly": 6811.437499999965,
+    "max_monthly": 22877.999999999905,
+    "min_monthly": -2345.0000000000073,
+    "mc_median": 52888.24942112011,
+    "mc_p_profit": 1.0,
+    "mc_5th": 27794.118432205458,
+    "mc_95th": 81175.20853060653
+  },
+  {
+    "name": "STOCHASTIC|IMBALANCE|max_71d40b",
+    "strategy": {
+      "name": "STOCHASTIC|IMBALANCE|max_71d40b",
+      "entry_signals": [
+        {
+          "signal_name": "stochastic",
+          "module": "signals.momentum",
+          "function": "stochastic",
+          "params": {
+            "k_period": 8,
+            "d_period": 2,
+            "overbought": 35.9243,
+            "oversold": 23.095
+          },
+          "columns": {
+            "long": "entry_long_stoch",
+            "short": "entry_short_stoch"
+          }
+        }
+      ],
+      "entry_filters": [
+        {
+          "signal_name": "imbalance",
+          "module": "signals.orderflow",
+          "function": "imbalance",
+          "params": {
+            "ratio_threshold": 1.8117
+          },
+          "column": "signal_buy_imbalance"
+        }
+      ],
+      "exit_rules": {
+        "stop_loss_type": "fixed_points",
+        "stop_loss_value": 31.7,
+        "take_profit_type": "fixed_points",
+        "take_profit_value": 222.2,
+        "trailing_stop": false,
+        "trailing_activation": 4.0,
+        "trailing_distance": 2.0,
+        "time_exit_minutes": null
+      },
+      "sizing_rules": {
+        "method": "fixed",
+        "fixed_contracts": 3,
+        "risk_pct": 0.01,
+        "atr_risk_multiple": 2.0
+      },
+      "primary_timeframe": "1m",
+      "require_all_entries": true
+    },
+    "fitness": 43291.85894582562,
+    "trades": 793,
+    "win_rate": 30.51702395964691,
+    "profit_factor": 1.566645629445986,
+    "sharpe": 2.394706323470089,
+    "total_pnl": 59527.199999998054,
+    "max_drawdown": -4298.700000000128,
+    "avg_monthly": 4579.015384615235,
+    "max_monthly": 16555.79999999982,
+    "min_monthly": -2167.800000000128,
+    "mc_median": 57188.45635319341,
+    "mc_p_profit": 1.0,
+    "mc_5th": 34620.9822850954,
+    "mc_95th": 80619.13444626838
+  },
+  {
+    "name": "STOCHASTIC|IMBALANCE|max_9bfa74",
+    "strategy": {
+      "name": "STOCHASTIC|IMBALANCE|max_9bfa74",
+      "entry_signals": [
+        {
+          "signal_name": "stochastic",
+          "module": "signals.momentum",
+          "function": "stochastic",
+          "params": {
+            "k_period": 8,
+            "d_period": 2,
+            "overbought": 35.1174,
+            "oversold": 23.2039
+          },
+          "columns": {
+            "long": "entry_long_stoch",
+            "short": "entry_short_stoch"
+          }
+        }
+      ],
+      "entry_filters": [
+        {
+          "signal_name": "imbalance",
+          "module": "signals.orderflow",
+          "function": "imbalance",
+          "params": {
+            "ratio_threshold": 1.7523
+          },
+          "column": "signal_buy_imbalance"
+        }
+      ],
+      "exit_rules": {
+        "stop_loss_type": "fixed_points",
+        "stop_loss_value": 30.7,
+        "take_profit_type": "fixed_points",
+        "take_profit_value": 223.3,
+        "trailing_stop": false,
+        "trailing_activation": 4.0,
+        "trailing_distance": 2.0,
+        "time_exit_minutes": null
+      },
+      "sizing_rules": {
+        "method": "fixed",
+        "fixed_contracts": 3,
+        "risk_pct": 0.01,
+        "atr_risk_multiple": 2.0
+      },
+      "primary_timeframe": "1m",
+      "require_all_entries": true
+    },
+    "fitness": 41931.62725042779,
+    "trades": 611,
+    "win_rate": 31.914893617021278,
+    "profit_factor": 1.7038668758631885,
+    "sharpe": 2.498935868197843,
+    "total_pnl": 53968.49999999806,
+    "max_drawdown": -4537.800000000163,
+    "avg_monthly": 5396.849999999804,
+    "max_monthly": 15531.899999999654,
+    "min_monthly": -1151.1000000001177,
+    "mc_median": 52540.35450086025,
+    "mc_p_profit": 1.0,
+    "mc_5th": 33235.958172200146,
+    "mc_95th": 72856.13239795576
+  },
+  {
+    "name": "STOCHASTIC|IMBALANCE|breed_23f33a",
+    "strategy": {
+      "name": "STOCHASTIC|IMBALANCE|breed_23f33a",
+      "entry_signals": [
+        {
+          "signal_name": "stochastic",
+          "module": "signals.momentum",
+          "function": "stochastic",
+          "params": {
+            "k_period": 8,
+            "d_period": 2,
+            "overbought": 37.4325,
+            "oversold": 23.9275
+          },
+          "columns": {
+            "long": "entry_long_stoch",
+            "short": "entry_short_stoch"
+          }
+        }
+      ],
+      "entry_filters": [
+        {
+          "signal_name": "imbalance",
+          "module": "signals.orderflow",
+          "function": "imbalance",
+          "params": {
+            "ratio_threshold": 1.6844
+          },
+          "column": "signal_buy_imbalance"
+        }
+      ],
+      "exit_rules": {
+        "stop_loss_type": "fixed_points",
+        "stop_loss_value": 31.9,
+        "take_profit_type": "fixed_points",
+        "take_profit_value": 232.8,
+        "trailing_stop": false,
+        "trailing_activation": 4.0,
+        "trailing_distance": 2.0,
+        "time_exit_minutes": null
+      },
+      "sizing_rules": {
+        "method": "fixed",
+        "fixed_contracts": 5,
+        "risk_pct": 0.01,
+        "atr_risk_multiple": 2.0
+      },
+      "primary_timeframe": "1m",
+      "require_all_entries": true
+    },
+    "fitness": 40775.943805116985,
+    "trades": 356,
+    "win_rate": 31.46067415730337,
+    "profit_factor": 1.6044579850531804,
+    "sharpe": 4.463527309482781,
+    "total_pnl": 46425.999999996544,
+    "max_drawdown": -4660.5,
+    "avg_monthly": 6632.285714285221,
+    "max_monthly": 16268.499999999207,
+    "min_monthly": -1072.0000000003783,
+    "mc_median": 45543.74475309484,
+    "mc_p_profit": 0.999,
+    "mc_5th": 20374.370416381746,
+    "mc_95th": 69611.64531688827
+  },
+  {
+    "name": "STOCHASTIC|IMBALANCE|breed_4db8ff",
+    "strategy": {
+      "name": "STOCHASTIC|IMBALANCE|breed_4db8ff",
+      "entry_signals": [
+        {
+          "signal_name": "stochastic",
+          "module": "signals.momentum",
+          "function": "stochastic",
+          "params": {
+            "k_period": 8,
+            "d_period": 2,
+            "overbought": 37.4325,
+            "oversold": 23.9275
+          },
+          "columns": {
+            "long": "entry_long_stoch",
+            "short": "entry_short_stoch"
+          }
+        }
+      ],
+      "entry_filters": [
+        {
+          "signal_name": "imbalance",
+          "module": "signals.orderflow",
+          "function": "imbalance",
+          "params": {
+            "ratio_threshold": 1.6844
+          },
+          "column": "signal_buy_imbalance"
+        }
+      ],
+      "exit_rules": {
+        "stop_loss_type": "fixed_points",
+        "stop_loss_value": 31.9,
+        "take_profit_type": "fixed_points",
+        "take_profit_value": 232.8,
+        "trailing_stop": false,
+        "trailing_activation": 4.0,
+        "trailing_distance": 2.0,
+        "time_exit_minutes": null
+      },
+      "sizing_rules": {
+        "method": "fixed",
+        "fixed_contracts": 5,
+        "risk_pct": 0.01,
+        "atr_risk_multiple": 2.0
+      },
+      "primary_timeframe": "1m",
+      "require_all_entries": true
+    },
+    "fitness": 40773.14863967854,
+    "trades": 356,
+    "win_rate": 31.46067415730337,
+    "profit_factor": 1.6044579850531804,
+    "sharpe": 4.463527309482781,
+    "total_pnl": 46425.999999996544,
+    "max_drawdown": -4660.5,
+    "avg_monthly": 6632.285714285221,
+    "max_monthly": 16268.499999999207,
+    "min_monthly": -1072.0000000003783,
+    "mc_median": 45536.65442221795,
+    "mc_p_profit": 0.9995,
+    "mc_5th": 21747.47117049151,
+    "mc_95th": 69019.41036854089
+  },
+  {
+    "name": "STOCHASTIC|IMBALANCE|breed_8b4977",
+    "strategy": {
+      "name": "STOCHASTIC|IMBALANCE|breed_8b4977",
+      "entry_signals": [
+        {
+          "signal_name": "stochastic",
+          "module": "signals.momentum",
+          "function": "stochastic",
+          "params": {
+            "k_period": 8,
+            "d_period": 2,
+            "overbought": 37.4325,
+            "oversold": 23.9275
+          },
+          "columns": {
+            "long": "entry_long_stoch",
+            "short": "entry_short_stoch"
+          }
+        }
+      ],
+      "entry_filters": [
+        {
+          "signal_name": "imbalance",
+          "module": "signals.orderflow",
+          "function": "imbalance",
+          "params": {
+            "ratio_threshold": 1.6844
+          },
+          "column": "signal_buy_imbalance"
+        }
+      ],
+      "exit_rules": {
+        "stop_loss_type": "fixed_points",
+        "stop_loss_value": 31.9,
+        "take_profit_type": "fixed_points",
+        "take_profit_value": 232.8,
+        "trailing_stop": false,
+        "trailing_activation": 4.0,
+        "trailing_distance": 2.0,
+        "time_exit_minutes": null
+      },
+      "sizing_rules": {
+        "method": "fixed",
+        "fixed_contracts": 5,
+        "risk_pct": 0.01,
+        "atr_risk_multiple": 2.0
+      },
+      "primary_timeframe": "1m",
+      "require_all_entries": true
+    },
+    "fitness": 40754.81373085376,
+    "trades": 356,
+    "win_rate": 31.46067415730337,
+    "profit_factor": 1.6044579850531804,
+    "sharpe": 4.463527309482781,
+    "total_pnl": 46425.999999996544,
+    "max_drawdown": -4660.5,
+    "avg_monthly": 6632.285714285221,
+    "max_monthly": 16268.499999999207,
+    "min_monthly": -1072.0000000003783,
+    "mc_median": 45498.484604568395,
+    "mc_p_profit": 1.0,
+    "mc_5th": 21552.01566800558,
+    "mc_95th": 70602.99362207997
+  },
+  {
+    "name": "STOCHASTIC|IMBALANCE|breed_4db8ff",
+    "strategy": {
+      "name": "STOCHASTIC|IMBALANCE|breed_4db8ff",
+      "entry_signals": [
+        {
+          "signal_name": "stochastic",
+          "module": "signals.momentum",
+          "function": "stochastic",
+          "params": {
+            "k_period": 8,
+            "d_period": 2,
+            "overbought": 37.4325,
+            "oversold": 23.9275
+          },
+          "columns": {
+            "long": "entry_long_stoch",
+            "short": "entry_short_stoch"
+          }
+        }
+      ],
+      "entry_filters": [
+        {
+          "signal_name": "imbalance",
+          "module": "signals.orderflow",
+          "function": "imbalance",
+          "params": {
+            "ratio_threshold": 1.6844
+          },
+          "column": "signal_buy_imbalance"
+        }
+      ],
+      "exit_rules": {
+        "stop_loss_type": "fixed_points",
+        "stop_loss_value": 31.9,
+        "take_profit_type": "fixed_points",
+        "take_profit_value": 232.8,
+        "trailing_stop": false,
+        "trailing_activation": 4.0,
+        "trailing_distance": 2.0,
+        "time_exit_minutes": null
+      },
+      "sizing_rules": {
+        "method": "fixed",
+        "fixed_contracts": 5,
+        "risk_pct": 0.01,
+        "atr_risk_multiple": 2.0
+      },
+      "primary_timeframe": "1m",
+      "require_all_entries": true
+    },
+    "fitness": 40709.76399874297,
+    "trades": 356,
+    "win_rate": 31.46067415730337,
+    "profit_factor": 1.6044579850531804,
+    "sharpe": 4.463527309482781,
+    "total_pnl": 46425.999999996544,
+    "max_drawdown": -4660.5,
+    "avg_monthly": 6632.285714285221,
+    "max_monthly": 16268.499999999207,
+    "min_monthly": -1072.0000000003783,
+    "mc_median": 45412.885140346814,
+    "mc_p_profit": 0.9985,
+    "mc_5th": 22023.979783917206,
+    "mc_95th": 71370.17953977795
+  },
+  {
+    "name": "STOCHASTIC|IMBALANCE|breed_8b4977",
+    "strategy": {
+      "name": "STOCHASTIC|IMBALANCE|breed_8b4977",
+      "entry_signals": [
+        {
+          "signal_name": "stochastic",
+          "module": "signals.momentum",
+          "function": "stochastic",
+          "params": {
+            "k_period": 8,
+            "d_period": 2,
+            "overbought": 37.4325,
+            "oversold": 23.9275
+          },
+          "columns": {
+            "long": "entry_long_stoch",
+            "short": "entry_short_stoch"
+          }
+        }
+      ],
+      "entry_filters": [
+        {
+          "signal_name": "imbalance",
+          "module": "signals.orderflow",
+          "function": "imbalance",
+          "params": {
+            "ratio_threshold": 1.6844
+          },
+          "column": "signal_buy_imbalance"
+        }
+      ],
+      "exit_rules": {
+        "stop_loss_type": "fixed_points",
+        "stop_loss_value": 31.9,
+        "take_profit_type": "fixed_points",
+        "take_profit_value": 232.8,
+        "trailing_stop": false,
+        "trailing_activation": 4.0,
+        "trailing_distance": 2.0,
+        "time_exit_minutes": null
+      },
+      "sizing_rules": {
+        "method": "fixed",
+        "fixed_contracts": 5,
+        "risk_pct": 0.01,
+        "atr_risk_multiple": 2.0
+      },
+      "primary_timeframe": "1m",
+      "require_all_entries": true
+    },
+    "fitness": 40703.36872249153,
+    "trades": 356,
+    "win_rate": 31.46067415730337,
+    "profit_factor": 1.6044579850531804,
+    "sharpe": 4.463527309482781,
+    "total_pnl": 46425.999999996544,
+    "max_drawdown": -4660.5,
+    "avg_monthly": 6632.285714285221,
+    "max_monthly": 16268.499999999207,
+    "min_monthly": -1072.0000000003783,
+    "mc_median": 45397.09458784392,
+    "mc_p_profit": 0.9995,
+    "mc_5th": 21268.999338869035,
+    "mc_95th": 71635.23436629876
+  },
+  {
+    "name": "STOCHASTIC|IMBALANCE|breed_23f33a",
+    "strategy": {
+      "name": "STOCHASTIC|IMBALANCE|breed_23f33a",
+      "entry_signals": [
+        {
+          "signal_name": "stochastic",
+          "module": "signals.momentum",
+          "function": "stochastic",
+          "params": {
+            "k_period": 8,
+            "d_period": 2,
+            "overbought": 37.4325,
+            "oversold": 23.9275
+          },
+          "columns": {
+            "long": "entry_long_stoch",
+            "short": "entry_short_stoch"
+          }
+        }
+      ],
+      "entry_filters": [
+        {
+          "signal_name": "imbalance",
+          "module": "signals.orderflow",
+          "function": "imbalance",
+          "params": {
+            "ratio_threshold": 1.6844
+          },
+          "column": "signal_buy_imbalance"
+        }
+      ],
+      "exit_rules": {
+        "stop_loss_type": "fixed_points",
+        "stop_loss_value": 31.9,
+        "take_profit_type": "fixed_points",
+        "take_profit_value": 232.8,
+        "trailing_stop": false,
+        "trailing_activation": 4.0,
+        "trailing_distance": 2.0,
+        "time_exit_minutes": null
+      },
+      "sizing_rules": {
+        "method": "fixed",
+        "fixed_contracts": 5,
+        "risk_pct": 0.01,
+        "atr_risk_multiple": 2.0
+      },
+      "primary_timeframe": "1m",
+      "require_all_entries": true
+    },
+    "fitness": 40590.83587646893,
+    "trades": 356,
+    "win_rate": 31.46067415730337,
+    "profit_factor": 1.6044579850531804,
+    "sharpe": 4.463527309482781,
+    "total_pnl": 46425.999999996544,
+    "max_drawdown": -4660.5,
+    "avg_monthly": 6632.285714285221,
+    "max_monthly": 16268.499999999207,
+    "min_monthly": -1072.0000000003783,
+    "mc_median": 45178.028895798736,
+    "mc_p_profit": 0.9975,
+    "mc_5th": 19640.91661792174,
+    "mc_95th": 70022.95865864822
+  },
+  {
+    "name": "STOCHASTIC|IMBALANCE|breed_4db8ff",
+    "strategy": {
+      "name": "STOCHASTIC|IMBALANCE|breed_4db8ff",
+      "entry_signals": [
+        {
+          "signal_name": "stochastic",
+          "module": "signals.momentum",
+          "function": "stochastic",
+          "params": {
+            "k_period": 8,
+            "d_period": 2,
+            "overbought": 37.4325,
+            "oversold": 23.9275
+          },
+          "columns": {
+            "long": "entry_long_stoch",
+            "short": "entry_short_stoch"
+          }
+        }
+      ],
+      "entry_filters": [
+        {
+          "signal_name": "imbalance",
+          "module": "signals.orderflow",
+          "function": "imbalance",
+          "params": {
+            "ratio_threshold": 1.6844
+          },
+          "column": "signal_buy_imbalance"
+        }
+      ],
+      "exit_rules": {
+        "stop_loss_type": "fixed_points",
+        "stop_loss_value": 31.9,
+        "take_profit_type": "fixed_points",
+        "take_profit_value": 232.8,
+        "trailing_stop": false,
+        "trailing_activation": 4.0,
+        "trailing_distance": 2.0,
+        "time_exit_minutes": null
+      },
+      "sizing_rules": {
+        "method": "fixed",
+        "fixed_contracts": 5,
+        "risk_pct": 0.01,
+        "atr_risk_multiple": 2.0
+      },
+      "primary_timeframe": "1m",
+      "require_all_entries": true
+    },
+    "fitness": 40467.11388770648,
+    "trades": 356,
+    "win_rate": 31.46067415730337,
+    "profit_factor": 1.6044579850531804,
+    "sharpe": 4.463527309482781,
+    "total_pnl": 46425.999999996544,
+    "max_drawdown": -4660.5,
+    "avg_monthly": 6632.285714285221,
+    "max_monthly": 16268.499999999207,
+    "min_monthly": -1072.0000000003783,
+    "mc_median": 44924.58491827383,
+    "mc_p_profit": 0.9995,
+    "mc_5th": 20977.693424988116,
+    "mc_95th": 70157.41845038765
+  },
+  {
+    "name": "STOCHASTIC|IMBALANCE|breed_beafef",
+    "strategy": {
+      "name": "STOCHASTIC|IMBALANCE|breed_beafef",
+      "entry_signals": [
+        {
+          "signal_name": "stochastic",
+          "module": "signals.momentum",
+          "function": "stochastic",
+          "params": {
+            "k_period": 8,
+            "d_period": 2,
+            "overbought": 38.205,
+            "oversold": 23.7137
+          },
+          "columns": {
+            "long": "entry_long_stoch",
+            "short": "entry_short_stoch"
+          }
+        }
+      ],
+      "entry_filters": [
+        {
+          "signal_name": "imbalance",
+          "module": "signals.orderflow",
+          "function": "imbalance",
+          "params": {
+            "ratio_threshold": 1.7107
+          },
+          "column": "signal_buy_imbalance"
+        }
+      ],
+      "exit_rules": {
+        "stop_loss_type": "fixed_points",
+        "stop_loss_value": 31.9,
+        "take_profit_type": "fixed_points",
+        "take_profit_value": 232.8,
+        "trailing_stop": false,
+        "trailing_activation": 4.0,
+        "trailing_distance": 2.0,
+        "time_exit_minutes": null
+      },
+      "sizing_rules": {
+        "method": "fixed",
+        "fixed_contracts": 5,
+        "risk_pct": 0.01,
+        "atr_risk_multiple": 2.0
+      },
+      "primary_timeframe": "1m",
+      "require_all_entries": true
+    },
+    "fitness": 39981.024860235404,
+    "trades": 355,
+    "win_rate": 31.26760563380282,
+    "profit_factor": 1.595363643465284,
+    "sharpe": 4.304675928663992,
+    "total_pnl": 45727.499999996544,
+    "max_drawdown": -4660.5,
+    "avg_monthly": 6532.499999999506,
+    "max_monthly": 16601.49999999922,
+    "min_monthly": -1072.0000000003783,
+    "mc_median": 44555.621149045954,
+    "mc_p_profit": 0.998,
+    "mc_5th": 19850.35432298021,
+    "mc_95th": 71283.96781410897
+  },
+  {
+    "name": "STOCHASTIC|IMBALANCE|max_b85e7d",
+    "strategy": {
+      "name": "STOCHASTIC|IMBALANCE|max_b85e7d",
+      "entry_signals": [
+        {
+          "signal_name": "stochastic",
+          "module": "signals.momentum",
+          "function": "stochastic",
+          "params": {
+            "k_period": 8,
+            "d_period": 2,
+            "overbought": 37.9943,
+            "oversold": 23.9352
+          },
+          "columns": {
+            "long": "entry_long_stoch",
+            "short": "entry_short_stoch"
+          }
+        }
+      ],
+      "entry_filters": [
+        {
+          "signal_name": "imbalance",
+          "module": "signals.orderflow",
+          "function": "imbalance",
+          "params": {
+            "ratio_threshold": 1.8398
+          },
+          "column": "signal_buy_imbalance"
+        }
+      ],
+      "exit_rules": {
+        "stop_loss_type": "fixed_points",
+        "stop_loss_value": 32.5,
+        "take_profit_type": "fixed_points",
+        "take_profit_value": 223.9,
+        "trailing_stop": false,
+        "trailing_activation": 4.0,
+        "trailing_distance": 2.0,
+        "time_exit_minutes": null
+      },
+      "sizing_rules": {
+        "method": "fixed",
+        "fixed_contracts": 3,
+        "risk_pct": 0.01,
+        "atr_risk_multiple": 2.0
+      },
+      "primary_timeframe": "1m",
+      "require_all_entries": true
+    },
+    "fitness": 39814.59678813836,
+    "trades": 638,
+    "win_rate": 32.13166144200627,
+    "profit_factor": 1.6747906757341153,
+    "sharpe": 2.520762975285552,
+    "total_pnl": 56647.80000000052,
+    "max_drawdown": -4556.699999999808,
+    "avg_monthly": 5149.800000000046,
+    "max_monthly": 17503.500000000087,
+    "min_monthly": -2729.400000000003,
+    "mc_median": 54141.375394454444,
+    "mc_p_profit": 1.0,
+    "mc_5th": 34148.41392081673,
+    "mc_95th": 75763.44280585887
+  },
+  {
+    "name": "STOCHASTIC|IMBALANCE|max_27b536",
+    "strategy": {
+      "name": "STOCHASTIC|IMBALANCE|max_27b536",
+      "entry_signals": [
+        {
+          "signal_name": "stochastic",
+          "module": "signals.momentum",
+          "function": "stochastic",
+          "params": {
+            "k_period": 8,
+            "d_period": 2,
+            "overbought": 37.2642,
+            "oversold": 24.4016
+          },
+          "columns": {
+            "long": "entry_long_stoch",
+            "short": "entry_short_stoch"
+          }
+        }
+      ],
+      "entry_filters": [
+        {
+          "signal_name": "imbalance",
+          "module": "signals.orderflow",
+          "function": "imbalance",
+          "params": {
+            "ratio_threshold": 1.6959
+          },
+          "column": "signal_buy_imbalance"
+        }
+      ],
+      "exit_rules": {
+        "stop_loss_type": "fixed_points",
+        "stop_loss_value": 32.7,
+        "take_profit_type": "fixed_points",
+        "take_profit_value": 227.5,
+        "trailing_stop": false,
+        "trailing_activation": 4.0,
+        "trailing_distance": 2.0,
+        "time_exit_minutes": null
+      },
+      "sizing_rules": {
+        "method": "fixed",
+        "fixed_contracts": 4,
+        "risk_pct": 0.01,
+        "atr_risk_multiple": 2.0
+      },
+      "primary_timeframe": "1m",
+      "require_all_entries": true
+    },
+    "fitness": 39535.96188725457,
+    "trades": 423,
+    "win_rate": 32.62411347517731,
+    "profit_factor": 1.66085767611438,
+    "sharpe": 3.6324200078016466,
+    "total_pnl": 48721.59999999847,
+    "max_drawdown": -4518.400000000402,
+    "avg_monthly": 6090.199999999802,
+    "max_monthly": 17760.399999999765,
+    "min_monthly": -2693.2000000001335,
+    "mc_median": 47785.12377451862,
+    "mc_p_profit": 1.0,
+    "mc_5th": 26167.06193093557,
+    "mc_95th": 69692.96037844913
+  },
+  {
+    "name": "STOCHASTIC|IMBALANCE|max_030efd",
+    "strategy": {
+      "name": "STOCHASTIC|IMBALANCE|max_030efd",
+      "entry_signals": [
+        {
+          "signal_name": "stochastic",
+          "module": "signals.momentum",
+          "function": "stochastic",
+          "params": {
+            "k_period": 8,
+            "d_period": 2,
+            "overbought": 38.2109,
+            "oversold": 24.6015
+          },
+          "columns": {
+            "long": "entry_long_stoch",
+            "short": "entry_short_stoch"
+          }
+        }
+      ],
+      "entry_filters": [
+        {
+          "signal_name": "imbalance",
+          "module": "signals.orderflow",
+          "function": "imbalance",
+          "params": {
+            "ratio_threshold": 1.7338
+          },
+          "column": "signal_buy_imbalance"
+        }
+      ],
+      "exit_rules": {
+        "stop_loss_type": "fixed_points",
+        "stop_loss_value": 31.9,
+        "take_profit_type": "fixed_points",
+        "take_profit_value": 233.8,
+        "trailing_stop": false,
+        "trailing_activation": 4.0,
+        "trailing_distance": 2.0,
+        "time_exit_minutes": null
+      },
+      "sizing_rules": {
+        "method": "fixed",
+        "fixed_contracts": 4,
+        "risk_pct": 0.01,
+        "atr_risk_multiple": 2.0
+      },
+      "primary_timeframe": "1m",
+      "require_all_entries": true
+    },
+    "fitness": 38960.963277370916,
+    "trades": 423,
+    "win_rate": 32.15130023640662,
+    "profit_factor": 1.6878596483498798,
+    "sharpe": 3.6505339993588524,
+    "total_pnl": 49966.39999999671,
+    "max_drawdown": -4663.2000000005355,
+    "avg_monthly": 6245.79999999958,
+    "max_monthly": 17166.799999999446,
+    "min_monthly": -2762.0000000002847,
+    "mc_median": 48736.62655475564,
+    "mc_p_profit": 0.9995,
+    "mc_5th": 26267.22695499453,
+    "mc_95th": 72200.08470326845
+  },
+  {
+    "name": "STOCHASTIC|IMBALANCE|max_e8f767",
+    "strategy": {
+      "name": "STOCHASTIC|IMBALANCE|max_e8f767",
+      "entry_signals": [
+        {
+          "signal_name": "stochastic",
+          "module": "signals.momentum",
+          "function": "stochastic",
+          "params": {
+            "k_period": 8,
+            "d_period": 2,
+            "overbought": 38.4316,
+            "oversold": 23.1628
+          },
+          "columns": {
+            "long": "entry_long_stoch",
+            "short": "entry_short_stoch"
+          }
+        }
+      ],
+      "entry_filters": [
+        {
+          "signal_name": "imbalance",
+          "module": "signals.orderflow",
+          "function": "imbalance",
+          "params": {
+            "ratio_threshold": 1.7407
+          },
+          "column": "signal_buy_imbalance"
+        }
+      ],
+      "exit_rules": {
+        "stop_loss_type": "fixed_points",
+        "stop_loss_value": 32.9,
+        "take_profit_type": "fixed_points",
+        "take_profit_value": 215.5,
+        "trailing_stop": false,
+        "trailing_activation": 4.0,
+        "trailing_distance": 2.0,
+        "time_exit_minutes": null
+      },
+      "sizing_rules": {
+        "method": "fixed",
+        "fixed_contracts": 5,
+        "risk_pct": 0.01,
+        "atr_risk_multiple": 2.0
+      },
+      "primary_timeframe": "1m",
+      "require_all_entries": true
+    },
+    "fitness": 38270.342001443394,
+    "trades": 426,
+    "win_rate": 31.220657276995308,
+    "profit_factor": 1.53523635868249,
+    "sharpe": 3.097637892529211,
+    "total_pnl": 51075.99999999607,
+    "max_drawdown": -4830.5,
+    "avg_monthly": 6384.499999999509,
+    "max_monthly": 22812.999999999432,
+    "min_monthly": -2677.000000000291,
+    "mc_median": 49702.184002890324,
+    "mc_p_profit": 0.9985,
+    "mc_5th": 21691.765044553274,
+    "mc_95th": 76857.76187276459
+  },
+  {
+    "name": "STOCHASTIC|IMBALANCE|max_7e185a",
+    "strategy": {
+      "name": "STOCHASTIC|IMBALANCE|max_7e185a",
+      "entry_signals": [
+        {
+          "signal_name": "stochastic",
+          "module": "signals.momentum",
+          "function": "stochastic",
+          "params": {
+            "k_period": 8,
+            "d_period": 2,
+            "overbought": 38.3789,
+            "oversold": 23.6051
+          },
+          "columns": {
+            "long": "entry_long_stoch",
+            "short": "entry_short_stoch"
+          }
+        }
+      ],
+      "entry_filters": [
+        {
+          "signal_name": "imbalance",
+          "module": "signals.orderflow",
+          "function": "imbalance",
+          "params": {
+            "ratio_threshold": 1.7065
+          },
+          "column": "signal_buy_imbalance"
+        }
+      ],
+      "exit_rules": {
+        "stop_loss_type": "fixed_points",
+        "stop_loss_value": 32.2,
+        "take_profit_type": "fixed_points",
+        "take_profit_value": 226.8,
+        "trailing_stop": false,
+        "trailing_activation": 4.0,
+        "trailing_distance": 2.0,
+        "time_exit_minutes": null
+      },
+      "sizing_rules": {
+        "method": "fixed",
+        "fixed_contracts": 5,
+        "risk_pct": 0.01,
+        "atr_risk_multiple": 2.0
+      },
+      "primary_timeframe": "1m",
+      "require_all_entries": true
+    },
+    "fitness": 37771.69542234382,
+    "trades": 355,
+    "win_rate": 31.26760563380282,
+    "profit_factor": 1.5702243564918448,
+    "sharpe": 4.218722597564912,
+    "total_pnl": 44172.999999998174,
+    "max_drawdown": -4693.5,
+    "avg_monthly": 6310.4285714283105,
+    "max_monthly": 16082.999999999556,
+    "min_monthly": -1150.0000000001892,
+    "mc_median": 42286.890844689595,
+    "mc_p_profit": 0.9975,
+    "mc_5th": 18319.002582855843,
+    "mc_95th": 67655.33367298517
+  },
+  {
+    "name": "STOCHASTIC|IMBALANCE|max_b0cdd0",
+    "strategy": {
+      "name": "STOCHASTIC|IMBALANCE|max_b0cdd0",
+      "entry_signals": [
+        {
+          "signal_name": "stochastic",
+          "module": "signals.momentum",
+          "function": "stochastic",
+          "params": {
+            "k_period": 8,
+            "d_period": 2,
+            "overbought": 35.3277,
+            "oversold": 23.6259
+          },
+          "columns": {
+            "long": "entry_long_stoch",
+            "short": "entry_short_stoch"
+          }
+        }
+      ],
+      "entry_filters": [
+        {
+          "signal_name": "imbalance",
+          "module": "signals.orderflow",
+          "function": "imbalance",
+          "params": {
+            "ratio_threshold": 1.7424
+          },
+          "column": "signal_buy_imbalance"
+        }
+      ],
+      "exit_rules": {
+        "stop_loss_type": "fixed_points",
+        "stop_loss_value": 31.9,
+        "take_profit_type": "fixed_points",
+        "take_profit_value": 222.1,
+        "trailing_stop": false,
+        "trailing_activation": 4.0,
+        "trailing_distance": 2.0,
+        "time_exit_minutes": null
+      },
+      "sizing_rules": {
+        "method": "fixed",
+        "fixed_contracts": 2,
+        "risk_pct": 0.01,
+        "atr_risk_multiple": 2.0
+      },
+      "primary_timeframe": "1m",
+      "require_all_entries": true
+    },
+    "fitness": 37767.15137000742,
+    "trades": 799,
+    "win_rate": 31.53942428035044,
+    "profit_factor": 1.6520152260254863,
+    "sharpe": 2.7442525929492114,
+    "total_pnl": 45768.599999996564,
+    "max_drawdown": -2749.0000000003783,
+    "avg_monthly": 3520.661538461272,
+    "max_monthly": 11132.199999999615,
+    "min_monthly": -637.8000000001517,
+    "mc_median": 43455.164278478274,
+    "mc_p_profit": 1.0,
+    "mc_5th": 28169.1273042398,
+    "mc_95th": 59089.70773881994
+  },
+  {
+    "name": "STOCHASTIC|IMBALANCE|max_5de661",
+    "strategy": {
+      "name": "STOCHASTIC|IMBALANCE|max_5de661",
+      "entry_signals": [
+        {
+          "signal_name": "stochastic",
+          "module": "signals.momentum",
+          "function": "stochastic",
+          "params": {
+            "k_period": 8,
+            "d_period": 2,
+            "overbought": 35.9865,
+            "oversold": 24.2824
+          },
+          "columns": {
+            "long": "entry_long_stoch",
+            "short": "entry_short_stoch"
+          }
+        }
+      ],
+      "entry_filters": [
+        {
+          "signal_name": "imbalance",
+          "module": "signals.orderflow",
+          "function": "imbalance",
+          "params": {
+            "ratio_threshold": 1.7109
+          },
+          "column": "signal_buy_imbalance"
+        }
+      ],
+      "exit_rules": {
+        "stop_loss_type": "fixed_points",
+        "stop_loss_value": 31.0,
+        "take_profit_type": "fixed_points",
+        "take_profit_value": 217.8,
+        "trailing_stop": false,
+        "trailing_activation": 4.0,
+        "trailing_distance": 2.0,
+        "time_exit_minutes": null
+      },
+      "sizing_rules": {
+        "method": "fixed",
+        "fixed_contracts": 2,
+        "risk_pct": 0.01,
+        "atr_risk_multiple": 2.0
+      },
+      "primary_timeframe": "1m",
+      "require_all_entries": true
+    },
+    "fitness": 37430.75678911031,
+    "trades": 830,
+    "win_rate": 30.72289156626506,
+    "profit_factor": 1.6344443057462623,
+    "sharpe": 2.784070676755819,
+    "total_pnl": 45742.79999999977,
+    "max_drawdown": -2813.800000000221,
+    "avg_monthly": 3518.676923076904,
+    "max_monthly": 11263.399999999932,
+    "min_monthly": -908.0000000000003,
+    "mc_median": 43334.682808989965,
+    "mc_p_profit": 1.0,
+    "mc_5th": 28536.59590994498,
+    "mc_95th": 59239.08019441253
+  },
+  {
+    "name": "STOCHASTIC|IMBALANCE|max_b3e902",
+    "strategy": {
+      "name": "STOCHASTIC|IMBALANCE|max_b3e902",
+      "entry_signals": [
+        {
+          "signal_name": "stochastic",
+          "module": "signals.momentum",
+          "function": "stochastic",
+          "params": {
+            "k_period": 8,
+            "d_period": 2,
+            "overbought": 37.4794,
+            "oversold": 23.2523
+          },
+          "columns": {
+            "long": "entry_long_stoch",
+            "short": "entry_short_stoch"
+          }
+        }
+      ],
+      "entry_filters": [
+        {
+          "signal_name": "imbalance",
+          "module": "signals.orderflow",
+          "function": "imbalance",
+          "params": {
+            "ratio_threshold": 1.6427
+          },
+          "column": "signal_buy_imbalance"
+        }
+      ],
+      "exit_rules": {
+        "stop_loss_type": "fixed_points",
+        "stop_loss_value": 31.1,
+        "take_profit_type": "fixed_points",
+        "take_profit_value": 226.6,
+        "trailing_stop": false,
+        "trailing_activation": 4.0,
+        "trailing_distance": 2.0,
+        "time_exit_minutes": null
+      },
+      "sizing_rules": {
+        "method": "fixed",
+        "fixed_contracts": 4,
+        "risk_pct": 0.01,
+        "atr_risk_multiple": 2.0
+      },
+      "primary_timeframe": "1m",
+      "require_all_entries": true
+    },
+    "fitness": 37226.92986898168,
+    "trades": 522,
+    "win_rate": 31.226053639846747,
+    "profit_factor": 1.5239580443363157,
+    "sharpe": 3.0859748176927755,
+    "total_pnl": 46836.40000000348,
+    "max_drawdown": -4553.200000000012,
+    "avg_monthly": 5204.044444444828,
+    "max_monthly": 16933.600000000297,
+    "min_monthly": -1077.1999999996974,
+    "mc_median": 45670.215293516245,
+    "mc_p_profit": 1.0,
+    "mc_5th": 23895.812676080564,
+    "mc_95th": 69271.62439230627
+  },
+  {
+    "name": "STOCHASTIC|IMBALANCE|max_12805f",
+    "strategy": {
+      "name": "STOCHASTIC|IMBALANCE|max_12805f",
+      "entry_signals": [
+        {
+          "signal_name": "stochastic",
+          "module": "signals.momentum",
+          "function": "stochastic",
+          "params": {
+            "k_period": 8,
+            "d_period": 2,
+            "overbought": 35.4851,
+            "oversold": 25.2602
+          },
+          "columns": {
+            "long": "entry_long_stoch",
+            "short": "entry_short_stoch"
+          }
+        }
+      ],
+      "entry_filters": [
+        {
+          "signal_name": "imbalance",
+          "module": "signals.orderflow",
+          "function": "imbalance",
+          "params": {
+            "ratio_threshold": 1.7656
+          },
+          "column": "signal_buy_imbalance"
+        }
+      ],
+      "exit_rules": {
+        "stop_loss_type": "fixed_points",
+        "stop_loss_value": 30.8,
+        "take_profit_type": "fixed_points",
+        "take_profit_value": 239.5,
+        "trailing_stop": false,
+        "trailing_activation": 4.0,
+        "trailing_distance": 2.0,
+        "time_exit_minutes": null
+      },
+      "sizing_rules": {
+        "method": "fixed",
+        "fixed_contracts": 4,
+        "risk_pct": 0.01,
+        "atr_risk_multiple": 2.0
+      },
+      "primary_timeframe": "1m",
+      "require_all_entries": true
+    },
+    "fitness": 36589.15496543666,
+    "trades": 513,
+    "win_rate": 30.79922027290448,
+    "profit_factor": 1.5397855659540551,
+    "sharpe": 3.01172113562471,
+    "total_pnl": 47203.600000001934,
+    "max_drawdown": -4510.000000000116,
+    "avg_monthly": 5244.844444444654,
+    "max_monthly": 16048.800000000218,
+    "min_monthly": -2255.1999999998247,
+    "mc_median": 45641.8654864296,
+    "mc_p_profit": 1.0,
+    "mc_5th": 22768.291632256765,
+    "mc_95th": 71075.78337404355
+  },
+  {
+    "name": "STOCHASTIC|IMBALANCE|max_2eb871",
+    "strategy": {
+      "name": "STOCHASTIC|IMBALANCE|max_2eb871",
+      "entry_signals": [
+        {
+          "signal_name": "stochastic",
+          "module": "signals.momentum",
+          "function": "stochastic",
+          "params": {
+            "k_period": 8,
+            "d_period": 2,
+            "overbought": 38.4747,
+            "oversold": 24.5173
+          },
+          "columns": {
+            "long": "entry_long_stoch",
+            "short": "entry_short_stoch"
+          }
+        }
+      ],
+      "entry_filters": [
+        {
+          "signal_name": "imbalance",
+          "module": "signals.orderflow",
+          "function": "imbalance",
+          "params": {
+            "ratio_threshold": 1.7157
+          },
+          "column": "signal_buy_imbalance"
+        }
+      ],
+      "exit_rules": {
+        "stop_loss_type": "fixed_points",
+        "stop_loss_value": 32.7,
+        "take_profit_type": "fixed_points",
+        "take_profit_value": 226.4,
+        "trailing_stop": false,
+        "trailing_activation": 4.0,
+        "trailing_distance": 2.0,
+        "time_exit_minutes": null
+      },
+      "sizing_rules": {
+        "method": "fixed",
+        "fixed_contracts": 5,
+        "risk_pct": 0.01,
+        "atr_risk_multiple": 2.0
+      },
+      "primary_timeframe": "1m",
+      "require_all_entries": true
+    },
+    "fitness": 36228.56353925745,
+    "trades": 355,
+    "win_rate": 30.985915492957744,
+    "profit_factor": 1.551744296879937,
+    "sharpe": 4.170866272861895,
+    "total_pnl": 43413.99999999874,
+    "max_drawdown": -4788.5,
+    "avg_monthly": 6201.99999999982,
+    "max_monthly": 16169.999999999782,
+    "min_monthly": -1280.0000000001892,
+    "mc_median": 42015.698507087785,
+    "mc_p_profit": 0.996,
+    "mc_5th": 16517.765953148624,
+    "mc_95th": 67184.60460104025
+  },
+  {
+    "name": "STOCHASTIC|IMBALANCE|max_43ec0c",
+    "strategy": {
+      "name": "STOCHASTIC|IMBALANCE|max_43ec0c",
+      "entry_signals": [
+        {
+          "signal_name": "stochastic",
+          "module": "signals.momentum",
+          "function": "stochastic",
+          "params": {
+            "k_period": 8,
+            "d_period": 2,
+            "overbought": 36.2948,
+            "oversold": 23.4852
+          },
+          "columns": {
+            "long": "entry_long_stoch",
+            "short": "entry_short_stoch"
+          }
+        }
+      ],
+      "entry_filters": [
+        {
+          "signal_name": "imbalance",
+          "module": "signals.orderflow",
+          "function": "imbalance",
+          "params": {
+            "ratio_threshold": 1.8038
+          },
+          "column": "signal_buy_imbalance"
+        }
+      ],
+      "exit_rules": {
+        "stop_loss_type": "fixed_points",
+        "stop_loss_value": 31.9,
+        "take_profit_type": "fixed_points",
+        "take_profit_value": 228.3,
+        "trailing_stop": false,
+        "trailing_activation": 4.0,
+        "trailing_distance": 2.0,
+        "time_exit_minutes": null
+      },
+      "sizing_rules": {
+        "method": "fixed",
+        "fixed_contracts": 2,
+        "risk_pct": 0.01,
+        "atr_risk_multiple": 2.0
+      },
+      "primary_timeframe": "1m",
+      "require_all_entries": true
+    },
+    "fitness": 35920.329880067045,
+    "trades": 796,
+    "win_rate": 31.030150753768844,
+    "profit_factor": 1.6259159088123174,
+    "sharpe": 2.580110840467308,
+    "total_pnl": 43924.3999999968,
+    "max_drawdown": -3021.4000000003725,
+    "avg_monthly": 3378.79999999975,
+    "max_monthly": 11662.199999999668,
+    "min_monthly": -1209.2000000001617,
+    "mc_median": 41755.49052936668,
+    "mc_p_profit": 1.0,
+    "mc_5th": 26794.781060979578,
+    "mc_95th": 57501.80309124488
+  },
+  {
+    "name": "STOCHASTIC|IMBALANCE|max_4f8425",
+    "strategy": {
+      "name": "STOCHASTIC|IMBALANCE|max_4f8425",
+      "entry_signals": [
+        {
+          "signal_name": "stochastic",
+          "module": "signals.momentum",
+          "function": "stochastic",
+          "params": {
+            "k_period": 8,
+            "d_period": 2,
+            "overbought": 36.6962,
+            "oversold": 23.7147
+          },
+          "columns": {
+            "long": "entry_long_stoch",
+            "short": "entry_short_stoch"
+          }
+        }
+      ],
+      "entry_filters": [
+        {
+          "signal_name": "imbalance",
+          "module": "signals.orderflow",
+          "function": "imbalance",
+          "params": {
+            "ratio_threshold": 1.8608
+          },
+          "column": "signal_buy_imbalance"
+        }
+      ],
+      "exit_rules": {
+        "stop_loss_type": "fixed_points",
+        "stop_loss_value": 32.2,
+        "take_profit_type": "fixed_points",
+        "take_profit_value": 225.4,
+        "trailing_stop": false,
+        "trailing_activation": 4.0,
+        "trailing_distance": 2.0,
+        "time_exit_minutes": null
+      },
+      "sizing_rules": {
+        "method": "fixed",
+        "fixed_contracts": 2,
+        "risk_pct": 0.01,
+        "atr_risk_multiple": 2.0
+      },
+      "primary_timeframe": "1m",
+      "require_all_entries": true
+    },
+    "fitness": 34543.58992021484,
+    "trades": 776,
+    "win_rate": 31.314432989690722,
+    "profit_factor": 1.6223080160814825,
+    "sharpe": 2.5577798523442388,
+    "total_pnl": 42876.39999999897,
+    "max_drawdown": -3056.199999999866,
+    "avg_monthly": 3298.1846153845336,
+    "max_monthly": 11816.599999999951,
+    "min_monthly": -1808.4000000000883,
+    "mc_median": 40684.10291735343,
+    "mc_p_profit": 1.0,
+    "mc_5th": 26221.71148709687,
+    "mc_95th": 55753.36566548825
+  },
+  {
+    "name": "STOCHASTIC|IMBALANCE|breed_0b8a00",
+    "strategy": {
+      "name": "STOCHASTIC|IMBALANCE|breed_0b8a00",
+      "entry_signals": [
+        {
+          "signal_name": "stochastic",
+          "module": "signals.momentum",
+          "function": "stochastic",
+          "params": {
+            "k_period": 8,
+            "d_period": 2,
+            "overbought": 38.205,
+            "oversold": 23.7137
+          },
+          "columns": {
+            "long": "entry_long_stoch",
+            "short": "entry_short_stoch"
+          }
+        }
+      ],
+      "entry_filters": [
+        {
+          "signal_name": "imbalance",
+          "module": "signals.orderflow",
+          "function": "imbalance",
+          "params": {
+            "ratio_threshold": 1.7107
+          },
+          "column": "signal_buy_imbalance"
+        }
+      ],
+      "exit_rules": {
+        "stop_loss_type": "fixed_points",
+        "stop_loss_value": 31.7,
+        "take_profit_type": "fixed_points",
+        "take_profit_value": 222.2,
+        "trailing_stop": false,
+        "trailing_activation": 4.0,
+        "trailing_distance": 2.0,
+        "time_exit_minutes": null
+      },
+      "sizing_rules": {
+        "method": "fixed",
+        "fixed_contracts": 5,
+        "risk_pct": 0.01,
+        "atr_risk_multiple": 2.0
+      },
+      "primary_timeframe": "1m",
+      "require_all_entries": true
+    },
+    "fitness": 33879.64901990387,
+    "trades": 362,
+    "win_rate": 30.11049723756906,
+    "profit_factor": 1.4949324965520434,
+    "sharpe": 3.8358925142888416,
+    "total_pnl": 39115.99999999849,
+    "max_drawdown": -4628.5,
+    "avg_monthly": 5587.9999999997835,
+    "max_monthly": 15546.999999999694,
+    "min_monthly": -1020.0000000001892,
+    "mc_median": 37274.36946838084,
+    "mc_p_profit": 0.9985,
+    "mc_5th": 13451.592895290916,
+    "mc_95th": 62985.706442537776
+  },
+  {
+    "name": "STOCHASTIC|IMBALANCE|max_34497a",
+    "strategy": {
+      "name": "STOCHASTIC|IMBALANCE|max_34497a",
+      "entry_signals": [
+        {
+          "signal_name": "stochastic",
+          "module": "signals.momentum",
+          "function": "stochastic",
+          "params": {
+            "k_period": 8,
+            "d_period": 2,
+            "overbought": 36.6675,
+            "oversold": 23.5253
+          },
+          "columns": {
+            "long": "entry_long_stoch",
+            "short": "entry_short_stoch"
+          }
+        }
+      ],
+      "entry_filters": [
+        {
+          "signal_name": "imbalance",
+          "module": "signals.orderflow",
+          "function": "imbalance",
+          "params": {
+            "ratio_threshold": 1.7719
+          },
+          "column": "signal_buy_imbalance"
+        }
+      ],
+      "exit_rules": {
+        "stop_loss_type": "fixed_points",
+        "stop_loss_value": 30.9,
+        "take_profit_type": "fixed_points",
+        "take_profit_value": 231.7,
+        "trailing_stop": false,
+        "trailing_activation": 4.0,
+        "trailing_distance": 2.0,
+        "time_exit_minutes": null
+      },
+      "sizing_rules": {
+        "method": "fixed",
+        "fixed_contracts": 4,
+        "risk_pct": 0.01,
+        "atr_risk_multiple": 2.0
+      },
+      "primary_timeframe": "1m",
+      "require_all_entries": true
+    },
+    "fitness": 33859.882481780915,
+    "trades": 514,
+    "win_rate": 30.544747081712064,
+    "profit_factor": 1.4965502155544999,
+    "sharpe": 2.854024683317235,
+    "total_pnl": 43583.99999999635,
+    "max_drawdown": -4524.400000000431,
+    "avg_monthly": 4842.666666666257,
+    "max_monthly": 14748.799999999577,
+    "min_monthly": -2309.600000000359,
+    "mc_median": 41883.57607468474,
+    "mc_p_profit": 0.9995,
+    "mc_5th": 18768.478194114887,
+    "mc_95th": 65991.2607691948
+  },
+  {
+    "name": "STOCHASTIC|IMBALANCE|max_9057f7",
+    "strategy": {
+      "name": "STOCHASTIC|IMBALANCE|max_9057f7",
+      "entry_signals": [
+        {
+          "signal_name": "stochastic",
+          "module": "signals.momentum",
+          "function": "stochastic",
+          "params": {
+            "k_period": 8,
+            "d_period": 2,
+            "overbought": 37.1653,
+            "oversold": 23.1557
+          },
+          "columns": {
+            "long": "entry_long_stoch",
+            "short": "entry_short_stoch"
+          }
+        }
+      ],
+      "entry_filters": [
+        {
+          "signal_name": "imbalance",
+          "module": "signals.orderflow",
+          "function": "imbalance",
+          "params": {
+            "ratio_threshold": 1.7217
+          },
+          "column": "signal_buy_imbalance"
+        }
+      ],
+      "exit_rules": {
+        "stop_loss_type": "fixed_points",
+        "stop_loss_value": 32.7,
+        "take_profit_type": "fixed_points",
+        "take_profit_value": 212.7,
+        "trailing_stop": false,
+        "trailing_activation": 4.0,
+        "trailing_distance": 2.0,
+        "time_exit_minutes": null
+      },
+      "sizing_rules": {
+        "method": "fixed",
+        "fixed_contracts": 4,
+        "risk_pct": 0.01,
+        "atr_risk_multiple": 2.0
+      },
+      "primary_timeframe": "1m",
+      "require_all_entries": true
+    },
+    "fitness": 33644.377024632005,
+    "trades": 432,
+    "win_rate": 31.48148148148148,
+    "profit_factor": 1.5593343018865666,
+    "sharpe": 3.303605779204897,
+    "total_pnl": 42965.59999999863,
+    "max_drawdown": -4518.400000000402,
+    "avg_monthly": 5370.699999999826,
+    "max_monthly": 19554.79999999985,
+    "min_monthly": -3084.400000000133,
+    "mc_median": 41101.354049273345,
+    "mc_p_profit": 1.0,
+    "mc_5th": 20495.655621434867,
+    "mc_95th": 64258.107914333945
+  },
+  {
+    "name": "STOCHASTIC|IMBALANCE|max_cd81a7",
+    "strategy": {
+      "name": "STOCHASTIC|IMBALANCE|max_cd81a7",
+      "entry_signals": [
+        {
+          "signal_name": "stochastic",
+          "module": "signals.momentum",
+          "function": "stochastic",
+          "params": {
+            "k_period": 8,
+            "d_period": 2,
+            "overbought": 37.5013,
+            "oversold": 23.3464
+          },
+          "columns": {
+            "long": "entry_long_stoch",
+            "short": "entry_short_stoch"
+          }
+        }
+      ],
+      "entry_filters": [
+        {
+          "signal_name": "imbalance",
+          "module": "signals.orderflow",
+          "function": "imbalance",
+          "params": {
+            "ratio_threshold": 1.6818
+          },
+          "column": "signal_buy_imbalance"
+        }
+      ],
+      "exit_rules": {
+        "stop_loss_type": "fixed_points",
+        "stop_loss_value": 31.0,
+        "take_profit_type": "fixed_points",
+        "take_profit_value": 234.1,
+        "trailing_stop": false,
+        "trailing_activation": 4.0,
+        "trailing_distance": 2.0,
+        "time_exit_minutes": null
+      },
+      "sizing_rules": {
+        "method": "fixed",
+        "fixed_contracts": 5,
+        "risk_pct": 0.01,
+        "atr_risk_multiple": 2.0
+      },
+      "primary_timeframe": "1m",
+      "require_all_entries": true
+    },
+    "fitness": 33446.05441492801,
+    "trades": 364,
+    "win_rate": 29.120879120879124,
+    "profit_factor": 1.4779031112013357,
+    "sharpe": 3.5987250149001166,
+    "total_pnl": 37664.499999999665,
+    "max_drawdown": -4501.5,
+    "avg_monthly": 5380.64285714281,
+    "max_monthly": 16780.49999999987,
+    "min_monthly": -1320.5,
+    "mc_median": 35728.8231155706,
+    "mc_p_profit": 0.993,
+    "mc_5th": 12290.562449917808,
+    "mc_95th": 60603.90114327489
+  },
+  {
+    "name": "STOCHASTIC|IMBALANCE|max_bec304",
+    "strategy": {
+      "name": "STOCHASTIC|IMBALANCE|max_bec304",
+      "entry_signals": [
+        {
+          "signal_name": "stochastic",
+          "module": "signals.momentum",
+          "function": "stochastic",
+          "params": {
+            "k_period": 8,
+            "d_period": 2,
+            "overbought": 37.1499,
+            "oversold": 24.1174
+          },
+          "columns": {
+            "long": "entry_long_stoch",
+            "short": "entry_short_stoch"
+          }
+        }
+      ],
+      "entry_filters": [
+        {
+          "signal_name": "imbalance",
+          "module": "signals.orderflow",
+          "function": "imbalance",
+          "params": {
+            "ratio_threshold": 1.8752
+          },
+          "column": "signal_buy_imbalance"
+        }
+      ],
+      "exit_rules": {
+        "stop_loss_type": "fixed_points",
+        "stop_loss_value": 31.7,
+        "take_profit_type": "fixed_points",
+        "take_profit_value": 245.9,
+        "trailing_stop": false,
+        "trailing_activation": 4.0,
+        "trailing_distance": 2.0,
+        "time_exit_minutes": null
+      },
+      "sizing_rules": {
+        "method": "fixed",
+        "fixed_contracts": 2,
+        "risk_pct": 0.01,
+        "atr_risk_multiple": 2.0
+      },
+      "primary_timeframe": "1m",
+      "require_all_entries": true
+    },
+    "fitness": 33367.05428711901,
+    "trades": 779,
+    "win_rate": 29.781771501925547,
+    "profit_factor": 1.5923708439749962,
+    "sharpe": 2.321320989149067,
+    "total_pnl": 41099.39999999888,
+    "max_drawdown": -3130.5999999998603,
+    "avg_monthly": 3161.4923076922205,
+    "max_monthly": 12150.399999999941,
+    "min_monthly": -1681.8000000000884,
+    "mc_median": 38897.98549731565,
+    "mc_p_profit": 1.0,
+    "mc_5th": 23323.423484430758,
+    "mc_95th": 54740.9056642324
+  },
+  {
+    "name": "STOCHASTIC|IMBALANCE|breed_a11845",
+    "strategy": {
+      "name": "STOCHASTIC|IMBALANCE|breed_a11845",
+      "entry_signals": [
+        {
+          "signal_name": "stochastic",
+          "module": "signals.momentum",
+          "function": "stochastic",
+          "params": {
+            "k_period": 8,
+            "d_period": 2,
+            "overbought": 37.4109,
+            "oversold": 23.3806
+          },
+          "columns": {
+            "long": "entry_long_stoch",
+            "short": "entry_short_stoch"
+          }
+        }
+      ],
+      "entry_filters": [
+        {
+          "signal_name": "imbalance",
+          "module": "signals.orderflow",
+          "function": "imbalance",
+          "params": {
+            "ratio_threshold": 1.8065
+          },
+          "column": "signal_buy_imbalance"
+        }
+      ],
+      "exit_rules": {
+        "stop_loss_type": "fixed_points",
+        "stop_loss_value": 31.6,
+        "take_profit_type": "fixed_points",
+        "take_profit_value": 235.8,
+        "trailing_stop": false,
+        "trailing_activation": 4.0,
+        "trailing_distance": 2.0,
+        "time_exit_minutes": null
+      },
+      "sizing_rules": {
+        "method": "fixed",
+        "fixed_contracts": 5,
+        "risk_pct": 0.01,
+        "atr_risk_multiple": 2.0
+      },
+      "primary_timeframe": "1m",
+      "require_all_entries": true
+    },
+    "fitness": 30692.649714056875,
+    "trades": 357,
+    "win_rate": 29.69187675070028,
+    "profit_factor": 1.4815159847862456,
+    "sharpe": 3.641171056461544,
+    "total_pnl": 37473.50000000318,
+    "max_drawdown": -4597.5,
+    "avg_monthly": 5353.357142857597,
+    "max_monthly": 17018.500000000648,
+    "min_monthly": -2858.999999999578,
+    "mc_median": 36808.29942811017,
+    "mc_p_profit": 0.994,
+    "mc_5th": 11429.921796704622,
+    "mc_95th": 61260.63312605948
+  },
+  {
+    "name": "STOCHASTIC|IMBALANCE|max_d0dc61",
+    "strategy": {
+      "name": "STOCHASTIC|IMBALANCE|max_d0dc61",
+      "entry_signals": [
+        {
+          "signal_name": "stochastic",
+          "module": "signals.momentum",
+          "function": "stochastic",
+          "params": {
+            "k_period": 8,
+            "d_period": 2,
+            "overbought": 37.1493,
+            "oversold": 23.0806
+          },
+          "columns": {
+            "long": "entry_long_stoch",
+            "short": "entry_short_stoch"
+          }
+        }
+      ],
+      "entry_filters": [
+        {
+          "signal_name": "imbalance",
+          "module": "signals.orderflow",
+          "function": "imbalance",
+          "params": {
+            "ratio_threshold": 1.7668
+          },
+          "column": "signal_buy_imbalance"
+        }
+      ],
+      "exit_rules": {
+        "stop_loss_type": "fixed_points",
+        "stop_loss_value": 32.6,
+        "take_profit_type": "fixed_points",
+        "take_profit_value": 219.5,
+        "trailing_stop": false,
+        "trailing_activation": 4.0,
+        "trailing_distance": 2.0,
+        "time_exit_minutes": null
+      },
+      "sizing_rules": {
+        "method": "fixed",
+        "fixed_contracts": 5,
+        "risk_pct": 0.01,
+        "atr_risk_multiple": 2.0
+      },
+      "primary_timeframe": "1m",
+      "require_all_entries": true
+    },
+    "fitness": 27450.37880529633,
+    "trades": 358,
+    "win_rate": 29.329608938547487,
+    "profit_factor": 1.4097284816457143,
+    "sharpe": 3.3315437437450033,
+    "total_pnl": 33183.500000003376,
+    "max_drawdown": -4561.0,
+    "avg_monthly": 4740.500000000482,
+    "max_monthly": 13216.500000000815,
+    "min_monthly": -2328.9999999996217,
+    "mc_median": 32234.90046773186,
+    "mc_p_profit": 0.986,
+    "mc_5th": 8299.647642029251,
+    "mc_95th": 55818.47184086155
+  },
+  {
+    "name": "STOCHASTIC|IMBALANCE|max_13fa11",
+    "strategy": {
+      "name": "STOCHASTIC|IMBALANCE|max_13fa11",
+      "entry_signals": [
+        {
+          "signal_name": "stochastic",
+          "module": "signals.momentum",
+          "function": "stochastic",
+          "params": {
+            "k_period": 8,
+            "d_period": 2,
+            "overbought": 37.3674,
+            "oversold": 23.9007
+          },
+          "columns": {
+            "long": "entry_long_stoch",
+            "short": "entry_short_stoch"
+          }
+        }
+      ],
+      "entry_filters": [
+        {
+          "signal_name": "imbalance",
+          "module": "signals.orderflow",
+          "function": "imbalance",
+          "params": {
+            "ratio_threshold": 1.6367
+          },
+          "column": "signal_buy_imbalance"
+        }
+      ],
+      "exit_rules": {
+        "stop_loss_type": "fixed_points",
+        "stop_loss_value": 32.4,
+        "take_profit_type": "fixed_points",
+        "take_profit_value": 235.7,
+        "trailing_stop": false,
+        "trailing_activation": 4.0,
+        "trailing_distance": 2.0,
+        "time_exit_minutes": null
+      },
+      "sizing_rules": {
+        "method": "fixed",
+        "fixed_contracts": 5,
+        "risk_pct": 0.01,
+        "atr_risk_multiple": 2.0
+      },
+      "primary_timeframe": "1m",
+      "require_all_entries": true
+    },
+    "fitness": 23786.50438632467,
+    "trades": 243,
+    "win_rate": 33.33333333333333,
+    "profit_factor": 1.4371525306349566,
+    "sharpe": 3.2387930372674654,
+    "total_pnl": 22724.499999997905,
+    "max_drawdown": -4506.0,
+    "avg_monthly": 4544.899999999581,
+    "max_monthly": 10267.9999999996,
+    "min_monthly": -1202.0000000003783,
+    "mc_median": 21904.108772652602,
+    "mc_p_profit": 0.9745,
+    "mc_5th": 2913.160815320624,
+    "mc_95th": 41311.65470144935
+  },
+  {
+    "name": "STOCHASTIC|IMBALANCE|max_8762e2",
+    "strategy": {
+      "name": "STOCHASTIC|IMBALANCE|max_8762e2",
+      "entry_signals": [
+        {
+          "signal_name": "stochastic",
+          "module": "signals.momentum",
+          "function": "stochastic",
+          "params": {
+            "k_period": 8,
+            "d_period": 2,
+            "overbought": 38.356,
+            "oversold": 24.1498
+          },
+          "columns": {
+            "long": "entry_long_stoch",
+            "short": "entry_short_stoch"
+          }
+        }
+      ],
+      "entry_filters": [
+        {
+          "signal_name": "imbalance",
+          "module": "signals.orderflow",
+          "function": "imbalance",
+          "params": {
+            "ratio_threshold": 1.6378
+          },
+          "column": "signal_buy_imbalance"
+        }
+      ],
+      "exit_rules": {
+        "stop_loss_type": "fixed_points",
+        "stop_loss_value": 32.4,
+        "take_profit_type": "fixed_points",
+        "take_profit_value": 238.4,
+        "trailing_stop": false,
+        "trailing_activation": 4.0,
+        "trailing_distance": 2.0,
+        "time_exit_minutes": null
+      },
+      "sizing_rules": {
+        "method": "fixed",
+        "fixed_contracts": 5,
+        "risk_pct": 0.01,
+        "atr_risk_multiple": 2.0
+      },
+      "primary_timeframe": "1m",
+      "require_all_entries": true
+    },
+    "fitness": 23313.526672176653,
+    "trades": 244,
+    "win_rate": 32.78688524590164,
+    "profit_factor": 1.4284855711900222,
+    "sharpe": 3.189597687235259,
+    "total_pnl": 22457.999999997977,
+    "max_drawdown": -4506.0,
+    "avg_monthly": 4491.599999999596,
+    "max_monthly": 10064.999999999622,
+    "min_monthly": -1202.0000000003783,
+    "mc_median": 21271.953344356487,
+    "mc_p_profit": 0.9765,
+    "mc_5th": 3651.6021744000027,
+    "mc_95th": 40227.41408016031
+  },
+  {
+    "name": "STOCHASTIC|IMBALANCE|max_ce12a7",
+    "strategy": {
+      "name": "STOCHASTIC|IMBALANCE|max_ce12a7",
+      "entry_signals": [
+        {
+          "signal_name": "stochastic",
+          "module": "signals.momentum",
+          "function": "stochastic",
+          "params": {
+            "k_period": 8,
+            "d_period": 2,
+            "overbought": 36.4379,
+            "oversold": 24.2425
+          },
+          "columns": {
+            "long": "entry_long_stoch",
+            "short": "entry_short_stoch"
+          }
+        }
+      ],
+      "entry_filters": [
+        {
+          "signal_name": "imbalance",
+          "module": "signals.orderflow",
+          "function": "imbalance",
+          "params": {
+            "ratio_threshold": 1.6349
+          },
+          "column": "signal_buy_imbalance"
+        }
+      ],
+      "exit_rules": {
+        "stop_loss_type": "fixed_points",
+        "stop_loss_value": 32.0,
+        "take_profit_type": "fixed_points",
+        "take_profit_value": 229.5,
+        "trailing_stop": false,
+        "trailing_activation": 4.0,
+        "trailing_distance": 2.0,
+        "time_exit_minutes": null
+      },
+      "sizing_rules": {
+        "method": "fixed",
+        "fixed_contracts": 5,
+        "risk_pct": 0.01,
+        "atr_risk_multiple": 2.0
+      },
+      "primary_timeframe": "1m",
+      "require_all_entries": true
+    },
+    "fitness": 19559.44122714673,
+    "trades": 247,
+    "win_rate": 32.79352226720648,
+    "profit_factor": 1.407433752537036,
+    "sharpe": 3.110922651367981,
+    "total_pnl": 21479.5,
+    "max_drawdown": -4784.0,
+    "avg_monthly": 4295.9,
+    "max_monthly": 9744.0,
+    "min_monthly": -1432.0,
+    "mc_median": 20963.982454293466,
+    "mc_p_profit": 0.9745,
+    "mc_5th": 3024.3029252435617,
+    "mc_95th": 40199.47865532441
+  },
+  {
+    "name": "STOCHASTIC|IMBALANCE|max_905a4c",
+    "strategy": {
+      "name": "STOCHASTIC|IMBALANCE|max_905a4c",
+      "entry_signals": [
+        {
+          "signal_name": "stochastic",
+          "module": "signals.momentum",
+          "function": "stochastic",
+          "params": {
+            "k_period": 8,
+            "d_period": 2,
+            "overbought": 38.998,
+            "oversold": 23.953
+          },
+          "columns": {
+            "long": "entry_long_stoch",
+            "short": "entry_short_stoch"
+          }
+        }
+      ],
+      "entry_filters": [
+        {
+          "signal_name": "imbalance",
+          "module": "signals.orderflow",
+          "function": "imbalance",
+          "params": {
+            "ratio_threshold": 1.6259
+          },
+          "column": "signal_buy_imbalance"
+        }
+      ],
+      "exit_rules": {
+        "stop_loss_type": "fixed_points",
+        "stop_loss_value": 32.2,
+        "take_profit_type": "fixed_points",
+        "take_profit_value": 220.3,
+        "trailing_stop": false,
+        "trailing_activation": 4.0,
+        "trailing_distance": 2.0,
+        "time_exit_minutes": null
+      },
+      "sizing_rules": {
+        "method": "fixed",
+        "fixed_contracts": 5,
+        "risk_pct": 0.01,
+        "atr_risk_multiple": 2.0
+      },
+      "primary_timeframe": "1m",
+      "require_all_entries": true
+    },
+    "fitness": 17254.03697443788,
+    "trades": 247,
+    "win_rate": 32.79352226720648,
+    "profit_factor": 1.371131687630799,
+    "sharpe": 2.953220195848361,
+    "total_pnl": 19679.999999998792,
+    "max_drawdown": -4814.0,
+    "avg_monthly": 3935.9999999997585,
+    "max_monthly": 9221.999999999738,
+    "min_monthly": -1486.0000000001965,
+    "mc_median": 19271.5739488776,
+    "mc_p_profit": 0.9575,
+    "mc_5th": 939.6289931929557,
+    "mc_95th": 37800.353441050196
+  },
+  {
+    "name": "STOCHASTIC|IMBALANCE|max_156d40",
+    "strategy": {
+      "name": "STOCHASTIC|IMBALANCE|max_156d40",
+      "entry_signals": [
+        {
+          "signal_name": "stochastic",
+          "module": "signals.momentum",
+          "function": "stochastic",
+          "params": {
+            "k_period": 8,
+            "d_period": 2,
+            "overbought": 38.4875,
+            "oversold": 24.0378
+          },
+          "columns": {
+            "long": "entry_long_stoch",
+            "short": "entry_short_stoch"
+          }
+        }
+      ],
+      "entry_filters": [
+        {
+          "signal_name": "imbalance",
+          "module": "signals.orderflow",
+          "function": "imbalance",
+          "params": {
+            "ratio_threshold": 1.6353
+          },
+          "column": "signal_buy_imbalance"
+        }
+      ],
+      "exit_rules": {
+        "stop_loss_type": "fixed_points",
+        "stop_loss_value": 32.7,
+        "take_profit_type": "fixed_points",
+        "take_profit_value": 211.5,
+        "trailing_stop": false,
+        "trailing_activation": 4.0,
+        "trailing_distance": 2.0,
+        "time_exit_minutes": null
+      },
+      "sizing_rules": {
+        "method": "fixed",
+        "fixed_contracts": 5,
+        "risk_pct": 0.01,
+        "atr_risk_multiple": 2.0
+      },
+      "primary_timeframe": "1m",
+      "require_all_entries": true
+    },
+    "fitness": 16963.331353401783,
+    "trades": 247,
+    "win_rate": 31.983805668016196,
+    "profit_factor": 1.3167925206759885,
+    "sharpe": 2.6390764817752914,
+    "total_pnl": 17179.499999998872,
+    "max_drawdown": -4548.0,
+    "avg_monthly": 3435.8999999997745,
+    "max_monthly": 8545.999999999774,
+    "min_monthly": -1621.0000000001965,
+    "mc_median": 16697.76270680531,
+    "mc_p_profit": 0.9385,
+    "mc_5th": -1449.0381776690497,
+    "mc_95th": 35463.00823068644
+  },
+  {
+    "name": "STOCHASTIC|IMBALANCE|max_cd0b95",
+    "strategy": {
+      "name": "STOCHASTIC|IMBALANCE|max_cd0b95",
+      "entry_signals": [
+        {
+          "signal_name": "stochastic",
+          "module": "signals.momentum",
+          "function": "stochastic",
+          "params": {
+            "k_period": 8,
+            "d_period": 2,
+            "overbought": 39.6709,
+            "oversold": 22.6061
+          },
+          "columns": {
+            "long": "entry_long_stoch",
+            "short": "entry_short_stoch"
+          }
+        }
+      ],
+      "entry_filters": [
+        {
+          "signal_name": "imbalance",
+          "module": "signals.orderflow",
+          "function": "imbalance",
+          "params": {
+            "ratio_threshold": 1.5308
+          },
+          "column": "signal_buy_imbalance"
+        }
+      ],
+      "exit_rules": {
+        "stop_loss_type": "fixed_points",
+        "stop_loss_value": 32.8,
+        "take_profit_type": "fixed_points",
+        "take_profit_value": 221.6,
+        "trailing_stop": false,
+        "trailing_activation": 4.0,
+        "trailing_distance": 2.0,
+        "time_exit_minutes": null
+      },
+      "sizing_rules": {
+        "method": "fixed",
+        "fixed_contracts": 5,
+        "risk_pct": 0.01,
+        "atr_risk_multiple": 2.0
+      },
+      "primary_timeframe": "1m",
+      "require_all_entries": true
+    },
+    "fitness": 11333.550912409486,
+    "trades": 248,
+    "win_rate": 31.048387096774192,
+    "profit_factor": 1.2545801422194862,
+    "sharpe": 1.9876303517040759,
+    "total_pnl": 13944.50000000096,
+    "max_drawdown": -4562.0,
+    "avg_monthly": 2788.900000000192,
+    "max_monthly": 9459.00000000016,
+    "min_monthly": -2307.499999999818,
+    "mc_median": 13153.201824817457,
+    "mc_p_profit": 0.8785,
+    "mc_5th": -5134.235147684403,
+    "mc_95th": 32236.202841559472
+  },
+  {
+    "name": "STOCHASTIC|IMBALANCE|max_5cef62",
+    "strategy": {
+      "name": "STOCHASTIC|IMBALANCE|max_5cef62",
+      "entry_signals": [
+        {
+          "signal_name": "stochastic",
+          "module": "signals.momentum",
+          "function": "stochastic",
+          "params": {
+            "k_period": 8,
+            "d_period": 2,
+            "overbought": 37.3376,
+            "oversold": 23.1325
+          },
+          "columns": {
+            "long": "entry_long_stoch",
+            "short": "entry_short_stoch"
+          }
+        }
+      ],
+      "entry_filters": [
+        {
+          "signal_name": "imbalance",
+          "module": "signals.orderflow",
+          "function": "imbalance",
+          "params": {
+            "ratio_threshold": 1.5966
+          },
+          "column": "signal_buy_imbalance"
+        }
+      ],
+      "exit_rules": {
+        "stop_loss_type": "fixed_points",
+        "stop_loss_value": 32.9,
+        "take_profit_type": "fixed_points",
+        "take_profit_value": 219.6,
+        "trailing_stop": false,
+        "trailing_activation": 4.0,
+        "trailing_distance": 2.0,
+        "time_exit_minutes": null
+      },
+      "sizing_rules": {
+        "method": "fixed",
+        "fixed_contracts": 5,
+        "risk_pct": 0.01,
+        "atr_risk_multiple": 2.0
+      },
+      "primary_timeframe": "1m",
+      "require_all_entries": true
+    },
+    "fitness": 10545.484886384147,
+    "trades": 246,
+    "win_rate": 31.70731707317073,
+    "profit_factor": 1.2369679535334854,
+    "sharpe": 1.8618367489925645,
+    "total_pnl": 12932.99999999757,
+    "max_drawdown": -4576.0,
+    "avg_monthly": 2586.599999999514,
+    "max_monthly": 7963.999999999476,
+    "min_monthly": -1919.5000000003783,
+    "mc_median": 12341.36977277197,
+    "mc_p_profit": 0.863,
+    "mc_5th": -5792.65819239662,
+    "mc_95th": 30505.11273567081
+  },
+  {
+    "name": "STOCHASTIC|IMBALANCE|max_85d513",
+    "strategy": {
+      "name": "STOCHASTIC|IMBALANCE|max_85d513",
+      "entry_signals": [
+        {
+          "signal_name": "stochastic",
+          "module": "signals.momentum",
+          "function": "stochastic",
+          "params": {
+            "k_period": 8,
+            "d_period": 2,
+            "overbought": 35.7055,
+            "oversold": 25.2803
+          },
+          "columns": {
+            "long": "entry_long_stoch",
+            "short": "entry_short_stoch"
+          }
+        }
+      ],
+      "entry_filters": [
+        {
+          "signal_name": "imbalance",
+          "module": "signals.orderflow",
+          "function": "imbalance",
+          "params": {
+            "ratio_threshold": 1.7821
+          },
+          "column": "signal_buy_imbalance"
+        }
+      ],
+      "exit_rules": {
+        "stop_loss_type": "fixed_points",
+        "stop_loss_value": 33.0,
+        "take_profit_type": "fixed_points",
+        "take_profit_value": 220.3,
+        "trailing_stop": false,
+        "trailing_activation": 4.0,
+        "trailing_distance": 2.0,
+        "time_exit_minutes": null
+      },
+      "sizing_rules": {
+        "method": "fixed",
+        "fixed_contracts": 5,
+        "risk_pct": 0.01,
+        "atr_risk_multiple": 2.0
+      },
+      "primary_timeframe": "1m",
+      "require_all_entries": true
+    },
+    "fitness": -3365.987340738876,
+    "trades": 101,
+    "win_rate": 31.683168316831683,
+    "profit_factor": 1.0603763306625498,
+    "sharpe": 0.5441305208435011,
+    "total_pnl": 1329.9999999999782,
+    "max_drawdown": -4627.5,
+    "avg_monthly": 443.33333333332604,
+    "max_monthly": 4137.499999999978,
+    "min_monthly": -3068.5,
+    "mc_median": 948.3586518556258,
+    "mc_p_profit": 0.56,
+    "mc_5th": -8335.98365099675,
+    "mc_95th": 11464.072451104354
+  }
+]

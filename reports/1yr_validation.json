@@ -1,0 +1,2921 @@
+{
+  "test_type": "1_year_validation",
+  "period": "2025-03-19 to 2026-03-18",
+  "bars": 126732,
+  "trading_days": 258,
+  "candidates": 55,
+  "profitable": 11,
+  "strong_90pct": 0,
+  "elapsed_seconds": 101.84155082702637,
+  "results": [
+    {
+      "label": "[OCT] MACD|EMA_SLOPE|SL25_TP125",
+      "strategy": {
+        "name": "MACD|EMA_SLOPE|SL25_TP125",
+        "entry_signals": [
+          {
+            "signal_name": "macd",
+            "module": "signals.momentum",
+            "function": "macd",
+            "params": {
+              "fast": 12,
+              "slow": 26,
+              "signal_period": 9
+            },
+            "columns": {
+              "long": "entry_long_macd",
+              "short": "entry_short_macd"
+            }
+          }
+        ],
+        "entry_filters": [
+          {
+            "signal_name": "ema_slope",
+            "module": "signals.trend",
+            "function": "ema_slope",
+            "params": {
+              "period": 21,
+              "slope_lookback": 3
+            },
+            "column": "signal_ema_slope_up"
+          }
+        ],
+        "exit_rules": {
+          "stop_loss_type": "fixed_points",
+          "stop_loss_value": 25.0,
+          "take_profit_type": "fixed_points",
+          "take_profit_value": 125.0,
+          "trailing_stop": false,
+          "trailing_activation": 4.0,
+          "trailing_distance": 2.0,
+          "time_exit_minutes": null
+        },
+        "sizing_rules": {
+          "method": "risk_pct",
+          "fixed_contracts": 2,
+          "risk_pct": 0.015,
+          "atr_risk_multiple": 2.0
+        },
+        "primary_timeframe": "1m",
+        "require_all_entries": true
+      },
+      "trades": 9,
+      "win_rate": 33.33333333333333,
+      "profit_factor": 2.2888888888888888,
+      "sharpe": 6.56246265443968,
+      "total_pnl": 6124.8,
+      "max_drawdown": -2376.0,
+      "avg_trade": 680.5333333333333,
+      "avg_winner": 3625.6,
+      "avg_loser": -792.0,
+      "mc_median": 6009.535210472357,
+      "mc_mean": 5991.4740685791685,
+      "mc_5th": -3164.7221301331306,
+      "mc_95th": 16008.087372296857,
+      "mc_p_profit": 0.8524,
+      "mc_p_ruin": 1.0,
+      "mc_composite": 33.38,
+      "mc_pass_rate": 0.0
+    },
+    {
+      "label": "[OCT] ROC|VOLUME_PROFILE|SL25_TP150",
+      "strategy": {
+        "name": "ROC|VOLUME_PROFILE|SL25_TP150",
+        "entry_signals": [
+          {
+            "signal_name": "roc",
+            "module": "signals.momentum",
+            "function": "roc",
+            "params": {
+              "period": 10
+            },
+            "columns": {
+              "long": "entry_long_roc",
+              "short": "entry_short_roc"
+            }
+          }
+        ],
+        "entry_filters": [
+          {
+            "signal_name": "volume_profile",
+            "module": "signals.volume",
+            "function": "volume_profile",
+            "params": {
+              "lookback_bars": 100,
+              "num_bins": 50
+            },
+            "column": "signal_above_vah"
+          }
+        ],
+        "exit_rules": {
+          "stop_loss_type": "fixed_points",
+          "stop_loss_value": 25.0,
+          "take_profit_type": "fixed_points",
+          "take_profit_value": 150.0,
+          "trailing_stop": false,
+          "trailing_activation": 4.0,
+          "trailing_distance": 2.0,
+          "time_exit_minutes": null
+        },
+        "sizing_rules": {
+          "method": "risk_pct",
+          "fixed_contracts": 2,
+          "risk_pct": 0.015,
+          "atr_risk_multiple": 2.0
+        },
+        "primary_timeframe": "1m",
+        "require_all_entries": true
+      },
+      "trades": 8,
+      "win_rate": 37.5,
+      "profit_factor": 2.458712121212121,
+      "sharpe": 6.443150180923654,
+      "total_pnl": 5776.5,
+      "max_drawdown": -2376.0,
+      "avg_trade": 722.0625,
+      "avg_winner": 3245.5,
+      "avg_loser": -792.0,
+      "mc_median": 5544.847009483397,
+      "mc_mean": 5895.422413853084,
+      "mc_5th": -4576.994351639137,
+      "mc_95th": 16609.595583057366,
+      "mc_p_profit": 0.8174,
+      "mc_p_ruin": 1.0,
+      "mc_composite": 32.52,
+      "mc_pass_rate": 0.0
+    },
+    {
+      "label": "[OCT] ROC|VOLUME_PROFILE|SL25_TP75",
+      "strategy": {
+        "name": "ROC|VOLUME_PROFILE|SL25_TP75",
+        "entry_signals": [
+          {
+            "signal_name": "roc",
+            "module": "signals.momentum",
+            "function": "roc",
+            "params": {
+              "period": 10
+            },
+            "columns": {
+              "long": "entry_long_roc",
+              "short": "entry_short_roc"
+            }
+          }
+        ],
+        "entry_filters": [
+          {
+            "signal_name": "volume_profile",
+            "module": "signals.volume",
+            "function": "volume_profile",
+            "params": {
+              "lookback_bars": 100,
+              "num_bins": 50
+            },
+            "column": "signal_above_vah"
+          }
+        ],
+        "exit_rules": {
+          "stop_loss_type": "fixed_points",
+          "stop_loss_value": 25.0,
+          "take_profit_type": "fixed_points",
+          "take_profit_value": 75.0,
+          "trailing_stop": false,
+          "trailing_activation": 4.0,
+          "trailing_distance": 2.0,
+          "time_exit_minutes": null
+        },
+        "sizing_rules": {
+          "method": "risk_pct",
+          "fixed_contracts": 2,
+          "risk_pct": 0.015,
+          "atr_risk_multiple": 2.0
+        },
+        "primary_timeframe": "1m",
+        "require_all_entries": true
+      },
+      "trades": 11,
+      "win_rate": 45.45454545454545,
+      "profit_factor": 1.9476010101010102,
+      "sharpe": 5.525120497849305,
+      "total_pnl": 4503.0,
+      "max_drawdown": -2376.0,
+      "avg_trade": 409.3636363636364,
+      "avg_winner": 1851.0,
+      "avg_loser": -792.0,
+      "mc_median": 4322.130279700174,
+      "mc_mean": 4501.084300116827,
+      "mc_5th": -2960.6999963780054,
+      "mc_95th": 12406.904685730697,
+      "mc_p_profit": 0.8332,
+      "mc_p_ruin": 1.0,
+      "mc_composite": 32.24,
+      "mc_pass_rate": 0.0
+    },
+    {
+      "label": "[OCT] STOCH|BK_SQUEEZE|SL10_TP30",
+      "strategy": {
+        "name": "STOCH|BK_SQUEEZE|SL10_TP30",
+        "entry_signals": [
+          {
+            "signal_name": "stochastic",
+            "module": "signals.momentum",
+            "function": "stochastic",
+            "params": {
+              "k_period": 14,
+              "d_period": 3,
+              "overbought": 80.0,
+              "oversold": 20.0
+            },
+            "columns": {
+              "long": "entry_long_stoch",
+              "short": "entry_short_stoch"
+            }
+          }
+        ],
+        "entry_filters": [
+          {
+            "signal_name": "bollinger_keltner_squeeze",
+            "module": "signals.volatility",
+            "function": "bollinger_keltner_squeeze",
+            "params": {
+              "bb_period": 20,
+              "bb_std": 2.0,
+              "kc_period": 20,
+              "kc_atr_period": 14,
+              "kc_mult": 1.5
+            },
+            "column": "signal_squeeze_on"
+          }
+        ],
+        "exit_rules": {
+          "stop_loss_type": "fixed_points",
+          "stop_loss_value": 10.0,
+          "take_profit_type": "fixed_points",
+          "take_profit_value": 30.0,
+          "trailing_stop": false,
+          "trailing_activation": 4.0,
+          "trailing_distance": 2.0,
+          "time_exit_minutes": null
+        },
+        "sizing_rules": {
+          "method": "risk_pct",
+          "fixed_contracts": 2,
+          "risk_pct": 0.015,
+          "atr_risk_multiple": 2.0
+        },
+        "primary_timeframe": "1m",
+        "require_all_entries": true
+      },
+      "trades": 28,
+      "win_rate": 39.285714285714285,
+      "profit_factor": 1.6233230134158927,
+      "sharpe": 3.658821995832224,
+      "total_pnl": 3624.0,
+      "max_drawdown": -2052.0,
+      "avg_trade": 129.42857142857142,
+      "avg_winner": 858.0,
+      "avg_loser": -342.0,
+      "mc_median": 3470.6392171238876,
+      "mc_mean": 3465.9710213648605,
+      "mc_5th": -1536.7818934065322,
+      "mc_95th": 8627.869512439713,
+      "mc_p_profit": 0.8564,
+      "mc_p_ruin": 1.0,
+      "mc_composite": 35.49,
+      "mc_pass_rate": 0.0
+    },
+    {
+      "label": "[OCT] MACD|LARGE_TRADE|SL15_TP120",
+      "strategy": {
+        "name": "MACD|LARGE_TRADE|SL15_TP120",
+        "entry_signals": [
+          {
+            "signal_name": "macd",
+            "module": "signals.momentum",
+            "function": "macd",
+            "params": {
+              "fast": 12,
+              "slow": 26,
+              "signal_period": 9
+            },
+            "columns": {
+              "long": "entry_long_macd",
+              "short": "entry_short_macd"
+            }
+          }
+        ],
+        "entry_filters": [
+          {
+            "signal_name": "large_trade_detection",
+            "module": "signals.orderflow",
+            "function": "large_trade_detection",
+            "params": {
+              "volume_lookback": 50,
+              "threshold": 3.0
+            },
+            "column": "signal_large_trade"
+          }
+        ],
+        "exit_rules": {
+          "stop_loss_type": "fixed_points",
+          "stop_loss_value": 15.0,
+          "take_profit_type": "fixed_points",
+          "take_profit_value": 120.0,
+          "trailing_stop": false,
+          "trailing_activation": 4.0,
+          "trailing_distance": 2.0,
+          "time_exit_minutes": null
+        },
+        "sizing_rules": {
+          "method": "risk_pct",
+          "fixed_contracts": 2,
+          "risk_pct": 0.015,
+          "atr_risk_multiple": 2.0
+        },
+        "primary_timeframe": "1m",
+        "require_all_entries": true
+      },
+      "trades": 12,
+      "win_rate": 16.666666666666664,
+      "profit_factor": 1.446341463414634,
+      "sharpe": 2.3017580709353473,
+      "total_pnl": 2196.0,
+      "max_drawdown": -2460.0,
+      "avg_trade": 183.0,
+      "avg_winner": 3558.0,
+      "avg_loser": -492.0,
+      "mc_median": 2048.5687591599453,
+      "mc_mean": 2123.356195659085,
+      "mc_5th": -5964.991958880477,
+      "mc_95th": 10778.669743328239,
+      "mc_p_profit": 0.6242,
+      "mc_p_ruin": 1.0,
+      "mc_composite": 14.16,
+      "mc_pass_rate": 0.0
+    },
+    {
+      "label": "[OCT] CCI|FOOTPRINT_IMBALANCE|SL30_TP180",
+      "strategy": {
+        "name": "CCI|FOOTPRINT_IMBALANCE|SL30_TP180",
+        "entry_signals": [
+          {
+            "signal_name": "cci",
+            "module": "signals.momentum",
+            "function": "cci",
+            "params": {
+              "period": 20
+            },
+            "columns": {
+              "long": "entry_long_cci",
+              "short": "entry_short_cci"
+            }
+          }
+        ],
+        "entry_filters": [
+          {
+            "signal_name": "footprint_imbalance",
+            "module": "signals.orderflow",
+            "function": "footprint_imbalance",
+            "params": {
+              "stacked_threshold": 3
+            },
+            "column": "signal_stacked_buy"
+          }
+        ],
+        "exit_rules": {
+          "stop_loss_type": "fixed_points",
+          "stop_loss_value": 30.0,
+          "take_profit_type": "fixed_points",
+          "take_profit_value": 180.0,
+          "trailing_stop": false,
+          "trailing_activation": 4.0,
+          "trailing_distance": 2.0,
+          "time_exit_minutes": null
+        },
+        "sizing_rules": {
+          "method": "risk_pct",
+          "fixed_contracts": 2,
+          "risk_pct": 0.02,
+          "atr_risk_multiple": 2.0
+        },
+        "primary_timeframe": "1m",
+        "require_all_entries": true
+      },
+      "trades": 6,
+      "win_rate": 33.33333333333333,
+      "profit_factor": 1.3730095541401275,
+      "sharpe": 2.0277204576349117,
+      "total_pnl": 1405.5,
+      "max_drawdown": -2826.0,
+      "avg_trade": 234.25,
+      "avg_winner": 2586.75,
+      "avg_loser": -942.0,
+      "mc_median": 1281.9809013692284,
+      "mc_mean": 1357.605828534425,
+      "mc_5th": -5612.060634985797,
+      "mc_95th": 8646.049588964852,
+      "mc_p_profit": 0.6452,
+      "mc_p_ruin": 1.0,
+      "mc_composite": 9.68,
+      "mc_pass_rate": 0.0
+    },
+    {
+      "label": "[OCT] WILLIAMS_R|FOOTPRINT|SL20_TP80",
+      "strategy": {
+        "name": "WILLIAMS_R|FOOTPRINT|SL20_TP80",
+        "entry_signals": [
+          {
+            "signal_name": "williams_r",
+            "module": "signals.momentum",
+            "function": "williams_r",
+            "params": {
+              "period": 14,
+              "overbought": -20.0,
+              "oversold": -80.0
+            },
+            "columns": {
+              "long": "entry_long_williams",
+              "short": "entry_short_williams"
+            }
+          }
+        ],
+        "entry_filters": [
+          {
+            "signal_name": "footprint_imbalance",
+            "module": "signals.orderflow",
+            "function": "footprint_imbalance",
+            "params": {
+              "stacked_threshold": 3
+            },
+            "column": "signal_stacked_buy"
+          }
+        ],
+        "exit_rules": {
+          "stop_loss_type": "fixed_points",
+          "stop_loss_value": 20.0,
+          "take_profit_type": "fixed_points",
+          "take_profit_value": 80.0,
+          "trailing_stop": false,
+          "trailing_activation": 4.0,
+          "trailing_distance": 2.0,
+          "time_exit_minutes": null
+        },
+        "sizing_rules": {
+          "method": "risk_pct",
+          "fixed_contracts": 2,
+          "risk_pct": 0.015,
+          "atr_risk_multiple": 2.0
+        },
+        "primary_timeframe": "1m",
+        "require_all_entries": true
+      },
+      "trades": 12,
+      "win_rate": 25.0,
+      "profit_factor": 1.2242990654205608,
+      "sharpe": 1.4540028321816032,
+      "total_pnl": 1296.0,
+      "max_drawdown": -2568.0,
+      "avg_trade": 108.0,
+      "avg_winner": 2358.0,
+      "avg_loser": -642.0,
+      "mc_median": 1205.4051813427322,
+      "mc_mean": 1270.1250080265727,
+      "mc_5th": -5020.735503743079,
+      "mc_95th": 9530.999438378956,
+      "mc_p_profit": 0.6092,
+      "mc_p_ruin": 1.0,
+      "mc_composite": 8.45,
+      "mc_pass_rate": 0.0
+    },
+    {
+      "label": "[OCT] ROC|LINEAR_REG_SLOPE|SL30_TP180",
+      "strategy": {
+        "name": "ROC|LINEAR_REG_SLOPE|SL30_TP180",
+        "entry_signals": [
+          {
+            "signal_name": "roc",
+            "module": "signals.momentum",
+            "function": "roc",
+            "params": {
+              "period": 10
+            },
+            "columns": {
+              "long": "entry_long_roc",
+              "short": "entry_short_roc"
+            }
+          }
+        ],
+        "entry_filters": [
+          {
+            "signal_name": "linear_regression_slope",
+            "module": "signals.trend",
+            "function": "linear_regression_slope",
+            "params": {
+              "period": 20
+            },
+            "column": "signal_linreg_up"
+          }
+        ],
+        "exit_rules": {
+          "stop_loss_type": "fixed_points",
+          "stop_loss_value": 30.0,
+          "take_profit_type": "fixed_points",
+          "take_profit_value": 180.0,
+          "trailing_stop": false,
+          "trailing_activation": 4.0,
+          "trailing_distance": 2.0,
+          "time_exit_minutes": null
+        },
+        "sizing_rules": {
+          "method": "risk_pct",
+          "fixed_contracts": 2,
+          "risk_pct": 0.02,
+          "atr_risk_multiple": 2.0
+        },
+        "primary_timeframe": "1m",
+        "require_all_entries": true
+      },
+      "trades": 6,
+      "win_rate": 16.666666666666664,
+      "profit_factor": 1.1375796178343949,
+      "sharpe": 0.8585934377264394,
+      "total_pnl": 648.0,
+      "max_drawdown": -2826.0,
+      "avg_trade": 108.0,
+      "avg_winner": 5358.0,
+      "avg_loser": -942.0,
+      "mc_median": 488.0323108520315,
+      "mc_mean": 611.2561744407045,
+      "mc_5th": -5880.800115470378,
+      "mc_95th": 12658.757158855402,
+      "mc_p_profit": 0.6168,
+      "mc_p_ruin": 1.0,
+      "mc_composite": 4.89,
+      "mc_pass_rate": 0.0
+    },
+    {
+      "label": "[OCT] KELTNER|SESSION_LEVELS|SL30_TP240",
+      "strategy": {
+        "name": "KELTNER|SESSION_LEVELS|SL30_TP240",
+        "entry_signals": [
+          {
+            "signal_name": "keltner_channels",
+            "module": "signals.volatility",
+            "function": "keltner_channels",
+            "params": {
+              "ema_period": 20,
+              "atr_period": 14,
+              "multiplier": 1.5
+            },
+            "columns": {
+              "long": "entry_long_kc",
+              "short": "entry_short_kc"
+            }
+          }
+        ],
+        "entry_filters": [
+          {
+            "signal_name": "session_levels",
+            "module": "signals.price_action",
+            "function": "session_levels",
+            "params": {},
+            "column": "signal_at_session_high"
+          }
+        ],
+        "exit_rules": {
+          "stop_loss_type": "fixed_points",
+          "stop_loss_value": 30.0,
+          "take_profit_type": "fixed_points",
+          "take_profit_value": 240.0,
+          "trailing_stop": false,
+          "trailing_activation": 4.0,
+          "trailing_distance": 2.0,
+          "time_exit_minutes": null
+        },
+        "sizing_rules": {
+          "method": "risk_pct",
+          "fixed_contracts": 2,
+          "risk_pct": 0.015,
+          "atr_risk_multiple": 2.0
+        },
+        "primary_timeframe": "1m",
+        "require_all_entries": true
+      },
+      "trades": 5,
+      "win_rate": 20.0,
+      "profit_factor": 1.1816560509554142,
+      "sharpe": 1.2064297434831779,
+      "total_pnl": 570.4000000000001,
+      "max_drawdown": -2386.4000000000015,
+      "avg_trade": 114.08,
+      "avg_winner": 3710.4,
+      "avg_loser": -785.0,
+      "mc_median": 460.52494752943676,
+      "mc_mean": 553.0604846307805,
+      "mc_5th": -4103.922003011485,
+      "mc_95th": 8944.379810741231,
+      "mc_p_profit": 0.643,
+      "mc_p_ruin": 1.0,
+      "mc_composite": 5.56,
+      "mc_pass_rate": 0.0
+    },
+    {
+      "label": "[OCT] CCI|FOOTPRINT_IMBALANCE|SL25_TP75",
+      "strategy": {
+        "name": "CCI|FOOTPRINT_IMBALANCE|SL25_TP75",
+        "entry_signals": [
+          {
+            "signal_name": "cci",
+            "module": "signals.momentum",
+            "function": "cci",
+            "params": {
+              "period": 20
+            },
+            "columns": {
+              "long": "entry_long_cci",
+              "short": "entry_short_cci"
+            }
+          }
+        ],
+        "entry_filters": [
+          {
+            "signal_name": "footprint_imbalance",
+            "module": "signals.orderflow",
+            "function": "footprint_imbalance",
+            "params": {
+              "stacked_threshold": 3
+            },
+            "column": "signal_stacked_buy"
+          }
+        ],
+        "exit_rules": {
+          "stop_loss_type": "fixed_points",
+          "stop_loss_value": 25.0,
+          "take_profit_type": "fixed_points",
+          "take_profit_value": 75.0,
+          "trailing_stop": false,
+          "trailing_activation": 4.0,
+          "trailing_distance": 2.0,
+          "time_exit_minutes": null
+        },
+        "sizing_rules": {
+          "method": "risk_pct",
+          "fixed_contracts": 2,
+          "risk_pct": 0.015,
+          "atr_risk_multiple": 2.0
+        },
+        "primary_timeframe": "1m",
+        "require_all_entries": true
+      },
+      "trades": 8,
+      "win_rate": 37.5,
+      "profit_factor": 1.1291666666666667,
+      "sharpe": 0.7989418524198988,
+      "total_pnl": 511.5,
+      "max_drawdown": -2376.0,
+      "avg_trade": 63.9375,
+      "avg_winner": 1490.5,
+      "avg_loser": -792.0,
+      "mc_median": 259.341214664375,
+      "mc_mean": 463.8307893137373,
+      "mc_5th": -5489.655985552108,
+      "mc_95th": 6729.458236170904,
+      "mc_p_profit": 0.5388,
+      "mc_p_ruin": 1.0,
+      "mc_composite": 4.5,
+      "mc_pass_rate": 0.0
+    },
+    {
+      "label": "[OCT] ROC|SL20_TP160",
+      "strategy": {
+        "name": "ROC|SL20_TP160",
+        "entry_signals": [
+          {
+            "signal_name": "roc",
+            "module": "signals.momentum",
+            "function": "roc",
+            "params": {
+              "period": 10
+            },
+            "columns": {
+              "long": "entry_long_roc",
+              "short": "entry_short_roc"
+            }
+          }
+        ],
+        "entry_filters": [],
+        "exit_rules": {
+          "stop_loss_type": "fixed_points",
+          "stop_loss_value": 20.0,
+          "take_profit_type": "fixed_points",
+          "take_profit_value": 160.0,
+          "trailing_stop": false,
+          "trailing_activation": 4.0,
+          "trailing_distance": 2.0,
+          "time_exit_minutes": null
+        },
+        "sizing_rules": {
+          "method": "risk_pct",
+          "fixed_contracts": 2,
+          "risk_pct": 0.02,
+          "atr_risk_multiple": 2.0
+        },
+        "primary_timeframe": "1m",
+        "require_all_entries": true
+      },
+      "trades": 12,
+      "win_rate": 16.666666666666664,
+      "profit_factor": 1.05,
+      "sharpe": 0.46689729018786896,
+      "total_pnl": 321.0,
+      "max_drawdown": -2568.0,
+      "avg_trade": 26.75,
+      "avg_winner": 3370.5,
+      "avg_loser": -642.0,
+      "mc_median": 11.558189858791593,
+      "mc_mean": 411.8293734900616,
+      "mc_5th": -7775.906560523132,
+      "mc_95th": 10711.678228567394,
+      "mc_p_profit": 0.5018,
+      "mc_p_ruin": 1.0,
+      "mc_composite": 3.04,
+      "mc_pass_rate": 0.0
+    },
+    {
+      "label": "[OCT] VWAP|FOOTPRINT|SL10_TP50",
+      "strategy": {
+        "name": "VWAP|FOOTPRINT|SL10_TP50",
+        "entry_signals": [
+          {
+            "signal_name": "vwap",
+            "module": "signals.volume",
+            "function": "vwap",
+            "params": {},
+            "columns": {
+              "long": "entry_long_vwap",
+              "short": "entry_short_vwap"
+            }
+          }
+        ],
+        "entry_filters": [
+          {
+            "signal_name": "footprint_imbalance",
+            "module": "signals.orderflow",
+            "function": "footprint_imbalance",
+            "params": {
+              "stacked_threshold": 3
+            },
+            "column": "signal_stacked_buy"
+          }
+        ],
+        "exit_rules": {
+          "stop_loss_type": "fixed_points",
+          "stop_loss_value": 10.0,
+          "take_profit_type": "fixed_points",
+          "take_profit_value": 50.0,
+          "trailing_stop": false,
+          "trailing_activation": 4.0,
+          "trailing_distance": 2.0,
+          "time_exit_minutes": null
+        },
+        "sizing_rules": {
+          "method": "risk_pct",
+          "fixed_contracts": 2,
+          "risk_pct": 0.015,
+          "atr_risk_multiple": 2.0
+        },
+        "primary_timeframe": "1m",
+        "require_all_entries": true
+      },
+      "trades": 11,
+      "win_rate": 18.181818181818183,
+      "profit_factor": 0.9473684210526315,
+      "sharpe": -0.6532698116327718,
+      "total_pnl": -162.0,
+      "max_drawdown": -2052.0,
+      "avg_trade": -14.727272727272727,
+      "avg_winner": 1458.0,
+      "avg_loser": -342.0,
+      "mc_median": -254.9649798858154,
+      "mc_mean": -202.54642418865743,
+      "mc_5th": -3803.059682181828,
+      "mc_95th": 3666.5770343817708,
+      "mc_p_profit": 0.3784,
+      "mc_p_ruin": 1.0,
+      "mc_composite": 2.75,
+      "mc_pass_rate": 0.0
+    },
+    {
+      "label": "[OCT] VWAP|FOOTPRINT|SL12_TP96",
+      "strategy": {
+        "name": "VWAP|FOOTPRINT|SL12_TP96",
+        "entry_signals": [
+          {
+            "signal_name": "vwap",
+            "module": "signals.volume",
+            "function": "vwap",
+            "params": {},
+            "columns": {
+              "long": "entry_long_vwap",
+              "short": "entry_short_vwap"
+            }
+          }
+        ],
+        "entry_filters": [
+          {
+            "signal_name": "footprint_imbalance",
+            "module": "signals.orderflow",
+            "function": "footprint_imbalance",
+            "params": {
+              "stacked_threshold": 3
+            },
+            "column": "signal_stacked_buy"
+          }
+        ],
+        "exit_rules": {
+          "stop_loss_type": "fixed_points",
+          "stop_loss_value": 12.0,
+          "take_profit_type": "fixed_points",
+          "take_profit_value": 96.0,
+          "trailing_stop": false,
+          "trailing_activation": 4.0,
+          "trailing_distance": 2.0,
+          "time_exit_minutes": null
+        },
+        "sizing_rules": {
+          "method": "risk_pct",
+          "fixed_contracts": 2,
+          "risk_pct": 0.015,
+          "atr_risk_multiple": 2.0
+        },
+        "primary_timeframe": "1m",
+        "require_all_entries": true
+      },
+      "trades": 9,
+      "win_rate": 11.11111111111111,
+      "profit_factor": 0.8824626865671642,
+      "sharpe": -1.0031797572838919,
+      "total_pnl": -378.0,
+      "max_drawdown": -2010.0,
+      "avg_trade": -42.0,
+      "avg_winner": 2838.0,
+      "avg_loser": -402.0,
+      "mc_median": -483.52146486720085,
+      "mc_mean": -342.7326053436093,
+      "mc_5th": -3753.907028159593,
+      "mc_95th": 5978.789506107289,
+      "mc_p_profit": 0.2988,
+      "mc_p_ruin": 1.0,
+      "mc_composite": 2.55,
+      "mc_pass_rate": 0.0
+    },
+    {
+      "label": "[FEB] RSI|EMA_RIBBON|gen_2d10a1",
+      "strategy": {
+        "name": "RSI|EMA_RIBBON|gen_2d10a1",
+        "entry_signals": [
+          {
+            "signal_name": "rsi",
+            "module": "signals.momentum",
+            "function": "rsi",
+            "params": {
+              "period": 14,
+              "overbought": 69.8418,
+              "oversold": 21.6515
+            },
+            "columns": {
+              "long": "entry_long_rsi",
+              "short": "entry_short_rsi"
+            }
+          }
+        ],
+        "entry_filters": [
+          {
+            "signal_name": "ema_ribbon",
+            "module": "signals.trend",
+            "function": "ema_ribbon",
+            "params": {
+              "periods": [
+                8,
+                13,
+                21,
+                34,
+                55
+              ]
+            },
+            "column": "signal_ema_ribbon_bullish"
+          }
+        ],
+        "exit_rules": {
+          "stop_loss_type": "fixed_points",
+          "stop_loss_value": 18.1,
+          "take_profit_type": "fixed_points",
+          "take_profit_value": 123.7,
+          "trailing_stop": false,
+          "trailing_activation": 4.0,
+          "trailing_distance": 2.0,
+          "time_exit_minutes": null
+        },
+        "sizing_rules": {
+          "method": "risk_pct",
+          "fixed_contracts": 1,
+          "risk_pct": 0.0198,
+          "atr_risk_multiple": 2.0
+        },
+        "primary_timeframe": "1m",
+        "require_all_entries": true
+      },
+      "trades": 6,
+      "win_rate": 16.666666666666664,
+      "profit_factor": 0.3856410256410544,
+      "sharpe": -9.614580880134097,
+      "total_pnl": -1796.9999999997817,
+      "max_drawdown": -2339.9999999998254,
+      "avg_trade": -299.4999999999636,
+      "avg_winner": 1128.0,
+      "avg_loser": -584.9999999999563,
+      "mc_median": -1843.7403344587183,
+      "mc_mean": -1798.344849496147,
+      "mc_5th": -3652.2461659656556,
+      "mc_95th": 1507.3695590153893,
+      "mc_p_profit": 0.1212,
+      "mc_p_ruin": 1.0,
+      "mc_composite": 1.12,
+      "mc_pass_rate": 0.0
+    },
+    {
+      "label": "[FEB] RSI|EMA_RIBBON|SL20.0_TP120.0|breed_0dee60",
+      "strategy": {
+        "name": "RSI|EMA_RIBBON|SL20.0_TP120.0|breed_0dee60",
+        "entry_signals": [
+          {
+            "signal_name": "rsi",
+            "module": "signals.momentum",
+            "function": "rsi",
+            "params": {
+              "period": 14,
+              "overbought": 70.0,
+              "oversold": 30.0
+            },
+            "columns": {
+              "long": "entry_long_rsi",
+              "short": "entry_short_rsi"
+            }
+          }
+        ],
+        "entry_filters": [
+          {
+            "signal_name": "ema_ribbon",
+            "module": "signals.trend",
+            "function": "ema_ribbon",
+            "params": {
+              "periods": [
+                8,
+                13,
+                21,
+                34,
+                55
+              ]
+            },
+            "column": "signal_ema_ribbon_bullish"
+          }
+        ],
+        "exit_rules": {
+          "stop_loss_type": "fixed_points",
+          "stop_loss_value": 18.3,
+          "take_profit_type": "fixed_points",
+          "take_profit_value": 127.9,
+          "trailing_stop": false,
+          "trailing_activation": 4.0,
+          "trailing_distance": 2.0,
+          "time_exit_minutes": null
+        },
+        "sizing_rules": {
+          "method": "risk_pct",
+          "fixed_contracts": 1,
+          "risk_pct": 0.02,
+          "atr_risk_multiple": 2.0
+        },
+        "primary_timeframe": "1m",
+        "require_all_entries": true
+      },
+      "trades": 6,
+      "win_rate": 16.666666666666664,
+      "profit_factor": 0.3817258883248872,
+      "sharpe": -9.740972419643892,
+      "total_pnl": -1826.9999999998909,
+      "max_drawdown": -2363.9999999999127,
+      "avg_trade": -304.4999999999818,
+      "avg_winner": 1128.0,
+      "avg_loser": -590.9999999999782,
+      "mc_median": -1874.4341738643052,
+      "mc_mean": -1829.4570897672918,
+      "mc_5th": -3700.8455589689784,
+      "mc_95th": 1488.1408973042355,
+      "mc_p_profit": 0.1158,
+      "mc_p_ruin": 1.0,
+      "mc_composite": 1.11,
+      "mc_pass_rate": 0.0
+    },
+    {
+      "label": "[FEB] RSI|EMA_RIBBON|breed_67da23",
+      "strategy": {
+        "name": "RSI|EMA_RIBBON|breed_67da23",
+        "entry_signals": [
+          {
+            "signal_name": "rsi",
+            "module": "signals.momentum",
+            "function": "rsi",
+            "params": {
+              "period": 14,
+              "overbought": 69.9028,
+              "oversold": 18.4255
+            },
+            "columns": {
+              "long": "entry_long_rsi",
+              "short": "entry_short_rsi"
+            }
+          }
+        ],
+        "entry_filters": [
+          {
+            "signal_name": "ema_ribbon",
+            "module": "signals.trend",
+            "function": "ema_ribbon",
+            "params": {
+              "periods": [
+                8,
+                13,
+                21,
+                34,
+                55
+              ]
+            },
+            "column": "signal_ema_ribbon_bullish"
+          }
+        ],
+        "exit_rules": {
+          "stop_loss_type": "fixed_points",
+          "stop_loss_value": 18.3,
+          "take_profit_type": "fixed_points",
+          "take_profit_value": 127.9,
+          "trailing_stop": false,
+          "trailing_activation": 4.0,
+          "trailing_distance": 2.0,
+          "time_exit_minutes": null
+        },
+        "sizing_rules": {
+          "method": "risk_pct",
+          "fixed_contracts": 1,
+          "risk_pct": 0.02,
+          "atr_risk_multiple": 2.0
+        },
+        "primary_timeframe": "1m",
+        "require_all_entries": true
+      },
+      "trades": 6,
+      "win_rate": 16.666666666666664,
+      "profit_factor": 0.3817258883248872,
+      "sharpe": -9.740972419643892,
+      "total_pnl": -1826.9999999998909,
+      "max_drawdown": -2363.9999999999127,
+      "avg_trade": -304.4999999999818,
+      "avg_winner": 1128.0,
+      "avg_loser": -590.9999999999782,
+      "mc_median": -1874.819400602013,
+      "mc_mean": -1828.6726914216383,
+      "mc_5th": -3698.682324268166,
+      "mc_95th": 1457.5276163668598,
+      "mc_p_profit": 0.1082,
+      "mc_p_ruin": 1.0,
+      "mc_composite": 1.11,
+      "mc_pass_rate": 0.0
+    },
+    {
+      "label": "[FEB] RSI|EMA_RIBBON|breed_0f0520",
+      "strategy": {
+        "name": "RSI|EMA_RIBBON|breed_0f0520",
+        "entry_signals": [
+          {
+            "signal_name": "rsi",
+            "module": "signals.momentum",
+            "function": "rsi",
+            "params": {
+              "period": 14,
+              "overbought": 69.9567,
+              "oversold": 21.2408
+            },
+            "columns": {
+              "long": "entry_long_rsi",
+              "short": "entry_short_rsi"
+            }
+          }
+        ],
+        "entry_filters": [
+          {
+            "signal_name": "ema_ribbon",
+            "module": "signals.trend",
+            "function": "ema_ribbon",
+            "params": {
+              "periods": [
+                8,
+                13,
+                21,
+                34,
+                55
+              ]
+            },
+            "column": "signal_ema_ribbon_bullish"
+          }
+        ],
+        "exit_rules": {
+          "stop_loss_type": "fixed_points",
+          "stop_loss_value": 18.3,
+          "take_profit_type": "fixed_points",
+          "take_profit_value": 127.9,
+          "trailing_stop": false,
+          "trailing_activation": 4.0,
+          "trailing_distance": 2.0,
+          "time_exit_minutes": null
+        },
+        "sizing_rules": {
+          "method": "risk_pct",
+          "fixed_contracts": 1,
+          "risk_pct": 0.0198,
+          "atr_risk_multiple": 2.0
+        },
+        "primary_timeframe": "1m",
+        "require_all_entries": true
+      },
+      "trades": 6,
+      "win_rate": 16.666666666666664,
+      "profit_factor": 0.3817258883248872,
+      "sharpe": -9.740972419643892,
+      "total_pnl": -1826.9999999998909,
+      "max_drawdown": -2363.9999999999127,
+      "avg_trade": -304.4999999999818,
+      "avg_winner": 1128.0,
+      "avg_loser": -590.9999999999782,
+      "mc_median": -1875.6214427263913,
+      "mc_mean": -1821.3715059623576,
+      "mc_5th": -3684.2150093743326,
+      "mc_95th": 1456.5661448000533,
+      "mc_p_profit": 0.1134,
+      "mc_p_ruin": 1.0,
+      "mc_composite": 1.11,
+      "mc_pass_rate": 0.0
+    },
+    {
+      "label": "[FEB] RSI|EMA_RIBBON|breed_67da23",
+      "strategy": {
+        "name": "RSI|EMA_RIBBON|breed_67da23",
+        "entry_signals": [
+          {
+            "signal_name": "rsi",
+            "module": "signals.momentum",
+            "function": "rsi",
+            "params": {
+              "period": 14,
+              "overbought": 69.9028,
+              "oversold": 18.4255
+            },
+            "columns": {
+              "long": "entry_long_rsi",
+              "short": "entry_short_rsi"
+            }
+          }
+        ],
+        "entry_filters": [
+          {
+            "signal_name": "ema_ribbon",
+            "module": "signals.trend",
+            "function": "ema_ribbon",
+            "params": {
+              "periods": [
+                8,
+                13,
+                21,
+                34,
+                55
+              ]
+            },
+            "column": "signal_ema_ribbon_bullish"
+          }
+        ],
+        "exit_rules": {
+          "stop_loss_type": "fixed_points",
+          "stop_loss_value": 18.3,
+          "take_profit_type": "fixed_points",
+          "take_profit_value": 127.9,
+          "trailing_stop": false,
+          "trailing_activation": 4.0,
+          "trailing_distance": 2.0,
+          "time_exit_minutes": null
+        },
+        "sizing_rules": {
+          "method": "risk_pct",
+          "fixed_contracts": 1,
+          "risk_pct": 0.02,
+          "atr_risk_multiple": 2.0
+        },
+        "primary_timeframe": "1m",
+        "require_all_entries": true
+      },
+      "trades": 6,
+      "win_rate": 16.666666666666664,
+      "profit_factor": 0.3817258883248872,
+      "sharpe": -9.740972419643892,
+      "total_pnl": -1826.9999999998909,
+      "max_drawdown": -2363.9999999999127,
+      "avg_trade": -304.4999999999818,
+      "avg_winner": 1128.0,
+      "avg_loser": -590.9999999999782,
+      "mc_median": -1877.5105748891765,
+      "mc_mean": -1838.4370701858916,
+      "mc_5th": -3698.7450805770795,
+      "mc_95th": 1429.7168928973367,
+      "mc_p_profit": 0.1114,
+      "mc_p_ruin": 1.0,
+      "mc_composite": 1.11,
+      "mc_pass_rate": 0.0
+    },
+    {
+      "label": "[FEB] RSI|EMA_RIBBON|breed_df5690",
+      "strategy": {
+        "name": "RSI|EMA_RIBBON|breed_df5690",
+        "entry_signals": [
+          {
+            "signal_name": "rsi",
+            "module": "signals.momentum",
+            "function": "rsi",
+            "params": {
+              "period": 14,
+              "overbought": 69.9028,
+              "oversold": 18.4255
+            },
+            "columns": {
+              "long": "entry_long_rsi",
+              "short": "entry_short_rsi"
+            }
+          }
+        ],
+        "entry_filters": [
+          {
+            "signal_name": "ema_ribbon",
+            "module": "signals.trend",
+            "function": "ema_ribbon",
+            "params": {
+              "periods": [
+                8,
+                13,
+                21,
+                34,
+                55
+              ]
+            },
+            "column": "signal_ema_ribbon_bullish"
+          }
+        ],
+        "exit_rules": {
+          "stop_loss_type": "fixed_points",
+          "stop_loss_value": 18.3,
+          "take_profit_type": "fixed_points",
+          "take_profit_value": 127.9,
+          "trailing_stop": false,
+          "trailing_activation": 4.0,
+          "trailing_distance": 2.0,
+          "time_exit_minutes": null
+        },
+        "sizing_rules": {
+          "method": "risk_pct",
+          "fixed_contracts": 1,
+          "risk_pct": 0.022,
+          "atr_risk_multiple": 2.0
+        },
+        "primary_timeframe": "1m",
+        "require_all_entries": true
+      },
+      "trades": 6,
+      "win_rate": 16.666666666666664,
+      "profit_factor": 0.3817258883248872,
+      "sharpe": -9.740972419643892,
+      "total_pnl": -1826.9999999998909,
+      "max_drawdown": -2363.9999999999127,
+      "avg_trade": -304.4999999999818,
+      "avg_winner": 1128.0,
+      "avg_loser": -590.9999999999782,
+      "mc_median": -1880.6383013759769,
+      "mc_mean": -1843.4655037322677,
+      "mc_5th": -3685.7803731600156,
+      "mc_95th": 1447.4033693387041,
+      "mc_p_profit": 0.1122,
+      "mc_p_ruin": 1.0,
+      "mc_composite": 1.11,
+      "mc_pass_rate": 0.0
+    },
+    {
+      "label": "[FEB] RSI|EMA_RIBBON|breed_67da23",
+      "strategy": {
+        "name": "RSI|EMA_RIBBON|breed_67da23",
+        "entry_signals": [
+          {
+            "signal_name": "rsi",
+            "module": "signals.momentum",
+            "function": "rsi",
+            "params": {
+              "period": 14,
+              "overbought": 69.9028,
+              "oversold": 18.4255
+            },
+            "columns": {
+              "long": "entry_long_rsi",
+              "short": "entry_short_rsi"
+            }
+          }
+        ],
+        "entry_filters": [
+          {
+            "signal_name": "ema_ribbon",
+            "module": "signals.trend",
+            "function": "ema_ribbon",
+            "params": {
+              "periods": [
+                8,
+                13,
+                21,
+                34,
+                55
+              ]
+            },
+            "column": "signal_ema_ribbon_bullish"
+          }
+        ],
+        "exit_rules": {
+          "stop_loss_type": "fixed_points",
+          "stop_loss_value": 18.3,
+          "take_profit_type": "fixed_points",
+          "take_profit_value": 127.9,
+          "trailing_stop": false,
+          "trailing_activation": 4.0,
+          "trailing_distance": 2.0,
+          "time_exit_minutes": null
+        },
+        "sizing_rules": {
+          "method": "risk_pct",
+          "fixed_contracts": 1,
+          "risk_pct": 0.02,
+          "atr_risk_multiple": 2.0
+        },
+        "primary_timeframe": "1m",
+        "require_all_entries": true
+      },
+      "trades": 6,
+      "win_rate": 16.666666666666664,
+      "profit_factor": 0.3817258883248872,
+      "sharpe": -9.740972419643892,
+      "total_pnl": -1826.9999999998909,
+      "max_drawdown": -2363.9999999999127,
+      "avg_trade": -304.4999999999818,
+      "avg_winner": 1128.0,
+      "avg_loser": -590.9999999999782,
+      "mc_median": -1883.1276681977251,
+      "mc_mean": -1852.1448061970198,
+      "mc_5th": -3702.997082248242,
+      "mc_95th": 1439.8322738276254,
+      "mc_p_profit": 0.1058,
+      "mc_p_ruin": 1.0,
+      "mc_composite": 1.1,
+      "mc_pass_rate": 0.0
+    },
+    {
+      "label": "[FEB] RSI|EMA_RIBBON|gen_334c65",
+      "strategy": {
+        "name": "RSI|EMA_RIBBON|gen_334c65",
+        "entry_signals": [
+          {
+            "signal_name": "rsi",
+            "module": "signals.momentum",
+            "function": "rsi",
+            "params": {
+              "period": 14,
+              "overbought": 69.9028,
+              "oversold": 18.4255
+            },
+            "columns": {
+              "long": "entry_long_rsi",
+              "short": "entry_short_rsi"
+            }
+          }
+        ],
+        "entry_filters": [
+          {
+            "signal_name": "ema_ribbon",
+            "module": "signals.trend",
+            "function": "ema_ribbon",
+            "params": {
+              "periods": [
+                8,
+                13,
+                21,
+                34,
+                55
+              ]
+            },
+            "column": "signal_ema_ribbon_bullish"
+          }
+        ],
+        "exit_rules": {
+          "stop_loss_type": "fixed_points",
+          "stop_loss_value": 18.3,
+          "take_profit_type": "fixed_points",
+          "take_profit_value": 127.9,
+          "trailing_stop": false,
+          "trailing_activation": 4.0,
+          "trailing_distance": 2.0,
+          "time_exit_minutes": null
+        },
+        "sizing_rules": {
+          "method": "risk_pct",
+          "fixed_contracts": 1,
+          "risk_pct": 0.022,
+          "atr_risk_multiple": 2.0
+        },
+        "primary_timeframe": "1m",
+        "require_all_entries": true
+      },
+      "trades": 6,
+      "win_rate": 16.666666666666664,
+      "profit_factor": 0.3817258883248872,
+      "sharpe": -9.740972419643892,
+      "total_pnl": -1826.9999999998909,
+      "max_drawdown": -2363.9999999999127,
+      "avg_trade": -304.4999999999818,
+      "avg_winner": 1128.0,
+      "avg_loser": -590.9999999999782,
+      "mc_median": -1883.1915978488469,
+      "mc_mean": -1846.3770848511756,
+      "mc_5th": -3698.5177811806693,
+      "mc_95th": 1430.2072769355154,
+      "mc_p_profit": 0.1104,
+      "mc_p_ruin": 1.0,
+      "mc_composite": 1.11,
+      "mc_pass_rate": 0.0
+    },
+    {
+      "label": "[FEB] RSI|EMA_RIBBON|breed_a2fe38",
+      "strategy": {
+        "name": "RSI|EMA_RIBBON|breed_a2fe38",
+        "entry_signals": [
+          {
+            "signal_name": "rsi",
+            "module": "signals.momentum",
+            "function": "rsi",
+            "params": {
+              "period": 14,
+              "overbought": 69.9028,
+              "oversold": 18.4255
+            },
+            "columns": {
+              "long": "entry_long_rsi",
+              "short": "entry_short_rsi"
+            }
+          }
+        ],
+        "entry_filters": [
+          {
+            "signal_name": "ema_ribbon",
+            "module": "signals.trend",
+            "function": "ema_ribbon",
+            "params": {
+              "periods": [
+                8,
+                13,
+                21,
+                34,
+                55
+              ]
+            },
+            "column": "signal_ema_ribbon_bullish"
+          }
+        ],
+        "exit_rules": {
+          "stop_loss_type": "fixed_points",
+          "stop_loss_value": 18.3,
+          "take_profit_type": "fixed_points",
+          "take_profit_value": 127.9,
+          "trailing_stop": false,
+          "trailing_activation": 4.0,
+          "trailing_distance": 2.0,
+          "time_exit_minutes": null
+        },
+        "sizing_rules": {
+          "method": "risk_pct",
+          "fixed_contracts": 1,
+          "risk_pct": 0.02,
+          "atr_risk_multiple": 2.0
+        },
+        "primary_timeframe": "1m",
+        "require_all_entries": true
+      },
+      "trades": 6,
+      "win_rate": 16.666666666666664,
+      "profit_factor": 0.3817258883248872,
+      "sharpe": -9.740972419643892,
+      "total_pnl": -1826.9999999998909,
+      "max_drawdown": -2363.9999999999127,
+      "avg_trade": -304.4999999999818,
+      "avg_winner": 1128.0,
+      "avg_loser": -590.9999999999782,
+      "mc_median": -1885.8939183597868,
+      "mc_mean": -1878.6185464320536,
+      "mc_5th": -3695.630917308821,
+      "mc_95th": 1362.6571378672704,
+      "mc_p_profit": 0.1002,
+      "mc_p_ruin": 1.0,
+      "mc_composite": 1.1,
+      "mc_pass_rate": 0.0
+    },
+    {
+      "label": "[FEB] RSI|EMA_RIBBON|breed_0b7bf9",
+      "strategy": {
+        "name": "RSI|EMA_RIBBON|breed_0b7bf9",
+        "entry_signals": [
+          {
+            "signal_name": "rsi",
+            "module": "signals.momentum",
+            "function": "rsi",
+            "params": {
+              "period": 14,
+              "overbought": 69.9567,
+              "oversold": 21.2408
+            },
+            "columns": {
+              "long": "entry_long_rsi",
+              "short": "entry_short_rsi"
+            }
+          }
+        ],
+        "entry_filters": [
+          {
+            "signal_name": "ema_ribbon",
+            "module": "signals.trend",
+            "function": "ema_ribbon",
+            "params": {
+              "periods": [
+                8,
+                13,
+                21,
+                34,
+                55
+              ]
+            },
+            "column": "signal_ema_ribbon_bullish"
+          }
+        ],
+        "exit_rules": {
+          "stop_loss_type": "fixed_points",
+          "stop_loss_value": 19.0,
+          "take_profit_type": "fixed_points",
+          "take_profit_value": 123.5,
+          "trailing_stop": false,
+          "trailing_activation": 4.0,
+          "trailing_distance": 2.0,
+          "time_exit_minutes": null
+        },
+        "sizing_rules": {
+          "method": "risk_pct",
+          "fixed_contracts": 1,
+          "risk_pct": 0.022,
+          "atr_risk_multiple": 2.0
+        },
+        "primary_timeframe": "1m",
+        "require_all_entries": true
+      },
+      "trades": 6,
+      "win_rate": 16.666666666666664,
+      "profit_factor": 0.3686274509803922,
+      "sharpe": -10.17647843983297,
+      "total_pnl": -1932.0,
+      "max_drawdown": -2448.0,
+      "avg_trade": -322.0,
+      "avg_winner": 1128.0,
+      "avg_loser": -612.0,
+      "mc_median": -1989.9686203405981,
+      "mc_mean": -1941.0764258964673,
+      "mc_5th": -3822.5560199849097,
+      "mc_95th": 1374.9308082361395,
+      "mc_p_profit": 0.085,
+      "mc_p_ruin": 1.0,
+      "mc_composite": 1.07,
+      "mc_pass_rate": 0.0
+    },
+    {
+      "label": "[FEB] RSI|EMA_RIBBON|SL20.0_TP120.0|breed_f26100",
+      "strategy": {
+        "name": "RSI|EMA_RIBBON|SL20.0_TP120.0|breed_f26100",
+        "entry_signals": [
+          {
+            "signal_name": "rsi",
+            "module": "signals.momentum",
+            "function": "rsi",
+            "params": {
+              "period": 14,
+              "overbought": 70.0,
+              "oversold": 30.0
+            },
+            "columns": {
+              "long": "entry_long_rsi",
+              "short": "entry_short_rsi"
+            }
+          }
+        ],
+        "entry_filters": [
+          {
+            "signal_name": "ema_ribbon",
+            "module": "signals.trend",
+            "function": "ema_ribbon",
+            "params": {
+              "periods": [
+                8,
+                13,
+                21,
+                34,
+                55
+              ]
+            },
+            "column": "signal_ema_ribbon_bullish"
+          }
+        ],
+        "exit_rules": {
+          "stop_loss_type": "fixed_points",
+          "stop_loss_value": 19.0,
+          "take_profit_type": "fixed_points",
+          "take_profit_value": 123.5,
+          "trailing_stop": false,
+          "trailing_activation": 4.0,
+          "trailing_distance": 2.0,
+          "time_exit_minutes": null
+        },
+        "sizing_rules": {
+          "method": "risk_pct",
+          "fixed_contracts": 1,
+          "risk_pct": 0.02,
+          "atr_risk_multiple": 2.0
+        },
+        "primary_timeframe": "1m",
+        "require_all_entries": true
+      },
+      "trades": 6,
+      "win_rate": 16.666666666666664,
+      "profit_factor": 0.3686274509803922,
+      "sharpe": -10.17647843983297,
+      "total_pnl": -1932.0,
+      "max_drawdown": -2448.0,
+      "avg_trade": -322.0,
+      "avg_winner": 1128.0,
+      "avg_loser": -612.0,
+      "mc_median": -1990.804348213147,
+      "mc_mean": -1942.8022914900198,
+      "mc_5th": -3829.153158481098,
+      "mc_95th": 1463.7099807292211,
+      "mc_p_profit": 0.089,
+      "mc_p_ruin": 1.0,
+      "mc_composite": 1.07,
+      "mc_pass_rate": 0.0
+    },
+    {
+      "label": "[FEB] RSI|EMA_RIBBON|gen_5521ca",
+      "strategy": {
+        "name": "RSI|EMA_RIBBON|gen_5521ca",
+        "entry_signals": [
+          {
+            "signal_name": "rsi",
+            "module": "signals.momentum",
+            "function": "rsi",
+            "params": {
+              "period": 14,
+              "overbought": 69.9567,
+              "oversold": 21.2408
+            },
+            "columns": {
+              "long": "entry_long_rsi",
+              "short": "entry_short_rsi"
+            }
+          }
+        ],
+        "entry_filters": [
+          {
+            "signal_name": "ema_ribbon",
+            "module": "signals.trend",
+            "function": "ema_ribbon",
+            "params": {
+              "periods": [
+                8,
+                13,
+                21,
+                34,
+                55
+              ]
+            },
+            "column": "signal_ema_ribbon_bullish"
+          }
+        ],
+        "exit_rules": {
+          "stop_loss_type": "fixed_points",
+          "stop_loss_value": 19.0,
+          "take_profit_type": "fixed_points",
+          "take_profit_value": 123.5,
+          "trailing_stop": false,
+          "trailing_activation": 4.0,
+          "trailing_distance": 2.0,
+          "time_exit_minutes": null
+        },
+        "sizing_rules": {
+          "method": "risk_pct",
+          "fixed_contracts": 1,
+          "risk_pct": 0.0198,
+          "atr_risk_multiple": 2.0
+        },
+        "primary_timeframe": "1m",
+        "require_all_entries": true
+      },
+      "trades": 6,
+      "win_rate": 16.666666666666664,
+      "profit_factor": 0.3686274509803922,
+      "sharpe": -10.17647843983297,
+      "total_pnl": -1932.0,
+      "max_drawdown": -2448.0,
+      "avg_trade": -322.0,
+      "avg_winner": 1128.0,
+      "avg_loser": -612.0,
+      "mc_median": -1990.9457396897342,
+      "mc_mean": -1982.9706708284762,
+      "mc_5th": -3819.0242597882475,
+      "mc_95th": 1381.9719967851543,
+      "mc_p_profit": 0.0854,
+      "mc_p_ruin": 1.0,
+      "mc_composite": 1.06,
+      "mc_pass_rate": 0.0
+    },
+    {
+      "label": "[OCT] WILLIAMS_R|FOOTPRINT|SL30_TP180",
+      "strategy": {
+        "name": "WILLIAMS_R|FOOTPRINT|SL30_TP180",
+        "entry_signals": [
+          {
+            "signal_name": "williams_r",
+            "module": "signals.momentum",
+            "function": "williams_r",
+            "params": {
+              "period": 14,
+              "overbought": -20.0,
+              "oversold": -80.0
+            },
+            "columns": {
+              "long": "entry_long_williams",
+              "short": "entry_short_williams"
+            }
+          }
+        ],
+        "entry_filters": [
+          {
+            "signal_name": "footprint_imbalance",
+            "module": "signals.orderflow",
+            "function": "footprint_imbalance",
+            "params": {
+              "stacked_threshold": 3
+            },
+            "column": "signal_stacked_buy"
+          }
+        ],
+        "exit_rules": {
+          "stop_loss_type": "fixed_points",
+          "stop_loss_value": 30.0,
+          "take_profit_type": "fixed_points",
+          "take_profit_value": 180.0,
+          "trailing_stop": false,
+          "trailing_activation": 4.0,
+          "trailing_distance": 2.0,
+          "time_exit_minutes": null
+        },
+        "sizing_rules": {
+          "method": "risk_pct",
+          "fixed_contracts": 2,
+          "risk_pct": 0.015,
+          "atr_risk_multiple": 2.0
+        },
+        "primary_timeframe": "1m",
+        "require_all_entries": true
+      },
+      "trades": 6,
+      "win_rate": 16.666666666666664,
+      "profit_factor": 0.48471337579617835,
+      "sharpe": -4.814619275160504,
+      "total_pnl": -1941.6,
+      "max_drawdown": -2260.7999999999956,
+      "avg_trade": -323.59999999999997,
+      "avg_winner": 1826.4,
+      "avg_loser": -753.6,
+      "mc_median": -2018.1357669685276,
+      "mc_mean": -1980.2534051500634,
+      "mc_5th": -4705.509770346573,
+      "mc_95th": 2949.718041215097,
+      "mc_p_profit": 0.2574,
+      "mc_p_ruin": 1.0,
+      "mc_composite": 1.4,
+      "mc_pass_rate": 0.0
+    },
+    {
+      "label": "[FEB] RSI|EMA_RIBBON|gen_6cc34b",
+      "strategy": {
+        "name": "RSI|EMA_RIBBON|gen_6cc34b",
+        "entry_signals": [
+          {
+            "signal_name": "rsi",
+            "module": "signals.momentum",
+            "function": "rsi",
+            "params": {
+              "period": 14,
+              "overbought": 69.6943,
+              "oversold": 20.8475
+            },
+            "columns": {
+              "long": "entry_long_rsi",
+              "short": "entry_short_rsi"
+            }
+          }
+        ],
+        "entry_filters": [
+          {
+            "signal_name": "ema_ribbon",
+            "module": "signals.trend",
+            "function": "ema_ribbon",
+            "params": {
+              "periods": [
+                8,
+                13,
+                21,
+                34,
+                55
+              ]
+            },
+            "column": "signal_ema_ribbon_bullish"
+          }
+        ],
+        "exit_rules": {
+          "stop_loss_type": "fixed_points",
+          "stop_loss_value": 19.7,
+          "take_profit_type": "fixed_points",
+          "take_profit_value": 123.5,
+          "trailing_stop": false,
+          "trailing_activation": 4.0,
+          "trailing_distance": 2.0,
+          "time_exit_minutes": null
+        },
+        "sizing_rules": {
+          "method": "risk_pct",
+          "fixed_contracts": 1,
+          "risk_pct": 0.0203,
+          "atr_risk_multiple": 2.0
+        },
+        "primary_timeframe": "1m",
+        "require_all_entries": true
+      },
+      "trades": 6,
+      "win_rate": 16.666666666666664,
+      "profit_factor": 0.35639810426539054,
+      "sharpe": -10.601597604344612,
+      "total_pnl": -2037.0000000001091,
+      "max_drawdown": -2532.0000000000873,
+      "avg_trade": -339.5000000000182,
+      "avg_winner": 1128.0,
+      "avg_loser": -633.0000000000218,
+      "mc_median": -2092.4394225522556,
+      "mc_mean": -2082.5526132759705,
+      "mc_5th": -3959.8492394413274,
+      "mc_95th": 1296.3112760414815,
+      "mc_p_profit": 0.072,
+      "mc_p_ruin": 1.0,
+      "mc_composite": 1.03,
+      "mc_pass_rate": 0.0
+    },
+    {
+      "label": "[FEB] RSI|EMA_RIBBON|SL20.0_TP120.0|breed_95a42f",
+      "strategy": {
+        "name": "RSI|EMA_RIBBON|SL20.0_TP120.0|breed_95a42f",
+        "entry_signals": [
+          {
+            "signal_name": "rsi",
+            "module": "signals.momentum",
+            "function": "rsi",
+            "params": {
+              "period": 14,
+              "overbought": 70.0,
+              "oversold": 30.0
+            },
+            "columns": {
+              "long": "entry_long_rsi",
+              "short": "entry_short_rsi"
+            }
+          }
+        ],
+        "entry_filters": [
+          {
+            "signal_name": "ema_ribbon",
+            "module": "signals.trend",
+            "function": "ema_ribbon",
+            "params": {
+              "periods": [
+                8,
+                13,
+                21,
+                34,
+                55
+              ]
+            },
+            "column": "signal_ema_ribbon_bullish"
+          }
+        ],
+        "exit_rules": {
+          "stop_loss_type": "fixed_points",
+          "stop_loss_value": 20.0,
+          "take_profit_type": "fixed_points",
+          "take_profit_value": 120.0,
+          "trailing_stop": false,
+          "trailing_activation": 4.0,
+          "trailing_distance": 2.0,
+          "time_exit_minutes": null
+        },
+        "sizing_rules": {
+          "method": "risk_pct",
+          "fixed_contracts": 1,
+          "risk_pct": 0.02,
+          "atr_risk_multiple": 2.0
+        },
+        "primary_timeframe": "1m",
+        "require_all_entries": true
+      },
+      "trades": 6,
+      "win_rate": 16.666666666666664,
+      "profit_factor": 0.3514018691588785,
+      "sharpe": -10.780703499319843,
+      "total_pnl": -2082.0,
+      "max_drawdown": -2568.0,
+      "avg_trade": -347.0,
+      "avg_winner": 1128.0,
+      "avg_loser": -642.0,
+      "mc_median": -2129.311433964911,
+      "mc_mean": -2085.010801760932,
+      "mc_5th": -4008.864011432431,
+      "mc_95th": 1281.4591524104137,
+      "mc_p_profit": 0.07,
+      "mc_p_ruin": 1.0,
+      "mc_composite": 1.02,
+      "mc_pass_rate": 0.0
+    },
+    {
+      "label": "[FEB] RSI|EMA_RIBBON|breed_b00fa1",
+      "strategy": {
+        "name": "RSI|EMA_RIBBON|breed_b00fa1",
+        "entry_signals": [
+          {
+            "signal_name": "rsi",
+            "module": "signals.momentum",
+            "function": "rsi",
+            "params": {
+              "period": 14,
+              "overbought": 69.9028,
+              "oversold": 18.4255
+            },
+            "columns": {
+              "long": "entry_long_rsi",
+              "short": "entry_short_rsi"
+            }
+          }
+        ],
+        "entry_filters": [
+          {
+            "signal_name": "ema_ribbon",
+            "module": "signals.trend",
+            "function": "ema_ribbon",
+            "params": {
+              "periods": [
+                8,
+                13,
+                21,
+                34,
+                55
+              ]
+            },
+            "column": "signal_ema_ribbon_bullish"
+          }
+        ],
+        "exit_rules": {
+          "stop_loss_type": "fixed_points",
+          "stop_loss_value": 20.0,
+          "take_profit_type": "fixed_points",
+          "take_profit_value": 120.0,
+          "trailing_stop": false,
+          "trailing_activation": 4.0,
+          "trailing_distance": 2.0,
+          "time_exit_minutes": null
+        },
+        "sizing_rules": {
+          "method": "risk_pct",
+          "fixed_contracts": 1,
+          "risk_pct": 0.022,
+          "atr_risk_multiple": 2.0
+        },
+        "primary_timeframe": "1m",
+        "require_all_entries": true
+      },
+      "trades": 6,
+      "win_rate": 16.666666666666664,
+      "profit_factor": 0.3514018691588785,
+      "sharpe": -10.780703499319843,
+      "total_pnl": -2082.0,
+      "max_drawdown": -2568.0,
+      "avg_trade": -347.0,
+      "avg_winner": 1128.0,
+      "avg_loser": -642.0,
+      "mc_median": -2132.496369988359,
+      "mc_mean": -2089.988421706098,
+      "mc_5th": -4015.290135873406,
+      "mc_95th": 1283.6575891327873,
+      "mc_p_profit": 0.066,
+      "mc_p_ruin": 1.0,
+      "mc_composite": 1.02,
+      "mc_pass_rate": 0.0
+    },
+    {
+      "label": "[FEB] RSI|EMA_RIBBON|SL20.0_TP120.0|breed_345811",
+      "strategy": {
+        "name": "RSI|EMA_RIBBON|SL20.0_TP120.0|breed_345811",
+        "entry_signals": [
+          {
+            "signal_name": "rsi",
+            "module": "signals.momentum",
+            "function": "rsi",
+            "params": {
+              "period": 14,
+              "overbought": 70.0,
+              "oversold": 30.0
+            },
+            "columns": {
+              "long": "entry_long_rsi",
+              "short": "entry_short_rsi"
+            }
+          }
+        ],
+        "entry_filters": [
+          {
+            "signal_name": "ema_ribbon",
+            "module": "signals.trend",
+            "function": "ema_ribbon",
+            "params": {
+              "periods": [
+                8,
+                13,
+                21,
+                34,
+                55
+              ]
+            },
+            "column": "signal_ema_ribbon_bullish"
+          }
+        ],
+        "exit_rules": {
+          "stop_loss_type": "fixed_points",
+          "stop_loss_value": 20.0,
+          "take_profit_type": "fixed_points",
+          "take_profit_value": 120.0,
+          "trailing_stop": false,
+          "trailing_activation": 4.0,
+          "trailing_distance": 2.0,
+          "time_exit_minutes": null
+        },
+        "sizing_rules": {
+          "method": "risk_pct",
+          "fixed_contracts": 1,
+          "risk_pct": 0.022,
+          "atr_risk_multiple": 2.0
+        },
+        "primary_timeframe": "1m",
+        "require_all_entries": true
+      },
+      "trades": 6,
+      "win_rate": 16.666666666666664,
+      "profit_factor": 0.3514018691588785,
+      "sharpe": -10.780703499319843,
+      "total_pnl": -2082.0,
+      "max_drawdown": -2568.0,
+      "avg_trade": -347.0,
+      "avg_winner": 1128.0,
+      "avg_loser": -642.0,
+      "mc_median": -2137.624617636833,
+      "mc_mean": -2103.1429454326308,
+      "mc_5th": -4009.6856244146975,
+      "mc_95th": 1258.2445005772972,
+      "mc_p_profit": 0.0652,
+      "mc_p_ruin": 1.0,
+      "mc_composite": 1.02,
+      "mc_pass_rate": 0.0
+    },
+    {
+      "label": "[FEB] RSI|EMA_RIBBON|SL20.0_TP120.0|breed_46c7fa",
+      "strategy": {
+        "name": "RSI|EMA_RIBBON|SL20.0_TP120.0|breed_46c7fa",
+        "entry_signals": [
+          {
+            "signal_name": "rsi",
+            "module": "signals.momentum",
+            "function": "rsi",
+            "params": {
+              "period": 14,
+              "overbought": 70.0,
+              "oversold": 30.0
+            },
+            "columns": {
+              "long": "entry_long_rsi",
+              "short": "entry_short_rsi"
+            }
+          }
+        ],
+        "entry_filters": [
+          {
+            "signal_name": "ema_ribbon",
+            "module": "signals.trend",
+            "function": "ema_ribbon",
+            "params": {
+              "periods": [
+                8,
+                13,
+                21,
+                34,
+                55
+              ]
+            },
+            "column": "signal_ema_ribbon_bullish"
+          }
+        ],
+        "exit_rules": {
+          "stop_loss_type": "fixed_points",
+          "stop_loss_value": 20.0,
+          "take_profit_type": "fixed_points",
+          "take_profit_value": 120.0,
+          "trailing_stop": false,
+          "trailing_activation": 4.0,
+          "trailing_distance": 2.0,
+          "time_exit_minutes": null
+        },
+        "sizing_rules": {
+          "method": "risk_pct",
+          "fixed_contracts": 1,
+          "risk_pct": 0.02,
+          "atr_risk_multiple": 2.0
+        },
+        "primary_timeframe": "1m",
+        "require_all_entries": true
+      },
+      "trades": 6,
+      "win_rate": 16.666666666666664,
+      "profit_factor": 0.3514018691588785,
+      "sharpe": -10.780703499319843,
+      "total_pnl": -2082.0,
+      "max_drawdown": -2568.0,
+      "avg_trade": -347.0,
+      "avg_winner": 1128.0,
+      "avg_loser": -642.0,
+      "mc_median": -2138.5639822979283,
+      "mc_mean": -2112.846762768852,
+      "mc_5th": -4004.142215138704,
+      "mc_95th": 1305.9209850947482,
+      "mc_p_profit": 0.068,
+      "mc_p_ruin": 1.0,
+      "mc_composite": 1.02,
+      "mc_pass_rate": 0.0
+    },
+    {
+      "label": "[FEB] RSI|EMA_RIBBON|breed_48c865",
+      "strategy": {
+        "name": "RSI|EMA_RIBBON|breed_48c865",
+        "entry_signals": [
+          {
+            "signal_name": "rsi",
+            "module": "signals.momentum",
+            "function": "rsi",
+            "params": {
+              "period": 14,
+              "overbought": 70.0,
+              "oversold": 20.0
+            },
+            "columns": {
+              "long": "entry_long_rsi",
+              "short": "entry_short_rsi"
+            }
+          }
+        ],
+        "entry_filters": [
+          {
+            "signal_name": "ema_ribbon",
+            "module": "signals.trend",
+            "function": "ema_ribbon",
+            "params": {
+              "periods": [
+                8,
+                13,
+                21,
+                34,
+                55
+              ]
+            },
+            "column": "signal_ema_ribbon_bullish"
+          }
+        ],
+        "exit_rules": {
+          "stop_loss_type": "fixed_points",
+          "stop_loss_value": 20.0,
+          "take_profit_type": "fixed_points",
+          "take_profit_value": 120.0,
+          "trailing_stop": false,
+          "trailing_activation": 4.0,
+          "trailing_distance": 2.0,
+          "time_exit_minutes": null
+        },
+        "sizing_rules": {
+          "method": "risk_pct",
+          "fixed_contracts": 1,
+          "risk_pct": 0.022,
+          "atr_risk_multiple": 2.0
+        },
+        "primary_timeframe": "1m",
+        "require_all_entries": true
+      },
+      "trades": 6,
+      "win_rate": 16.666666666666664,
+      "profit_factor": 0.3514018691588785,
+      "sharpe": -10.780703499319843,
+      "total_pnl": -2082.0,
+      "max_drawdown": -2568.0,
+      "avg_trade": -347.0,
+      "avg_winner": 1128.0,
+      "avg_loser": -642.0,
+      "mc_median": -2144.484778077316,
+      "mc_mean": -2132.7002127163114,
+      "mc_5th": -4012.6124708335283,
+      "mc_95th": 1290.3525680137268,
+      "mc_p_profit": 0.0658,
+      "mc_p_ruin": 1.0,
+      "mc_composite": 1.01,
+      "mc_pass_rate": 0.0
+    },
+    {
+      "label": "[FEB] RSI|EMA_RIBBON|breed_9dc4c4",
+      "strategy": {
+        "name": "RSI|EMA_RIBBON|breed_9dc4c4",
+        "entry_signals": [
+          {
+            "signal_name": "rsi",
+            "module": "signals.momentum",
+            "function": "rsi",
+            "params": {
+              "period": 14,
+              "overbought": 70.0,
+              "oversold": 20.0
+            },
+            "columns": {
+              "long": "entry_long_rsi",
+              "short": "entry_short_rsi"
+            }
+          }
+        ],
+        "entry_filters": [
+          {
+            "signal_name": "ema_ribbon",
+            "module": "signals.trend",
+            "function": "ema_ribbon",
+            "params": {
+              "periods": [
+                8,
+                13,
+                21,
+                34,
+                55
+              ]
+            },
+            "column": "signal_ema_ribbon_bullish"
+          }
+        ],
+        "exit_rules": {
+          "stop_loss_type": "fixed_points",
+          "stop_loss_value": 20.0,
+          "take_profit_type": "fixed_points",
+          "take_profit_value": 120.0,
+          "trailing_stop": false,
+          "trailing_activation": 4.0,
+          "trailing_distance": 2.0,
+          "time_exit_minutes": null
+        },
+        "sizing_rules": {
+          "method": "risk_pct",
+          "fixed_contracts": 1,
+          "risk_pct": 0.02,
+          "atr_risk_multiple": 2.0
+        },
+        "primary_timeframe": "1m",
+        "require_all_entries": true
+      },
+      "trades": 6,
+      "win_rate": 16.666666666666664,
+      "profit_factor": 0.3514018691588785,
+      "sharpe": -10.780703499319843,
+      "total_pnl": -2082.0,
+      "max_drawdown": -2568.0,
+      "avg_trade": -347.0,
+      "avg_winner": 1128.0,
+      "avg_loser": -642.0,
+      "mc_median": -2145.7926120748416,
+      "mc_mean": -2129.2589644409595,
+      "mc_5th": -4018.19218472398,
+      "mc_95th": 1320.9213149328014,
+      "mc_p_profit": 0.0708,
+      "mc_p_ruin": 1.0,
+      "mc_composite": 1.01,
+      "mc_pass_rate": 0.0
+    },
+    {
+      "label": "[FEB] RSI|EMA_RIBBON|gen_8bf23c",
+      "strategy": {
+        "name": "RSI|EMA_RIBBON|gen_8bf23c",
+        "entry_signals": [
+          {
+            "signal_name": "rsi",
+            "module": "signals.momentum",
+            "function": "rsi",
+            "params": {
+              "period": 15,
+              "overbought": 69.0448,
+              "oversold": 19.9015
+            },
+            "columns": {
+              "long": "entry_long_rsi",
+              "short": "entry_short_rsi"
+            }
+          }
+        ],
+        "entry_filters": [
+          {
+            "signal_name": "ema_ribbon",
+            "module": "signals.trend",
+            "function": "ema_ribbon",
+            "params": {
+              "periods": [
+                8,
+                13,
+                21,
+                34,
+                55
+              ]
+            },
+            "column": "signal_ema_ribbon_bullish"
+          }
+        ],
+        "exit_rules": {
+          "stop_loss_type": "fixed_points",
+          "stop_loss_value": 20.2,
+          "take_profit_type": "fixed_points",
+          "take_profit_value": 117.3,
+          "trailing_stop": false,
+          "trailing_activation": 4.0,
+          "trailing_distance": 2.0,
+          "time_exit_minutes": null
+        },
+        "sizing_rules": {
+          "method": "risk_pct",
+          "fixed_contracts": 1,
+          "risk_pct": 0.0184,
+          "atr_risk_multiple": 2.0
+        },
+        "primary_timeframe": "1m",
+        "require_all_entries": true
+      },
+      "trades": 6,
+      "win_rate": 16.666666666666664,
+      "profit_factor": 0.34814814814813644,
+      "sharpe": -10.899098950165671,
+      "total_pnl": -2112.000000000109,
+      "max_drawdown": -2592.0000000000873,
+      "avg_trade": -352.0000000000182,
+      "avg_winner": 1128.0,
+      "avg_loser": -648.0000000000218,
+      "mc_median": -2158.580319495133,
+      "mc_mean": -2105.100042841785,
+      "mc_5th": -4043.375588598702,
+      "mc_95th": 1313.2096646607488,
+      "mc_p_profit": 0.0694,
+      "mc_p_ruin": 1.0,
+      "mc_composite": 1.02,
+      "mc_pass_rate": 0.0
+    },
+    {
+      "label": "[FEB] RSI|EMA_RIBBON|gen_509f5f",
+      "strategy": {
+        "name": "RSI|EMA_RIBBON|gen_509f5f",
+        "entry_signals": [
+          {
+            "signal_name": "rsi",
+            "module": "signals.momentum",
+            "function": "rsi",
+            "params": {
+              "period": 14,
+              "overbought": 70.0397,
+              "oversold": 18.9991
+            },
+            "columns": {
+              "long": "entry_long_rsi",
+              "short": "entry_short_rsi"
+            }
+          }
+        ],
+        "entry_filters": [
+          {
+            "signal_name": "ema_ribbon",
+            "module": "signals.trend",
+            "function": "ema_ribbon",
+            "params": {
+              "periods": [
+                8,
+                13,
+                21,
+                34,
+                55
+              ]
+            },
+            "column": "signal_ema_ribbon_bullish"
+          }
+        ],
+        "exit_rules": {
+          "stop_loss_type": "fixed_points",
+          "stop_loss_value": 20.5,
+          "take_profit_type": "fixed_points",
+          "take_profit_value": 126.5,
+          "trailing_stop": false,
+          "trailing_activation": 4.0,
+          "trailing_distance": 2.0,
+          "time_exit_minutes": null
+        },
+        "sizing_rules": {
+          "method": "risk_pct",
+          "fixed_contracts": 1,
+          "risk_pct": 0.0212,
+          "atr_risk_multiple": 2.0
+        },
+        "primary_timeframe": "1m",
+        "require_all_entries": true
+      },
+      "trades": 6,
+      "win_rate": 16.666666666666664,
+      "profit_factor": 0.34337899543378997,
+      "sharpe": -11.075199746800836,
+      "total_pnl": -2157.0,
+      "max_drawdown": -2628.0,
+      "avg_trade": -359.5,
+      "avg_winner": 1128.0,
+      "avg_loser": -657.0,
+      "mc_median": -2197.7549931966932,
+      "mc_mean": -2155.5559468181127,
+      "mc_5th": -4103.387728495726,
+      "mc_95th": 1190.2456773047975,
+      "mc_p_profit": 0.0578,
+      "mc_p_ruin": 1.0,
+      "mc_composite": 1.01,
+      "mc_pass_rate": 0.0
+    },
+    {
+      "label": "[FEB] RSI|EMA_RIBBON|breed_9dacc6",
+      "strategy": {
+        "name": "RSI|EMA_RIBBON|breed_9dacc6",
+        "entry_signals": [
+          {
+            "signal_name": "rsi",
+            "module": "signals.momentum",
+            "function": "rsi",
+            "params": {
+              "period": 15,
+              "overbought": 69.213,
+              "oversold": 20.1769
+            },
+            "columns": {
+              "long": "entry_long_rsi",
+              "short": "entry_short_rsi"
+            }
+          }
+        ],
+        "entry_filters": [
+          {
+            "signal_name": "ema_ribbon",
+            "module": "signals.trend",
+            "function": "ema_ribbon",
+            "params": {
+              "periods": [
+                8,
+                13,
+                21,
+                34,
+                55
+              ]
+            },
+            "column": "signal_ema_ribbon_bullish"
+          }
+        ],
+        "exit_rules": {
+          "stop_loss_type": "fixed_points",
+          "stop_loss_value": 20.7,
+          "take_profit_type": "fixed_points",
+          "take_profit_value": 112.5,
+          "trailing_stop": false,
+          "trailing_activation": 4.0,
+          "trailing_distance": 2.0,
+          "time_exit_minutes": null
+        },
+        "sizing_rules": {
+          "method": "risk_pct",
+          "fixed_contracts": 1,
+          "risk_pct": 0.0193,
+          "atr_risk_multiple": 2.0
+        },
+        "primary_timeframe": "1m",
+        "require_all_entries": true
+      },
+      "trades": 6,
+      "win_rate": 16.666666666666664,
+      "profit_factor": 0.3402714932126585,
+      "sharpe": -11.191617023862422,
+      "total_pnl": -2187.000000000109,
+      "max_drawdown": -2652.0000000000873,
+      "avg_trade": -364.5000000000182,
+      "avg_winner": 1128.0,
+      "avg_loser": -663.0000000000218,
+      "mc_median": -2228.808764348076,
+      "mc_mean": -2145.1032723799503,
+      "mc_5th": -4128.071873513785,
+      "mc_95th": 1280.568241327261,
+      "mc_p_profit": 0.0692,
+      "mc_p_ruin": 1.0,
+      "mc_composite": 1.0,
+      "mc_pass_rate": 0.0
+    },
+    {
+      "label": "[FEB] RSI|EMA_RIBBON|gen_24758b",
+      "strategy": {
+        "name": "RSI|EMA_RIBBON|gen_24758b",
+        "entry_signals": [
+          {
+            "signal_name": "rsi",
+            "module": "signals.momentum",
+            "function": "rsi",
+            "params": {
+              "period": 15,
+              "overbought": 69.213,
+              "oversold": 20.1769
+            },
+            "columns": {
+              "long": "entry_long_rsi",
+              "short": "entry_short_rsi"
+            }
+          }
+        ],
+        "entry_filters": [
+          {
+            "signal_name": "ema_ribbon",
+            "module": "signals.trend",
+            "function": "ema_ribbon",
+            "params": {
+              "periods": [
+                8,
+                13,
+                21,
+                34,
+                55
+              ]
+            },
+            "column": "signal_ema_ribbon_bullish"
+          }
+        ],
+        "exit_rules": {
+          "stop_loss_type": "fixed_points",
+          "stop_loss_value": 20.7,
+          "take_profit_type": "fixed_points",
+          "take_profit_value": 112.5,
+          "trailing_stop": false,
+          "trailing_activation": 4.0,
+          "trailing_distance": 2.0,
+          "time_exit_minutes": null
+        },
+        "sizing_rules": {
+          "method": "risk_pct",
+          "fixed_contracts": 1,
+          "risk_pct": 0.0193,
+          "atr_risk_multiple": 2.0
+        },
+        "primary_timeframe": "1m",
+        "require_all_entries": true
+      },
+      "trades": 6,
+      "win_rate": 16.666666666666664,
+      "profit_factor": 0.3402714932126585,
+      "sharpe": -11.191617023862422,
+      "total_pnl": -2187.000000000109,
+      "max_drawdown": -2652.0000000000873,
+      "avg_trade": -364.5000000000182,
+      "avg_winner": 1128.0,
+      "avg_loser": -663.0000000000218,
+      "mc_median": -2229.046849465143,
+      "mc_mean": -2168.5171280675922,
+      "mc_5th": -4144.303603815983,
+      "mc_95th": 1262.1721613060558,
+      "mc_p_profit": 0.0646,
+      "mc_p_ruin": 1.0,
+      "mc_composite": 0.99,
+      "mc_pass_rate": 0.0
+    },
+    {
+      "label": "[FEB] RSI|EMA_RIBBON|breed_f9f416",
+      "strategy": {
+        "name": "RSI|EMA_RIBBON|breed_f9f416",
+        "entry_signals": [
+          {
+            "signal_name": "rsi",
+            "module": "signals.momentum",
+            "function": "rsi",
+            "params": {
+              "period": 14,
+              "overbought": 70.0,
+              "oversold": 20.0
+            },
+            "columns": {
+              "long": "entry_long_rsi",
+              "short": "entry_short_rsi"
+            }
+          }
+        ],
+        "entry_filters": [
+          {
+            "signal_name": "ema_ribbon",
+            "module": "signals.trend",
+            "function": "ema_ribbon",
+            "params": {
+              "periods": [
+                8,
+                13,
+                21,
+                34,
+                55
+              ]
+            },
+            "column": "signal_ema_ribbon_bullish"
+          }
+        ],
+        "exit_rules": {
+          "stop_loss_type": "fixed_points",
+          "stop_loss_value": 20.7,
+          "take_profit_type": "fixed_points",
+          "take_profit_value": 112.5,
+          "trailing_stop": false,
+          "trailing_activation": 4.0,
+          "trailing_distance": 2.0,
+          "time_exit_minutes": null
+        },
+        "sizing_rules": {
+          "method": "risk_pct",
+          "fixed_contracts": 1,
+          "risk_pct": 0.02,
+          "atr_risk_multiple": 2.0
+        },
+        "primary_timeframe": "1m",
+        "require_all_entries": true
+      },
+      "trades": 6,
+      "win_rate": 16.666666666666664,
+      "profit_factor": 0.3402714932126585,
+      "sharpe": -11.191617023862422,
+      "total_pnl": -2187.000000000109,
+      "max_drawdown": -2652.0000000000873,
+      "avg_trade": -364.5000000000182,
+      "avg_winner": 1128.0,
+      "avg_loser": -663.0000000000218,
+      "mc_median": -2238.4895113041566,
+      "mc_mean": -2182.724419745718,
+      "mc_5th": -4135.511136417497,
+      "mc_95th": 1229.5034182271224,
+      "mc_p_profit": 0.0654,
+      "mc_p_ruin": 1.0,
+      "mc_composite": 0.99,
+      "mc_pass_rate": 0.0
+    },
+    {
+      "label": "[FEB] RSI|EMA_RIBBON|breed_f94ef7",
+      "strategy": {
+        "name": "RSI|EMA_RIBBON|breed_f94ef7",
+        "entry_signals": [
+          {
+            "signal_name": "rsi",
+            "module": "signals.momentum",
+            "function": "rsi",
+            "params": {
+              "period": 15,
+              "overbought": 69.213,
+              "oversold": 20.1769
+            },
+            "columns": {
+              "long": "entry_long_rsi",
+              "short": "entry_short_rsi"
+            }
+          }
+        ],
+        "entry_filters": [
+          {
+            "signal_name": "ema_ribbon",
+            "module": "signals.trend",
+            "function": "ema_ribbon",
+            "params": {
+              "periods": [
+                8,
+                13,
+                21,
+                34,
+                55
+              ]
+            },
+            "column": "signal_ema_ribbon_bullish"
+          }
+        ],
+        "exit_rules": {
+          "stop_loss_type": "fixed_points",
+          "stop_loss_value": 20.7,
+          "take_profit_type": "fixed_points",
+          "take_profit_value": 112.5,
+          "trailing_stop": false,
+          "trailing_activation": 4.0,
+          "trailing_distance": 2.0,
+          "time_exit_minutes": null
+        },
+        "sizing_rules": {
+          "method": "risk_pct",
+          "fixed_contracts": 1,
+          "risk_pct": 0.0198,
+          "atr_risk_multiple": 2.0
+        },
+        "primary_timeframe": "1m",
+        "require_all_entries": true
+      },
+      "trades": 6,
+      "win_rate": 16.666666666666664,
+      "profit_factor": 0.3402714932126585,
+      "sharpe": -11.191617023862422,
+      "total_pnl": -2187.000000000109,
+      "max_drawdown": -2652.0000000000873,
+      "avg_trade": -364.5000000000182,
+      "avg_winner": 1128.0,
+      "avg_loser": -663.0000000000218,
+      "mc_median": -2254.3081595947187,
+      "mc_mean": -2230.3067878315173,
+      "mc_5th": -4142.8045017988825,
+      "mc_95th": 1195.0033703459546,
+      "mc_p_profit": 0.0638,
+      "mc_p_ruin": 1.0,
+      "mc_composite": 0.98,
+      "mc_pass_rate": 0.0
+    },
+    {
+      "label": "[OCT] VWAP|LAST_N_MIN|SL15_TP120",
+      "strategy": {
+        "name": "VWAP|LAST_N_MIN|SL15_TP120",
+        "entry_signals": [
+          {
+            "signal_name": "vwap",
+            "module": "signals.volume",
+            "function": "vwap",
+            "params": {},
+            "columns": {
+              "long": "entry_long_vwap",
+              "short": "entry_short_vwap"
+            }
+          }
+        ],
+        "entry_filters": [
+          {
+            "signal_name": "last_n_minutes",
+            "module": "signals.time_filters",
+            "function": "last_n_minutes",
+            "params": {
+              "n": 30
+            },
+            "column": "signal_last_n_minutes"
+          }
+        ],
+        "exit_rules": {
+          "stop_loss_type": "fixed_points",
+          "stop_loss_value": 15.0,
+          "take_profit_type": "fixed_points",
+          "take_profit_value": 120.0,
+          "trailing_stop": false,
+          "trailing_activation": 4.0,
+          "trailing_distance": 2.0,
+          "time_exit_minutes": null
+        },
+        "sizing_rules": {
+          "method": "risk_pct",
+          "fixed_contracts": 2,
+          "risk_pct": 0.015,
+          "atr_risk_multiple": 2.0
+        },
+        "primary_timeframe": "1m",
+        "require_all_entries": true
+      },
+      "trades": 5,
+      "win_rate": 0.0,
+      "profit_factor": 0.0,
+      "sharpe": -45.825756949558404,
+      "total_pnl": -2460.0,
+      "max_drawdown": -2460.0,
+      "avg_trade": -492.0,
+      "avg_winner": 0.0,
+      "avg_loser": -492.0,
+      "mc_median": -2471.5763451308558,
+      "mc_mean": -2471.455317146389,
+      "mc_5th": -2629.1769664553894,
+      "mc_95th": -2314.2232704624757,
+      "mc_p_profit": 0.0,
+      "mc_p_ruin": 1.0,
+      "mc_composite": 0.0,
+      "mc_pass_rate": 0.0
+    },
+    {
+      "label": "[OCT] CCI|FOOTPRINT_IMBALANCE|SL15_TP90",
+      "strategy": {
+        "name": "CCI|FOOTPRINT_IMBALANCE|SL15_TP90",
+        "entry_signals": [
+          {
+            "signal_name": "cci",
+            "module": "signals.momentum",
+            "function": "cci",
+            "params": {
+              "period": 20
+            },
+            "columns": {
+              "long": "entry_long_cci",
+              "short": "entry_short_cci"
+            }
+          }
+        ],
+        "entry_filters": [
+          {
+            "signal_name": "footprint_imbalance",
+            "module": "signals.orderflow",
+            "function": "footprint_imbalance",
+            "params": {
+              "stacked_threshold": 3
+            },
+            "column": "signal_stacked_buy"
+          }
+        ],
+        "exit_rules": {
+          "stop_loss_type": "fixed_points",
+          "stop_loss_value": 15.0,
+          "take_profit_type": "fixed_points",
+          "take_profit_value": 90.0,
+          "trailing_stop": false,
+          "trailing_activation": 4.0,
+          "trailing_distance": 2.0,
+          "time_exit_minutes": null
+        },
+        "sizing_rules": {
+          "method": "risk_pct",
+          "fixed_contracts": 2,
+          "risk_pct": 0.015,
+          "atr_risk_multiple": 2.0
+        },
+        "primary_timeframe": "1m",
+        "require_all_entries": true
+      },
+      "trades": 8,
+      "win_rate": 12.5,
+      "profit_factor": 0.2926829268292683,
+      "sharpe": -13.081162083520027,
+      "total_pnl": -2436.0,
+      "max_drawdown": -2436.0,
+      "avg_trade": -304.5,
+      "avg_winner": 1008.0,
+      "avg_loser": -492.0,
+      "mc_median": -2502.5963713440324,
+      "mc_mean": -2458.0742207411818,
+      "mc_5th": -4085.7614685070503,
+      "mc_95th": 479.82606900292893,
+      "mc_p_profit": 0.0724,
+      "mc_p_ruin": 1.0,
+      "mc_composite": 0.84,
+      "mc_pass_rate": 0.0
+    }
+  ]
+}
