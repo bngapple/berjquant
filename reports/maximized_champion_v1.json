@@ -1,0 +1,1115 @@
+{
+  "generated_at": "2026-03-21T08:05:36",
+  "pipeline": "maximize_champion_v1",
+  "base_strategy": "ROC\u00d7Keltner+PrevDay (crossbreed V4 #1)",
+  "target": "$15K+/month",
+  "strategies": [
+    {
+      "name": "ROC\u00d7KC|max_6eadb5",
+      "strategy": {
+        "name": "ROC\u00d7KC|max_6eadb5",
+        "entry_signals": [
+          {
+            "signal_name": "roc",
+            "module": "signals.momentum",
+            "function": "roc",
+            "params": {
+              "period": 35
+            },
+            "columns": {
+              "long": "entry_long_roc",
+              "short": "entry_short_roc"
+            }
+          },
+          {
+            "signal_name": "keltner_channels",
+            "module": "signals.volatility",
+            "function": "keltner_channels",
+            "params": {
+              "ema_period": 20,
+              "atr_period": 3,
+              "multiplier": 4.0
+            },
+            "columns": {
+              "long": "entry_long_kc",
+              "short": "entry_short_kc"
+            }
+          }
+        ],
+        "entry_filters": [
+          {
+            "signal_name": "previous_day_levels",
+            "module": "signals.price_action",
+            "function": "previous_day_levels",
+            "params": {},
+            "column": "signal_above_prev_high"
+          },
+          {
+            "signal_name": "time_of_day",
+            "module": "signals.time_filters",
+            "function": "time_of_day",
+            "params": {
+              "start_hour": 9,
+              "start_minute": 30,
+              "end_hour": 13,
+              "end_minute": 0
+            },
+            "column": "signal_time_allowed"
+          }
+        ],
+        "exit_rules": {
+          "stop_loss_type": "fixed_points",
+          "stop_loss_value": 20.6,
+          "take_profit_type": "fixed_points",
+          "take_profit_value": 189.7,
+          "trailing_stop": false,
+          "trailing_activation": 4.0,
+          "trailing_distance": 2.0,
+          "time_exit_minutes": null
+        },
+        "sizing_rules": {
+          "method": "fixed",
+          "fixed_contracts": 13,
+          "risk_pct": 0.02,
+          "atr_risk_multiple": 2.0
+        },
+        "primary_timeframe": "1m",
+        "require_all_entries": true
+      },
+      "trades": 11,
+      "win_rate": 81.82,
+      "profit_factor": 38.03,
+      "sharpe": 13.04,
+      "total_pnl": 42846.7,
+      "max_drawdown": -1157.0,
+      "avg_monthly": 14282.23,
+      "min_monthly": 4889.3,
+      "max_monthly": 29335.8,
+      "monthly_breakdown": {
+        "2024-09": 29335.8,
+        "2024-12": 8621.6,
+        "2025-03": 4889.3
+      },
+      "mc_p_profit": 1.0,
+      "mc_median": 42939.41,
+      "mc_composite": 54.18,
+      "mc_pass_rate": 0.0,
+      "wf_efficiency": 1.108,
+      "contracts": 13
+    },
+    {
+      "name": "ROC\u00d7KC|evo_dfb6e2",
+      "strategy": {
+        "name": "ROC\u00d7KC|evo_dfb6e2",
+        "entry_signals": [
+          {
+            "signal_name": "roc",
+            "module": "signals.momentum",
+            "function": "roc",
+            "params": {
+              "period": 35
+            },
+            "columns": {
+              "long": "entry_long_roc",
+              "short": "entry_short_roc"
+            }
+          },
+          {
+            "signal_name": "keltner_channels",
+            "module": "signals.volatility",
+            "function": "keltner_channels",
+            "params": {
+              "ema_period": 37,
+              "atr_period": 3,
+              "multiplier": 4.0
+            },
+            "columns": {
+              "long": "entry_long_kc",
+              "short": "entry_short_kc"
+            }
+          }
+        ],
+        "entry_filters": [
+          {
+            "signal_name": "previous_day_levels",
+            "module": "signals.price_action",
+            "function": "previous_day_levels",
+            "params": {},
+            "column": "signal_above_prev_high"
+          },
+          {
+            "signal_name": "time_of_day",
+            "module": "signals.time_filters",
+            "function": "time_of_day",
+            "params": {
+              "start_hour": 9,
+              "start_minute": 30,
+              "end_hour": 11,
+              "end_minute": 0
+            },
+            "column": "signal_time_allowed"
+          }
+        ],
+        "exit_rules": {
+          "stop_loss_type": "fixed_points",
+          "stop_loss_value": 23.8,
+          "take_profit_type": "fixed_points",
+          "take_profit_value": 177.3,
+          "trailing_stop": true,
+          "trailing_activation": 68.2,
+          "trailing_distance": 14.0,
+          "time_exit_minutes": null
+        },
+        "sizing_rules": {
+          "method": "fixed",
+          "fixed_contracts": 11,
+          "risk_pct": 0.02,
+          "atr_risk_multiple": 2.0
+        },
+        "primary_timeframe": "1m",
+        "require_all_entries": true
+      },
+      "trades": 15,
+      "win_rate": 80.0,
+      "profit_factor": 30.07,
+      "sharpe": 11.83,
+      "total_pnl": 48831.2,
+      "max_drawdown": -1763.3,
+      "avg_monthly": 12207.8,
+      "min_monthly": -559.9,
+      "max_monthly": 27175.5,
+      "monthly_breakdown": {
+        "2024-09": 27175.5,
+        "2024-12": 8013.5,
+        "2025-02": -559.9,
+        "2025-03": 14202.1
+      },
+      "mc_p_profit": 1.0,
+      "mc_median": 49010.11,
+      "mc_composite": 54.15,
+      "mc_pass_rate": 0.0,
+      "wf_efficiency": 1.384,
+      "contracts": 11
+    },
+    {
+      "name": "ROC\u00d7KC|evo_97a65c",
+      "strategy": {
+        "name": "ROC\u00d7KC|evo_97a65c",
+        "entry_signals": [
+          {
+            "signal_name": "roc",
+            "module": "signals.momentum",
+            "function": "roc",
+            "params": {
+              "period": 35
+            },
+            "columns": {
+              "long": "entry_long_roc",
+              "short": "entry_short_roc"
+            }
+          },
+          {
+            "signal_name": "keltner_channels",
+            "module": "signals.volatility",
+            "function": "keltner_channels",
+            "params": {
+              "ema_period": 29,
+              "atr_period": 3,
+              "multiplier": 4.0
+            },
+            "columns": {
+              "long": "entry_long_kc",
+              "short": "entry_short_kc"
+            }
+          }
+        ],
+        "entry_filters": [
+          {
+            "signal_name": "previous_day_levels",
+            "module": "signals.price_action",
+            "function": "previous_day_levels",
+            "params": {},
+            "column": "signal_above_prev_high"
+          },
+          {
+            "signal_name": "time_of_day",
+            "module": "signals.time_filters",
+            "function": "time_of_day",
+            "params": {
+              "start_hour": 9,
+              "start_minute": 30,
+              "end_hour": 11,
+              "end_minute": 0
+            },
+            "column": "signal_time_allowed"
+          }
+        ],
+        "exit_rules": {
+          "stop_loss_type": "fixed_points",
+          "stop_loss_value": 22.6,
+          "take_profit_type": "fixed_points",
+          "take_profit_value": 180.0,
+          "trailing_stop": false,
+          "trailing_activation": 4.0,
+          "trailing_distance": 2.0,
+          "time_exit_minutes": null
+        },
+        "sizing_rules": {
+          "method": "fixed",
+          "fixed_contracts": 11,
+          "risk_pct": 0.02,
+          "atr_risk_multiple": 2.0
+        },
+        "primary_timeframe": "1m",
+        "require_all_entries": true
+      },
+      "trades": 11,
+      "win_rate": 81.82,
+      "profit_factor": 33.1,
+      "sharpe": 12.95,
+      "total_pnl": 34246.3,
+      "max_drawdown": -1067.0,
+      "avg_monthly": 11415.43,
+      "min_monthly": 3923.7,
+      "max_monthly": 23542.2,
+      "monthly_breakdown": {
+        "2024-09": 23542.2,
+        "2024-12": 6780.4,
+        "2025-03": 3923.7
+      },
+      "mc_p_profit": 1.0,
+      "mc_median": 34410.08,
+      "mc_composite": 54.14,
+      "mc_pass_rate": 0.0,
+      "wf_efficiency": 1.784,
+      "contracts": 11
+    },
+    {
+      "name": "ROC\u00d7KC|evo_81184c",
+      "strategy": {
+        "name": "ROC\u00d7KC|evo_81184c",
+        "entry_signals": [
+          {
+            "signal_name": "roc",
+            "module": "signals.momentum",
+            "function": "roc",
+            "params": {
+              "period": 35
+            },
+            "columns": {
+              "long": "entry_long_roc",
+              "short": "entry_short_roc"
+            }
+          },
+          {
+            "signal_name": "keltner_channels",
+            "module": "signals.volatility",
+            "function": "keltner_channels",
+            "params": {
+              "ema_period": 29,
+              "atr_period": 3,
+              "multiplier": 4.0
+            },
+            "columns": {
+              "long": "entry_long_kc",
+              "short": "entry_short_kc"
+            }
+          }
+        ],
+        "entry_filters": [
+          {
+            "signal_name": "previous_day_levels",
+            "module": "signals.price_action",
+            "function": "previous_day_levels",
+            "params": {},
+            "column": "signal_above_prev_high"
+          },
+          {
+            "signal_name": "time_of_day",
+            "module": "signals.time_filters",
+            "function": "time_of_day",
+            "params": {
+              "start_hour": 9,
+              "start_minute": 30,
+              "end_hour": 11,
+              "end_minute": 0
+            },
+            "column": "signal_time_allowed"
+          }
+        ],
+        "exit_rules": {
+          "stop_loss_type": "fixed_points",
+          "stop_loss_value": 23.4,
+          "take_profit_type": "fixed_points",
+          "take_profit_value": 179.4,
+          "trailing_stop": false,
+          "trailing_activation": 4.0,
+          "trailing_distance": 2.0,
+          "time_exit_minutes": null
+        },
+        "sizing_rules": {
+          "method": "fixed",
+          "fixed_contracts": 10,
+          "risk_pct": 0.02,
+          "atr_risk_multiple": 2.0
+        },
+        "primary_timeframe": "1m",
+        "require_all_entries": true
+      },
+      "trades": 11,
+      "win_rate": 81.82,
+      "profit_factor": 31.93,
+      "sharpe": 12.93,
+      "total_pnl": 30993.0,
+      "max_drawdown": -1077.0,
+      "avg_monthly": 10331.0,
+      "min_monthly": 3555.0,
+      "max_monthly": 21330.0,
+      "monthly_breakdown": {
+        "2024-09": 21330.0,
+        "2024-12": 6108.0,
+        "2025-03": 3555.0
+      },
+      "mc_p_profit": 1.0,
+      "mc_median": 31186.99,
+      "mc_composite": 54.16,
+      "mc_pass_rate": 0.0,
+      "wf_efficiency": 1.783,
+      "contracts": 10
+    },
+    {
+      "name": "ROC\u00d7KC|evo_f8a6b6",
+      "strategy": {
+        "name": "ROC\u00d7KC|evo_f8a6b6",
+        "entry_signals": [
+          {
+            "signal_name": "roc",
+            "module": "signals.momentum",
+            "function": "roc",
+            "params": {
+              "period": 31
+            },
+            "columns": {
+              "long": "entry_long_roc",
+              "short": "entry_short_roc"
+            }
+          },
+          {
+            "signal_name": "keltner_channels",
+            "module": "signals.volatility",
+            "function": "keltner_channels",
+            "params": {
+              "ema_period": 24,
+              "atr_period": 3,
+              "multiplier": 4.0
+            },
+            "columns": {
+              "long": "entry_long_kc",
+              "short": "entry_short_kc"
+            }
+          }
+        ],
+        "entry_filters": [
+          {
+            "signal_name": "previous_day_levels",
+            "module": "signals.price_action",
+            "function": "previous_day_levels",
+            "params": {},
+            "column": "signal_above_prev_high"
+          },
+          {
+            "signal_name": "time_of_day",
+            "module": "signals.time_filters",
+            "function": "time_of_day",
+            "params": {
+              "start_hour": 9,
+              "start_minute": 0,
+              "end_hour": 12,
+              "end_minute": 0
+            },
+            "column": "signal_time_allowed"
+          }
+        ],
+        "exit_rules": {
+          "stop_loss_type": "fixed_points",
+          "stop_loss_value": 24.3,
+          "take_profit_type": "fixed_points",
+          "take_profit_value": 184.1,
+          "trailing_stop": true,
+          "trailing_activation": 51.7,
+          "trailing_distance": 16.6,
+          "time_exit_minutes": null
+        },
+        "sizing_rules": {
+          "method": "fixed",
+          "fixed_contracts": 8,
+          "risk_pct": 0.02,
+          "atr_risk_multiple": 2.0
+        },
+        "primary_timeframe": "1m",
+        "require_all_entries": true
+      },
+      "trades": 16,
+      "win_rate": 75.0,
+      "profit_factor": 19.41,
+      "sharpe": 11.24,
+      "total_pnl": 30572.8,
+      "max_drawdown": -679.2,
+      "avg_monthly": 10190.93,
+      "min_monthly": -415.2,
+      "max_monthly": 18917.6,
+      "monthly_breakdown": {
+        "2024-09": 18917.6,
+        "2024-12": 12070.4,
+        "2025-02": -415.2
+      },
+      "mc_p_profit": 1.0,
+      "mc_median": 30732.01,
+      "mc_composite": 53.94,
+      "mc_pass_rate": 0.0,
+      "wf_efficiency": 0.925,
+      "contracts": 8
+    },
+    {
+      "name": "ROC\u00d7KC|evo_279656",
+      "strategy": {
+        "name": "ROC\u00d7KC|evo_279656",
+        "entry_signals": [
+          {
+            "signal_name": "roc",
+            "module": "signals.momentum",
+            "function": "roc",
+            "params": {
+              "period": 35
+            },
+            "columns": {
+              "long": "entry_long_roc",
+              "short": "entry_short_roc"
+            }
+          },
+          {
+            "signal_name": "keltner_channels",
+            "module": "signals.volatility",
+            "function": "keltner_channels",
+            "params": {
+              "ema_period": 11,
+              "atr_period": 3,
+              "multiplier": 2.809
+            },
+            "columns": {
+              "long": "entry_long_kc",
+              "short": "entry_short_kc"
+            }
+          }
+        ],
+        "entry_filters": [
+          {
+            "signal_name": "previous_day_levels",
+            "module": "signals.price_action",
+            "function": "previous_day_levels",
+            "params": {},
+            "column": "signal_above_prev_high"
+          },
+          {
+            "signal_name": "time_of_day",
+            "module": "signals.time_filters",
+            "function": "time_of_day",
+            "params": {
+              "start_hour": 9,
+              "start_minute": 30,
+              "end_hour": 11,
+              "end_minute": 0
+            },
+            "column": "signal_time_allowed"
+          }
+        ],
+        "exit_rules": {
+          "stop_loss_type": "fixed_points",
+          "stop_loss_value": 24.5,
+          "take_profit_type": "fixed_points",
+          "take_profit_value": 167.6,
+          "trailing_stop": false,
+          "trailing_activation": 4.0,
+          "trailing_distance": 2.0,
+          "time_exit_minutes": null
+        },
+        "sizing_rules": {
+          "method": "fixed",
+          "fixed_contracts": 9,
+          "risk_pct": 0.02,
+          "atr_risk_multiple": 2.0
+        },
+        "primary_timeframe": "1m",
+        "require_all_entries": true
+      },
+      "trades": 11,
+      "win_rate": 81.82,
+      "profit_factor": 28.56,
+      "sharpe": 12.86,
+      "total_pnl": 25942.5,
+      "max_drawdown": -1008.9,
+      "avg_monthly": 8647.5,
+      "min_monthly": 2987.1,
+      "max_monthly": 17922.6,
+      "monthly_breakdown": {
+        "2024-09": 17922.6,
+        "2024-12": 5032.8,
+        "2025-03": 2987.1
+      },
+      "mc_p_profit": 1.0,
+      "mc_median": 26160.98,
+      "mc_composite": 54.14,
+      "mc_pass_rate": 0.0,
+      "wf_efficiency": 1.102,
+      "contracts": 9
+    },
+    {
+      "name": "ROC\u00d7KC|evo_1fa5d1",
+      "strategy": {
+        "name": "ROC\u00d7KC|evo_1fa5d1",
+        "entry_signals": [
+          {
+            "signal_name": "roc",
+            "module": "signals.momentum",
+            "function": "roc",
+            "params": {
+              "period": 35
+            },
+            "columns": {
+              "long": "entry_long_roc",
+              "short": "entry_short_roc"
+            }
+          },
+          {
+            "signal_name": "keltner_channels",
+            "module": "signals.volatility",
+            "function": "keltner_channels",
+            "params": {
+              "ema_period": 29,
+              "atr_period": 3,
+              "multiplier": 4.0
+            },
+            "columns": {
+              "long": "entry_long_kc",
+              "short": "entry_short_kc"
+            }
+          }
+        ],
+        "entry_filters": [
+          {
+            "signal_name": "previous_day_levels",
+            "module": "signals.price_action",
+            "function": "previous_day_levels",
+            "params": {},
+            "column": "signal_above_prev_high"
+          },
+          {
+            "signal_name": "time_of_day",
+            "module": "signals.time_filters",
+            "function": "time_of_day",
+            "params": {
+              "start_hour": 9,
+              "start_minute": 30,
+              "end_hour": 11,
+              "end_minute": 0
+            },
+            "column": "signal_time_allowed"
+          }
+        ],
+        "exit_rules": {
+          "stop_loss_type": "fixed_points",
+          "stop_loss_value": 24.5,
+          "take_profit_type": "fixed_points",
+          "take_profit_value": 166.1,
+          "trailing_stop": false,
+          "trailing_activation": 4.0,
+          "trailing_distance": 2.0,
+          "time_exit_minutes": null
+        },
+        "sizing_rules": {
+          "method": "fixed",
+          "fixed_contracts": 9,
+          "risk_pct": 0.02,
+          "atr_risk_multiple": 2.0
+        },
+        "primary_timeframe": "1m",
+        "require_all_entries": true
+      },
+      "trades": 11,
+      "win_rate": 81.82,
+      "profit_factor": 28.3,
+      "sharpe": 12.85,
+      "total_pnl": 25699.5,
+      "max_drawdown": -1008.9,
+      "avg_monthly": 8566.5,
+      "min_monthly": 2960.1,
+      "max_monthly": 17760.6,
+      "monthly_breakdown": {
+        "2024-09": 17760.6,
+        "2024-12": 4978.8,
+        "2025-03": 2960.1
+      },
+      "mc_p_profit": 1.0,
+      "mc_median": 25833.14,
+      "mc_composite": 54.13,
+      "mc_pass_rate": 0.0,
+      "wf_efficiency": 1.778,
+      "contracts": 9
+    },
+    {
+      "name": "ROC\u00d7KC|evo_22b09b",
+      "strategy": {
+        "name": "ROC\u00d7KC|evo_22b09b",
+        "entry_signals": [
+          {
+            "signal_name": "roc",
+            "module": "signals.momentum",
+            "function": "roc",
+            "params": {
+              "period": 35
+            },
+            "columns": {
+              "long": "entry_long_roc",
+              "short": "entry_short_roc"
+            }
+          },
+          {
+            "signal_name": "keltner_channels",
+            "module": "signals.volatility",
+            "function": "keltner_channels",
+            "params": {
+              "ema_period": 17,
+              "atr_period": 3,
+              "multiplier": 2.7905
+            },
+            "columns": {
+              "long": "entry_long_kc",
+              "short": "entry_short_kc"
+            }
+          }
+        ],
+        "entry_filters": [
+          {
+            "signal_name": "time_of_day",
+            "module": "signals.time_filters",
+            "function": "time_of_day",
+            "params": {
+              "start_hour": 9,
+              "start_minute": 30,
+              "end_hour": 13,
+              "end_minute": 0
+            },
+            "column": "signal_time_allowed"
+          }
+        ],
+        "exit_rules": {
+          "stop_loss_type": "fixed_points",
+          "stop_loss_value": 24.1,
+          "take_profit_type": "fixed_points",
+          "take_profit_value": 210.9,
+          "trailing_stop": false,
+          "trailing_activation": 4.0,
+          "trailing_distance": 2.0,
+          "time_exit_minutes": null
+        },
+        "sizing_rules": {
+          "method": "fixed",
+          "fixed_contracts": 10,
+          "risk_pct": 0.02,
+          "atr_risk_multiple": 2.0
+        },
+        "primary_timeframe": "1m",
+        "require_all_entries": true
+      },
+      "trades": 12,
+      "win_rate": 75.0,
+      "profit_factor": 21.96,
+      "sharpe": 9.35,
+      "total_pnl": 32377.0,
+      "max_drawdown": -4390.0,
+      "avg_monthly": 8094.25,
+      "min_monthly": -515.0,
+      "max_monthly": 25110.0,
+      "monthly_breakdown": {
+        "2024-09": 25110.0,
+        "2024-12": 7340.0,
+        "2025-02": 442.0,
+        "2025-03": -515.0
+      },
+      "mc_p_profit": 1.0,
+      "mc_median": 32493.88,
+      "mc_composite": 53.85,
+      "mc_pass_rate": 0.0,
+      "wf_efficiency": 0.927,
+      "contracts": 10
+    },
+    {
+      "name": "ROC\u00d7KC|evo_23f59a",
+      "strategy": {
+        "name": "ROC\u00d7KC|evo_23f59a",
+        "entry_signals": [
+          {
+            "signal_name": "roc",
+            "module": "signals.momentum",
+            "function": "roc",
+            "params": {
+              "period": 35
+            },
+            "columns": {
+              "long": "entry_long_roc",
+              "short": "entry_short_roc"
+            }
+          },
+          {
+            "signal_name": "keltner_channels",
+            "module": "signals.volatility",
+            "function": "keltner_channels",
+            "params": {
+              "ema_period": 29,
+              "atr_period": 3,
+              "multiplier": 4.0
+            },
+            "columns": {
+              "long": "entry_long_kc",
+              "short": "entry_short_kc"
+            }
+          }
+        ],
+        "entry_filters": [
+          {
+            "signal_name": "previous_day_levels",
+            "module": "signals.price_action",
+            "function": "previous_day_levels",
+            "params": {},
+            "column": "signal_above_prev_high"
+          },
+          {
+            "signal_name": "time_of_day",
+            "module": "signals.time_filters",
+            "function": "time_of_day",
+            "params": {
+              "start_hour": 9,
+              "start_minute": 30,
+              "end_hour": 11,
+              "end_minute": 0
+            },
+            "column": "signal_time_allowed"
+          }
+        ],
+        "exit_rules": {
+          "stop_loss_type": "fixed_points",
+          "stop_loss_value": 23.5,
+          "take_profit_type": "fixed_points",
+          "take_profit_value": 162.1,
+          "trailing_stop": false,
+          "trailing_activation": 4.0,
+          "trailing_distance": 2.0,
+          "time_exit_minutes": null
+        },
+        "sizing_rules": {
+          "method": "fixed",
+          "fixed_contracts": 8,
+          "risk_pct": 0.02,
+          "atr_risk_multiple": 2.0
+        },
+        "primary_timeframe": "1m",
+        "require_all_entries": true
+      },
+      "trades": 11,
+      "win_rate": 81.82,
+      "profit_factor": 28.71,
+      "sharpe": 12.86,
+      "total_pnl": 22300.0,
+      "max_drawdown": -864.8,
+      "avg_monthly": 7433.33,
+      "min_monthly": 2567.2,
+      "max_monthly": 15403.2,
+      "monthly_breakdown": {
+        "2024-09": 15403.2,
+        "2024-12": 4329.6,
+        "2025-03": 2567.2
+      },
+      "mc_p_profit": 1.0,
+      "mc_median": 22425.53,
+      "mc_composite": 54.13,
+      "mc_pass_rate": 0.0,
+      "wf_efficiency": 1.779,
+      "contracts": 8
+    },
+    {
+      "name": "ROC\u00d7KC|evo_0024ad",
+      "strategy": {
+        "name": "ROC\u00d7KC|evo_0024ad",
+        "entry_signals": [
+          {
+            "signal_name": "roc",
+            "module": "signals.momentum",
+            "function": "roc",
+            "params": {
+              "period": 35
+            },
+            "columns": {
+              "long": "entry_long_roc",
+              "short": "entry_short_roc"
+            }
+          },
+          {
+            "signal_name": "keltner_channels",
+            "module": "signals.volatility",
+            "function": "keltner_channels",
+            "params": {
+              "ema_period": 29,
+              "atr_period": 3,
+              "multiplier": 4.0
+            },
+            "columns": {
+              "long": "entry_long_kc",
+              "short": "entry_short_kc"
+            }
+          }
+        ],
+        "entry_filters": [
+          {
+            "signal_name": "previous_day_levels",
+            "module": "signals.price_action",
+            "function": "previous_day_levels",
+            "params": {},
+            "column": "signal_above_prev_high"
+          },
+          {
+            "signal_name": "time_of_day",
+            "module": "signals.time_filters",
+            "function": "time_of_day",
+            "params": {
+              "start_hour": 9,
+              "start_minute": 30,
+              "end_hour": 11,
+              "end_minute": 0
+            },
+            "column": "signal_time_allowed"
+          }
+        ],
+        "exit_rules": {
+          "stop_loss_type": "fixed_points",
+          "stop_loss_value": 23.9,
+          "take_profit_type": "fixed_points",
+          "take_profit_value": 153.3,
+          "trailing_stop": false,
+          "trailing_activation": 4.0,
+          "trailing_distance": 2.0,
+          "time_exit_minutes": null
+        },
+        "sizing_rules": {
+          "method": "fixed",
+          "fixed_contracts": 8,
+          "risk_pct": 0.02,
+          "atr_risk_multiple": 2.0
+        },
+        "primary_timeframe": "1m",
+        "require_all_entries": true
+      },
+      "trades": 11,
+      "win_rate": 81.82,
+      "profit_factor": 26.71,
+      "sharpe": 12.81,
+      "total_pnl": 21020.0,
+      "max_drawdown": -877.6,
+      "avg_monthly": 7006.67,
+      "min_monthly": 2426.4,
+      "max_monthly": 14558.4,
+      "monthly_breakdown": {
+        "2024-09": 14558.4,
+        "2024-12": 4035.2,
+        "2025-03": 2426.4
+      },
+      "mc_p_profit": 1.0,
+      "mc_median": 21097.79,
+      "mc_composite": 54.14,
+      "mc_pass_rate": 0.0,
+      "wf_efficiency": 1.776,
+      "contracts": 8
+    },
+    {
+      "name": "ROC\u00d7KC|evo_f21312",
+      "strategy": {
+        "name": "ROC\u00d7KC|evo_f21312",
+        "entry_signals": [
+          {
+            "signal_name": "roc",
+            "module": "signals.momentum",
+            "function": "roc",
+            "params": {
+              "period": 31
+            },
+            "columns": {
+              "long": "entry_long_roc",
+              "short": "entry_short_roc"
+            }
+          },
+          {
+            "signal_name": "keltner_channels",
+            "module": "signals.volatility",
+            "function": "keltner_channels",
+            "params": {
+              "ema_period": 24,
+              "atr_period": 3,
+              "multiplier": 3.374
+            },
+            "columns": {
+              "long": "entry_long_kc",
+              "short": "entry_short_kc"
+            }
+          }
+        ],
+        "entry_filters": [
+          {
+            "signal_name": "time_of_day",
+            "module": "signals.time_filters",
+            "function": "time_of_day",
+            "params": {
+              "start_hour": 9,
+              "start_minute": 30,
+              "end_hour": 11,
+              "end_minute": 0
+            },
+            "column": "signal_time_allowed"
+          }
+        ],
+        "exit_rules": {
+          "stop_loss_type": "fixed_points",
+          "stop_loss_value": 23.9,
+          "take_profit_type": "fixed_points",
+          "take_profit_value": 175.3,
+          "trailing_stop": true,
+          "trailing_activation": 49.5,
+          "trailing_distance": 24.9,
+          "time_exit_minutes": null
+        },
+        "sizing_rules": {
+          "method": "fixed",
+          "fixed_contracts": 8,
+          "risk_pct": 0.02,
+          "atr_risk_multiple": 2.0
+        },
+        "primary_timeframe": "1m",
+        "require_all_entries": true
+      },
+      "trades": 19,
+      "win_rate": 63.16,
+      "profit_factor": 10.59,
+      "sharpe": 7.38,
+      "total_pnl": 27449.6,
+      "max_drawdown": -1414.4,
+      "avg_monthly": 5489.92,
+      "min_monthly": -408.8,
+      "max_monthly": 17650.4,
+      "monthly_breakdown": {
+        "2024-09": 17650.4,
+        "2024-12": 9887.2,
+        "2025-01": -408.8,
+        "2025-02": 234.4,
+        "2025-03": 86.4
+      },
+      "mc_p_profit": 1.0,
+      "mc_median": 27444.39,
+      "mc_composite": 53.71,
+      "mc_pass_rate": 0.0,
+      "wf_efficiency": 0.967,
+      "contracts": 8
+    },
+    {
+      "name": "ROC\u00d7KC|max_2dc367",
+      "strategy": {
+        "name": "ROC\u00d7KC|max_2dc367",
+        "entry_signals": [
+          {
+            "signal_name": "roc",
+            "module": "signals.momentum",
+            "function": "roc",
+            "params": {
+              "period": 44
+            },
+            "columns": {
+              "long": "entry_long_roc",
+              "short": "entry_short_roc"
+            }
+          },
+          {
+            "signal_name": "keltner_channels",
+            "module": "signals.volatility",
+            "function": "keltner_channels",
+            "params": {
+              "ema_period": 26,
+              "atr_period": 3,
+              "multiplier": 4.0
+            },
+            "columns": {
+              "long": "entry_long_kc",
+              "short": "entry_short_kc"
+            }
+          }
+        ],
+        "entry_filters": [
+          {
+            "signal_name": "previous_day_levels",
+            "module": "signals.price_action",
+            "function": "previous_day_levels",
+            "params": {},
+            "column": "signal_above_prev_high"
+          },
+          {
+            "signal_name": "time_of_day",
+            "module": "signals.time_filters",
+            "function": "time_of_day",
+            "params": {
+              "start_hour": 9,
+              "start_minute": 0,
+              "end_hour": 12,
+              "end_minute": 0
+            },
+            "column": "signal_time_allowed"
+          }
+        ],
+        "exit_rules": {
+          "stop_loss_type": "fixed_points",
+          "stop_loss_value": 20.3,
+          "take_profit_type": "fixed_points",
+          "take_profit_value": 108.7,
+          "trailing_stop": false,
+          "trailing_activation": 4.0,
+          "trailing_distance": 2.0,
+          "time_exit_minutes": null
+        },
+        "sizing_rules": {
+          "method": "fixed",
+          "fixed_contracts": 10,
+          "risk_pct": 0.02,
+          "atr_risk_multiple": 2.0
+        },
+        "primary_timeframe": "1m",
+        "require_all_entries": true
+      },
+      "trades": 13,
+      "win_rate": 76.92,
+      "profit_factor": 16.26,
+      "sharpe": 12.46,
+      "total_pnl": 20093.0,
+      "max_drawdown": -988.0,
+      "avg_monthly": 5023.25,
+      "min_monthly": -439.0,
+      "max_monthly": 10705.0,
+      "monthly_breakdown": {
+        "2024-09": 10705.0,
+        "2024-12": 7686.0,
+        "2025-02": -439.0,
+        "2025-03": 2141.0
+      },
+      "mc_p_profit": 1.0,
+      "mc_median": 20163.64,
+      "mc_composite": 54.01,
+      "mc_pass_rate": 0.0,
+      "wf_efficiency": 0.809,
+      "contracts": 10
+    }
+  ]
+}

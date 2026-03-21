@@ -1,0 +1,159 @@
+{
+  "generated_at": "2026-03-21T02:09:19",
+  "pipeline": "crossbreed_v4",
+  "account": {
+    "initial_capital": 150000,
+    "prop_firm": "topstep_150k",
+    "max_drawdown": -4500.0,
+    "daily_loss_limit": -3000.0
+  },
+  "bounds": {
+    "sl_range": [
+      10.0,
+      35.0
+    ],
+    "tp_range": [
+      50.0,
+      300.0
+    ],
+    "ct_range": [
+      4,
+      15
+    ],
+    "rr_min": 4.0
+  },
+  "data": {
+    "full_period": "2024-03-19 to 2025-03-18",
+    "train_period": "2024-03-19 to 2024-11-18",
+    "validate_period": "2024-11-19 to 2025-03-18"
+  },
+  "pipeline_stats": {
+    "seeds_loaded": 285,
+    "initial_viable": 15,
+    "total_tested": 10485,
+    "generations": 60,
+    "wf_survivors": 60,
+    "mc_validated": 60,
+    "decorrelated_final": 1,
+    "elapsed_min": 90.6
+  },
+  "signal_diversity": {
+    "entry_types": [
+      "keltner_channels",
+      "roc"
+    ],
+    "filter_types": [
+      "previous_day_levels"
+    ],
+    "cross_family_count": 1
+  },
+  "strategies": [
+    {
+      "name": "ROC|KELTNER_CHANNELS\u00d7PREVIOUS_DAY_LEVELS|xfam_c33f2a",
+      "strategy": {
+        "name": "ROC|KELTNER_CHANNELS\u00d7PREVIOUS_DAY_LEVELS|xfam_c33f2a",
+        "entry_signals": [
+          {
+            "signal_name": "roc",
+            "module": "signals.momentum",
+            "function": "roc",
+            "params": {
+              "period": 32
+            },
+            "columns": {
+              "long": "entry_long_roc",
+              "short": "entry_short_roc"
+            }
+          },
+          {
+            "signal_name": "keltner_channels",
+            "module": "signals.volatility",
+            "function": "keltner_channels",
+            "params": {
+              "ema_period": 16,
+              "atr_period": 3,
+              "multiplier": 2.2608
+            },
+            "columns": {
+              "long": "entry_long_kc",
+              "short": "entry_short_kc"
+            }
+          }
+        ],
+        "entry_filters": [
+          {
+            "signal_name": "previous_day_levels",
+            "module": "signals.price_action",
+            "function": "previous_day_levels",
+            "params": {},
+            "column": "signal_above_prev_high"
+          },
+          {
+            "signal_name": "time_of_day",
+            "module": "signals.time_filters",
+            "function": "time_of_day",
+            "params": {
+              "start_hour": 9,
+              "start_minute": 30,
+              "end_hour": 11,
+              "end_minute": 0
+            },
+            "column": "signal_time_allowed"
+          }
+        ],
+        "exit_rules": {
+          "stop_loss_type": "fixed_points",
+          "stop_loss_value": 17.6,
+          "take_profit_type": "fixed_points",
+          "take_profit_value": 218.1,
+          "trailing_stop": false,
+          "trailing_activation": 4.0,
+          "trailing_distance": 2.0,
+          "time_exit_minutes": null
+        },
+        "sizing_rules": {
+          "method": "fixed",
+          "fixed_contracts": 4,
+          "risk_pct": 0.02,
+          "atr_risk_multiple": 2.0
+        },
+        "primary_timeframe": "1m",
+        "require_all_entries": true
+      },
+      "signal_family": "keltner_channels|roc+previous_day_levels",
+      "fitness": 18255.5,
+      "trades": 39,
+      "win_rate": 46.15,
+      "profit_factor": 4.63,
+      "sharpe": 5.06,
+      "total_pnl": 19822.4,
+      "max_drawdown": -2393.2,
+      "dd_margin": 2106.8,
+      "avg_monthly": 1982.24,
+      "max_monthly": 11813.2,
+      "min_monthly": -535.2,
+      "pct_months_profitable": 0.3,
+      "monthly_breakdown": {
+        "2024-05": -61.2,
+        "2024-06": 2266.4,
+        "2024-07": -308.0,
+        "2024-09": 11813.2,
+        "2024-10": -154.0,
+        "2024-11": -154.0,
+        "2024-12": 7240.4,
+        "2025-01": -154.0,
+        "2025-02": -131.2,
+        "2025-03": -535.2
+      },
+      "mc_median": 19823.25,
+      "mc_mean": 19810.15,
+      "mc_p_profit": 0.9984,
+      "mc_p_ruin": 1.0,
+      "mc_5th": 9338.88,
+      "mc_95th": 30297.57,
+      "mc_composite": 52.8,
+      "mc_pass_rate": 0.0,
+      "wf_efficiency": 0.993
+    }
+  ]
+}

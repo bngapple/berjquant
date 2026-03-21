@@ -1,0 +1,270 @@
+{
+  "generated_at": "2026-03-21T02:22:40",
+  "pipeline": "crossbreed_v4",
+  "account": {
+    "initial_capital": 150000,
+    "prop_firm": "topstep_150k",
+    "max_drawdown": -4500.0,
+    "daily_loss_limit": -3000.0
+  },
+  "bounds": {
+    "sl_range": [
+      10.0,
+      35.0
+    ],
+    "tp_range": [
+      50.0,
+      300.0
+    ],
+    "ct_range": [
+      4,
+      15
+    ],
+    "rr_min": 4.0
+  },
+  "data": {
+    "full_period": "2024-03-19 to 2025-03-18",
+    "train_period": "2024-03-19 to 2024-11-18",
+    "validate_period": "2024-11-19 to 2025-03-18"
+  },
+  "pipeline_stats": {
+    "seeds_loaded": 285,
+    "initial_viable": 3,
+    "total_tested": 10485,
+    "generations": 60,
+    "wf_survivors": 60,
+    "mc_validated": 8,
+    "decorrelated_final": 2,
+    "elapsed_min": 104.0
+  },
+  "signal_diversity": {
+    "entry_types": [
+      "rsi",
+      "vwap"
+    ],
+    "filter_types": [
+      "imbalance"
+    ],
+    "cross_family_count": 1
+  },
+  "strategies": [
+    {
+      "name": "RSI|sfam_e1acb1",
+      "strategy": {
+        "name": "RSI|sfam_e1acb1",
+        "entry_signals": [
+          {
+            "signal_name": "rsi",
+            "module": "signals.momentum",
+            "function": "rsi",
+            "params": {
+              "period": 12,
+              "overbought": 67.054,
+              "oversold": 24.1118
+            },
+            "columns": {
+              "long": "entry_long_rsi",
+              "short": "entry_short_rsi"
+            }
+          },
+          {
+            "signal_name": "vwap",
+            "module": "signals.volume",
+            "function": "vwap",
+            "params": {},
+            "columns": {
+              "long": "entry_long_vwap",
+              "short": "entry_short_vwap"
+            }
+          }
+        ],
+        "entry_filters": [
+          {
+            "signal_name": "imbalance",
+            "module": "signals.orderflow",
+            "function": "imbalance",
+            "params": {
+              "ratio_threshold": 4.941
+            },
+            "column": "signal_buy_imbalance"
+          },
+          {
+            "signal_name": "time_of_day",
+            "module": "signals.time_filters",
+            "function": "time_of_day",
+            "params": {
+              "start_hour": 9,
+              "start_minute": 30,
+              "end_hour": 10,
+              "end_minute": 30
+            },
+            "column": "signal_time_allowed"
+          }
+        ],
+        "exit_rules": {
+          "stop_loss_type": "fixed_points",
+          "stop_loss_value": 12.7,
+          "take_profit_type": "fixed_points",
+          "take_profit_value": 132.6,
+          "trailing_stop": false,
+          "trailing_activation": 4.0,
+          "trailing_distance": 2.0,
+          "time_exit_minutes": null
+        },
+        "sizing_rules": {
+          "method": "fixed",
+          "fixed_contracts": 4,
+          "risk_pct": 0.005,
+          "atr_risk_multiple": 2.0
+        },
+        "primary_timeframe": "1m",
+        "require_all_entries": true
+      },
+      "signal_family": "rsi|vwap+imbalance",
+      "fitness": -2567.16,
+      "trades": 27,
+      "win_rate": 22.22,
+      "profit_factor": 2.19,
+      "sharpe": 3.82,
+      "total_pnl": 2804.8,
+      "max_drawdown": -1942.8,
+      "dd_margin": 2557.2,
+      "avg_monthly": 233.73,
+      "max_monthly": 1865.6,
+      "min_monthly": -344.4,
+      "pct_months_profitable": 0.25,
+      "monthly_breakdown": {
+        "2024-03": -114.8,
+        "2024-04": 1865.6,
+        "2024-05": -114.8,
+        "2024-06": 1541.2,
+        "2024-07": -42.4,
+        "2024-08": -114.8,
+        "2024-09": -114.8,
+        "2024-10": -229.6,
+        "2024-11": -229.6,
+        "2024-12": -344.4,
+        "2025-01": -229.6,
+        "2025-03": 932.8
+      },
+      "mc_median": 2604.78,
+      "mc_mean": 2695.58,
+      "mc_p_profit": 0.887,
+      "mc_p_ruin": 1.0,
+      "mc_5th": -829.28,
+      "mc_95th": 6553.96,
+      "mc_composite": 38.71,
+      "mc_pass_rate": 0.0,
+      "wf_efficiency": 0.5
+    },
+    {
+      "name": "RSI|VWAP\u00d7IMBALANCE|xfam_cf188d",
+      "strategy": {
+        "name": "RSI|VWAP\u00d7IMBALANCE|xfam_cf188d",
+        "entry_signals": [
+          {
+            "signal_name": "rsi",
+            "module": "signals.momentum",
+            "function": "rsi",
+            "params": {
+              "period": 12,
+              "overbought": 67.9589,
+              "oversold": 24.0796
+            },
+            "columns": {
+              "long": "entry_long_rsi",
+              "short": "entry_short_rsi"
+            }
+          },
+          {
+            "signal_name": "vwap",
+            "module": "signals.volume",
+            "function": "vwap",
+            "params": {},
+            "columns": {
+              "long": "entry_long_vwap",
+              "short": "entry_short_vwap"
+            }
+          }
+        ],
+        "entry_filters": [
+          {
+            "signal_name": "imbalance",
+            "module": "signals.orderflow",
+            "function": "imbalance",
+            "params": {
+              "ratio_threshold": 4.0841
+            },
+            "column": "signal_buy_imbalance"
+          },
+          {
+            "signal_name": "time_of_day",
+            "module": "signals.time_filters",
+            "function": "time_of_day",
+            "params": {
+              "start_hour": 9,
+              "start_minute": 30,
+              "end_hour": 11,
+              "end_minute": 30
+            },
+            "column": "signal_time_allowed"
+          }
+        ],
+        "exit_rules": {
+          "stop_loss_type": "fixed_points",
+          "stop_loss_value": 15.6,
+          "take_profit_type": "fixed_points",
+          "take_profit_value": 109.0,
+          "trailing_stop": false,
+          "trailing_activation": 4.0,
+          "trailing_distance": 2.0,
+          "time_exit_minutes": null
+        },
+        "sizing_rules": {
+          "method": "fixed",
+          "fixed_contracts": 4,
+          "risk_pct": 0.005,
+          "atr_risk_multiple": 2.0
+        },
+        "primary_timeframe": "1m",
+        "require_all_entries": true
+      },
+      "signal_family": "rsi|vwap+imbalance",
+      "fitness": -7837.52,
+      "trades": 32,
+      "win_rate": 31.25,
+      "profit_factor": 2.43,
+      "sharpe": 4.96,
+      "total_pnl": 4220.8,
+      "max_drawdown": -1473.2,
+      "dd_margin": 3026.8,
+      "avg_monthly": 351.73,
+      "max_monthly": 1638.4,
+      "min_monthly": -414.0,
+      "pct_months_profitable": 0.42,
+      "monthly_breakdown": {
+        "2024-03": -138.0,
+        "2024-04": 1441.6,
+        "2024-05": 1638.4,
+        "2024-06": 1352.4,
+        "2024-07": -135.2,
+        "2024-08": -138.0,
+        "2024-09": -138.0,
+        "2024-10": -276.0,
+        "2024-11": 720.8,
+        "2024-12": -414.0,
+        "2025-01": -414.0,
+        "2025-03": 720.8
+      },
+      "mc_median": 3980.61,
+      "mc_mean": 4063.87,
+      "mc_p_profit": 0.9622,
+      "mc_p_ruin": 1.0,
+      "mc_5th": 315.98,
+      "mc_95th": 8117.64,
+      "mc_composite": 44.02,
+      "mc_pass_rate": 0.0,
+      "wf_efficiency": 0.5
+    }
+  ]
+}

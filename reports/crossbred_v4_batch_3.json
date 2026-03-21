@@ -1,0 +1,150 @@
+{
+  "generated_at": "2026-03-21T02:41:47",
+  "pipeline": "crossbreed_v4",
+  "account": {
+    "initial_capital": 150000,
+    "prop_firm": "topstep_150k",
+    "max_drawdown": -4500.0,
+    "daily_loss_limit": -3000.0
+  },
+  "bounds": {
+    "sl_range": [
+      10.0,
+      35.0
+    ],
+    "tp_range": [
+      50.0,
+      300.0
+    ],
+    "ct_range": [
+      4,
+      15
+    ],
+    "rr_min": 4.0
+  },
+  "data": {
+    "full_period": "2024-03-19 to 2025-03-18",
+    "train_period": "2024-03-19 to 2024-11-18",
+    "validate_period": "2024-11-19 to 2025-03-18"
+  },
+  "pipeline_stats": {
+    "seeds_loaded": 285,
+    "initial_viable": 9,
+    "total_tested": 10525,
+    "generations": 60,
+    "wf_survivors": 60,
+    "mc_validated": 26,
+    "decorrelated_final": 1,
+    "elapsed_min": 123.1
+  },
+  "signal_diversity": {
+    "entry_types": [
+      "ema_crossover"
+    ],
+    "filter_types": [
+      "bollinger_keltner_squeeze"
+    ],
+    "cross_family_count": 1
+  },
+  "strategies": [
+    {
+      "name": "EMA_CROSSOVER\u00d7BOLLINGER_KELTNER_SQUEEZE|xfam_187e01",
+      "strategy": {
+        "name": "EMA_CROSSOVER\u00d7BOLLINGER_KELTNER_SQUEEZE|xfam_187e01",
+        "entry_signals": [
+          {
+            "signal_name": "ema_crossover",
+            "module": "signals.trend",
+            "function": "ema_crossover",
+            "params": {
+              "fast_period": 8,
+              "slow_period": 66
+            },
+            "columns": {
+              "long": "entry_long_ema_cross",
+              "short": "entry_short_ema_cross"
+            }
+          }
+        ],
+        "entry_filters": [
+          {
+            "signal_name": "bollinger_keltner_squeeze",
+            "module": "signals.volatility",
+            "function": "bollinger_keltner_squeeze",
+            "params": {
+              "bb_period": 15,
+              "bb_std": 2.8329,
+              "kc_period": 12,
+              "kc_atr_period": 13,
+              "kc_mult": 1.4184
+            },
+            "column": "signal_squeeze_on"
+          },
+          {
+            "signal_name": "time_of_day",
+            "module": "signals.time_filters",
+            "function": "time_of_day",
+            "params": {
+              "start_hour": 9,
+              "start_minute": 30,
+              "end_hour": 11,
+              "end_minute": 0
+            },
+            "column": "signal_time_allowed"
+          }
+        ],
+        "exit_rules": {
+          "stop_loss_type": "fixed_points",
+          "stop_loss_value": 10.2,
+          "take_profit_type": "fixed_points",
+          "take_profit_value": 79.9,
+          "trailing_stop": false,
+          "trailing_activation": 4.0,
+          "trailing_distance": 2.0,
+          "time_exit_minutes": null
+        },
+        "sizing_rules": {
+          "method": "fixed",
+          "fixed_contracts": 4,
+          "risk_pct": 0.01,
+          "atr_risk_multiple": 2.0
+        },
+        "primary_timeframe": "1m",
+        "require_all_entries": true
+      },
+      "signal_family": "ema_crossover+bollinger_keltner_squeeze",
+      "fitness": 6353.11,
+      "trades": 20,
+      "win_rate": 30.0,
+      "profit_factor": 2.29,
+      "sharpe": 5.28,
+      "total_pnl": 1714.4,
+      "max_drawdown": -886.8,
+      "dd_margin": 3613.2,
+      "avg_monthly": 190.49,
+      "max_monthly": 2722.0,
+      "min_monthly": -379.2,
+      "pct_months_profitable": 0.11,
+      "monthly_breakdown": {
+        "2024-04": -59.6,
+        "2024-05": -94.8,
+        "2024-06": -94.8,
+        "2024-07": -94.8,
+        "2024-08": -94.8,
+        "2024-09": 2722.0,
+        "2024-10": -94.8,
+        "2024-11": -94.8,
+        "2025-02": -379.2
+      },
+      "mc_median": 1590.13,
+      "mc_mean": 1641.92,
+      "mc_p_profit": 0.8924,
+      "mc_p_ruin": 1.0,
+      "mc_5th": -461.63,
+      "mc_95th": 3912.21,
+      "mc_composite": 39.14,
+      "mc_pass_rate": 0.0,
+      "wf_efficiency": 0.5
+    }
+  ]
+}
