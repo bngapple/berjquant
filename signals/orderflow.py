@@ -218,12 +218,16 @@ def exhaustion(
 def imbalance(
     df: pl.DataFrame,
     ratio_threshold: float = 3.0,
+    volume_min_rvol: float = 0.8,
 ) -> pl.DataFrame:
     """Estimate buy/sell imbalance from bar data.
 
     Uses body-to-range ratio and close vs open to estimate buying vs selling
     pressure.  A large body relative to the full range in the direction of
     the close indicates one-sided flow.
+
+    Fix #15: Incorporates volume confirmation — signals only fire on bars
+    with above-threshold relative volume, filtering out low-conviction noise.
 
     Adds:
         buy_sell_ratio         — estimated buy/sell ratio (>1 = more buying)
@@ -235,8 +239,6 @@ def imbalance(
     body_ratio = body / bar_range  # -1 to +1
 
     # Convert to buy/sell ratio: map [-1,1] -> ratio
-    # body_ratio > 0 means bullish; we scale so 1.0 maps to a large ratio
-    # Using: ratio = (1 + body_ratio) / (1 - body_ratio), clamped
     buy_pct = (1.0 + body_ratio) / 2.0   # 0 to 1
     sell_pct = (1.0 - body_ratio) / 2.0   # 1 to 0
 
@@ -247,12 +249,25 @@ def imbalance(
         ).alias("buy_sell_ratio"),
     )
 
+    # Volume confirmation: relative volume vs 20-bar rolling mean
+    has_volume = "volume" in df.columns
+    if has_volume:
+        vol_avg = pl.col("volume").cast(pl.Float64).rolling_mean(window_size=20)
+        rvol = _safe_divide(pl.col("volume").cast(pl.Float64), vol_avg)
+        df = df.with_columns(rvol.alias("_rvol"))
+        vol_filter = pl.col("_rvol") >= volume_min_rvol
+    else:
+        vol_filter = pl.lit(True)
+
     df = df.with_columns([
-        (pl.col("buy_sell_ratio") > ratio_threshold)
+        ((pl.col("buy_sell_ratio") > ratio_threshold) & vol_filter)
             .alias("signal_buy_imbalance"),
-        (pl.col("buy_sell_ratio") < (1.0 / ratio_threshold))
+        ((pl.col("buy_sell_ratio") < (1.0 / ratio_threshold)) & vol_filter)
             .alias("signal_sell_imbalance"),
     ])
+
+    if has_volume:
+        df = df.drop("_rvol")
 
     return df
 

@@ -180,7 +180,7 @@ def main():
     config = BacktestConfig(
         symbol="MNQ", prop_firm_profile="topstep_150k",
         start_date="2024-03-19", end_date="2025-03-18",
-        slippage_ticks=2, initial_capital=150000.0,
+        slippage_ticks=3, initial_capital=150000.0,
     )
 
     # Load evolved strategies as seeds

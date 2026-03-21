@@ -88,10 +88,12 @@ class GeneratedStrategy:
     primary_timeframe: str = "1m"
     require_all_entries: bool = True  # AND mode (True) vs OR mode (False)
 
-    # Runtime cache: last ATR value seen during compute_signals, used by
+    # Runtime cache for ATR/close at each bar index, used by
     # get_stop_loss / get_take_profit when type is "atr_multiple".
     _last_atr: float = field(default=0.0, repr=False, compare=False)
     _last_close: float = field(default=0.0, repr=False, compare=False)
+    # Fix #29: Per-bar ATR array for correct sizing at entry time
+    _atr_array: list = field(default_factory=list, repr=False, compare=False)
 
     # ── Signal computation ───────────────────────────────────────────
 
@@ -200,19 +202,29 @@ class GeneratedStrategy:
         return df
 
     def _cache_runtime_values(self, df: pl.DataFrame) -> None:
-        """Store the last ATR and close values for stop/target calculations."""
+        """Store ATR and close values for stop/target calculations.
+
+        Fix #29: Cache the full ATR array so per-bar lookups are possible.
+        """
         # Look for any ATR column (atr_14, atr_10, etc.)
         atr_cols = [c for c in df.columns if c.startswith("atr_")]
         if atr_cols:
-            last_row = df.select(atr_cols[0]).row(-1)
-            val = last_row[0]
-            if val is not None and not math.isnan(val):
-                self._last_atr = float(val)
+            self._atr_array = df[atr_cols[0]].to_list()
+            last_val = self._atr_array[-1] if self._atr_array else None
+            if last_val is not None and not math.isnan(last_val):
+                self._last_atr = float(last_val)
 
         if "close" in df.columns:
             last_close = df.select("close").row(-1)[0]
             if last_close is not None:
                 self._last_close = float(last_close)
+
+    def set_bar_index(self, idx: int) -> None:
+        """Set current bar index for per-bar ATR lookups (fix #29)."""
+        if self._atr_array and 0 <= idx < len(self._atr_array):
+            val = self._atr_array[idx]
+            if val is not None and not math.isnan(val):
+                self._last_atr = float(val)
 
     # ── Stop loss ────────────────────────────────────────────────────
 
@@ -283,43 +295,51 @@ class GeneratedStrategy:
         contract_spec: ContractSpec,
         prop_rules: PropFirmRules,
     ) -> int:
-        """Calculate position size based on sizing rules."""
+        """Calculate position size based on sizing rules.
+
+        Fix #30: Applies DD-protection scaling — halves size when drawdown
+        is within 25% of the max DD limit.
+        """
         rules = self.sizing_rules
         max_allowed = prop_rules.max_contracts.get(contract_spec.symbol, 1)
 
         if rules.method == "fixed":
-            return min(rules.fixed_contracts, max_allowed)
+            contracts = min(rules.fixed_contracts, max_allowed)
 
         elif rules.method == "risk_pct":
-            # Risk a percentage of the current balance.
-            # risk_amount = balance * risk_pct
-            # contracts = risk_amount / (stop_distance_points * point_value)
             risk_amount = account_state.current_balance * rules.risk_pct
             stop_dist = self._stop_distance(self._last_close) if self._last_close > 0 else None
             if stop_dist is None or stop_dist <= 0:
-                return min(1, max_allowed)
-            dollar_risk_per_contract = stop_dist * contract_spec.point_value
-            if dollar_risk_per_contract <= 0:
-                return min(1, max_allowed)
-            contracts = int(risk_amount / dollar_risk_per_contract)
-            return max(1, min(contracts, max_allowed))
+                contracts = min(1, max_allowed)
+            else:
+                dollar_risk_per_contract = stop_dist * contract_spec.point_value
+                if dollar_risk_per_contract <= 0:
+                    contracts = min(1, max_allowed)
+                else:
+                    contracts = max(1, min(int(risk_amount / dollar_risk_per_contract), max_allowed))
 
         elif rules.method == "atr_scaled":
-            # Size inversely proportional to ATR-based stop distance.
-            # stop_distance = atr_risk_multiple * ATR
-            # contracts = (balance * risk_pct) / (stop_distance * point_value)
             if self._last_atr <= 0:
-                return min(1, max_allowed)
-            stop_dist = rules.atr_risk_multiple * self._last_atr
-            risk_amount = account_state.current_balance * rules.risk_pct
-            dollar_risk_per_contract = stop_dist * contract_spec.point_value
-            if dollar_risk_per_contract <= 0:
-                return min(1, max_allowed)
-            contracts = int(risk_amount / dollar_risk_per_contract)
-            return max(1, min(contracts, max_allowed))
+                contracts = min(1, max_allowed)
+            else:
+                stop_dist = rules.atr_risk_multiple * self._last_atr
+                risk_amount = account_state.current_balance * rules.risk_pct
+                dollar_risk_per_contract = stop_dist * contract_spec.point_value
+                if dollar_risk_per_contract <= 0:
+                    contracts = min(1, max_allowed)
+                else:
+                    contracts = max(1, min(int(risk_amount / dollar_risk_per_contract), max_allowed))
+        else:
+            contracts = min(1, max_allowed)
 
-        # Fallback
-        return min(1, max_allowed)
+        # Fix #30: DD-protection scaling
+        dd_remaining = abs(prop_rules.max_drawdown) - abs(account_state.current_drawdown)
+        dd_limit = abs(prop_rules.max_drawdown)
+        if dd_limit > 0 and dd_remaining < dd_limit * 0.25:
+            # Within 25% of max DD — halve position size
+            contracts = max(1, contracts // 2)
+
+        return contracts
 
     # ── Serialization ────────────────────────────────────────────────
 

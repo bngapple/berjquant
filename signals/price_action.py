@@ -219,16 +219,24 @@ def opening_range(df: pl.DataFrame, or_minutes: int = 30) -> pl.DataFrame:
         entry_long_or_breakout — close breaks above OR high after the OR period
         entry_short_or_breakout — close breaks below OR low after the OR period
 
-    Assumes the ``timestamp`` column is in US/Eastern (or a timezone-aware
-    equivalent).  If timestamps are UTC, convert before calling.
+    Fix #16: Converts timestamps to ET before extracting hours/minutes,
+    handling EDT/EST transitions correctly.
     """
+    # Convert to ET for correct time extraction
+    ts = pl.col("timestamp")
+    if df["timestamp"].dtype == pl.Datetime:
+        # Naive datetime — treat as UTC
+        et_ts = ts.dt.replace_time_zone("UTC").dt.convert_time_zone("US/Eastern")
+    else:
+        et_ts = ts.dt.convert_time_zone("US/Eastern")
+
     df = df.with_columns([
         _trading_date(),
-        pl.col("timestamp").dt.hour().alias("_hour"),
-        pl.col("timestamp").dt.minute().alias("_minute"),
+        et_ts.dt.hour().alias("_hour"),
+        et_ts.dt.minute().alias("_minute"),
     ])
 
-    # Compute minutes since 9:30
+    # Compute minutes since 9:30 ET
     df = df.with_columns(
         ((pl.col("_hour") - 9) * 60 + pl.col("_minute") - 30).alias("_mins_since_open"),
     )

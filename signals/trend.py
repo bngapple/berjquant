@@ -113,22 +113,27 @@ def ema_ribbon(
 # ---------------------------------------------------------------------------
 
 def linear_regression_slope(df: pl.DataFrame, period: int = 20) -> pl.DataFrame:
-    """Rolling linear regression slope of close price. Positive slope = uptrend."""
+    """Rolling linear regression slope of close price. Positive slope = uptrend.
+
+    Fix #21: Vectorized using numpy sliding_window_view instead of Python loop.
+    """
     slope_col = f"linreg_slope_{period}"
 
-    close = df.get_column("close").to_numpy()
+    close = df.get_column("close").to_numpy().astype(np.float64)
     n = len(close)
     slopes = np.full(n, np.nan)
 
-    # x values for regression: 0, 1, ..., period-1
-    x = np.arange(period, dtype=np.float64)
-    x_mean = x.mean()
-    x_var = ((x - x_mean) ** 2).sum()
+    if n >= period:
+        from numpy.lib.stride_tricks import sliding_window_view
+        x = np.arange(period, dtype=np.float64)
+        x_mean = x.mean()
+        x_dev = x - x_mean
+        x_var = (x_dev ** 2).sum()
 
-    for i in range(period - 1, n):
-        y = close[i - period + 1 : i + 1]
-        y_mean = y.mean()
-        slopes[i] = ((x - x_mean) * (y - y_mean)).sum() / x_var
+        windows = sliding_window_view(close, period)  # (n-period+1, period)
+        y_means = windows.mean(axis=1)
+        # Vectorized: sum((x - x_mean) * (y - y_mean)) / x_var for each window
+        slopes[period - 1:] = (windows - y_means[:, np.newaxis]) @ x_dev / x_var
 
     df = df.with_columns(
         pl.Series(name=slope_col, values=slopes),

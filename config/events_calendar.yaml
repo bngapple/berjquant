@@ -1,9 +1,10 @@
 # Economic Event Blackout Calendar
 # No new entries within blackout_buffer_minutes before/after events
+# Fix #7: Increased buffer from 5 to 15 min; added recurring event generation
 
-blackout_buffer_minutes: 5
+blackout_buffer_minutes: 15
 
-# Recurring event patterns (for auto-generating dates)
+# Recurring event patterns (parsed by risk manager to generate actual dates)
 recurring_events:
   - type: "NFP"
     description: "Non-Farm Payrolls"
@@ -13,19 +14,84 @@ recurring_events:
 
   - type: "CPI"
     description: "Consumer Price Index"
-    schedule: "monthly"
+    schedule: "monthly_mid"
     time: "08:30"
     timezone: "US/Eastern"
 
   - type: "PPI"
     description: "Producer Price Index"
-    schedule: "monthly"
+    schedule: "monthly_mid"
+    time: "08:30"
+    timezone: "US/Eastern"
+
+  - type: "ISM_MFG"
+    description: "ISM Manufacturing PMI"
+    schedule: "first_business_day"
+    time: "10:00"
+    timezone: "US/Eastern"
+
+  - type: "RETAIL_SALES"
+    description: "Retail Sales"
+    schedule: "monthly_mid"
+    time: "08:30"
+    timezone: "US/Eastern"
+
+  - type: "GDP"
+    description: "GDP (Advance/Prelim/Final)"
+    schedule: "quarterly"
+    time: "08:30"
+    timezone: "US/Eastern"
+
+  - type: "JOBLESS_CLAIMS"
+    description: "Initial Jobless Claims"
+    schedule: "weekly_thursday"
     time: "08:30"
     timezone: "US/Eastern"
 
 # Specific scheduled events (add as known)
 events:
-  # 2026 FOMC Meetings (update annually)
+  # 2025 FOMC Meetings
+  - date: "2025-01-29"
+    time: "14:00"
+    type: "FOMC"
+    description: "FOMC Rate Decision"
+
+  - date: "2025-03-19"
+    time: "14:00"
+    type: "FOMC"
+    description: "FOMC Rate Decision"
+
+  - date: "2025-05-07"
+    time: "14:00"
+    type: "FOMC"
+    description: "FOMC Rate Decision"
+
+  - date: "2025-06-18"
+    time: "14:00"
+    type: "FOMC"
+    description: "FOMC Rate Decision"
+
+  - date: "2025-07-30"
+    time: "14:00"
+    type: "FOMC"
+    description: "FOMC Rate Decision"
+
+  - date: "2025-09-17"
+    time: "14:00"
+    type: "FOMC"
+    description: "FOMC Rate Decision"
+
+  - date: "2025-10-29"
+    time: "14:00"
+    type: "FOMC"
+    description: "FOMC Rate Decision"
+
+  - date: "2025-12-17"
+    time: "14:00"
+    type: "FOMC"
+    description: "FOMC Rate Decision"
+
+  # 2026 FOMC Meetings
   - date: "2026-01-28"
     time: "14:00"
     type: "FOMC"

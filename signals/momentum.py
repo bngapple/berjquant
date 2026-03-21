@@ -6,6 +6,7 @@ stochastic also 'high'/'low') and returns the same DataFrame with new
 signal columns appended.
 """
 
+import numpy as np
 import polars as pl
 
 
@@ -145,14 +146,19 @@ def stochastic(
         pl.Series(name="stoch_d", values=d),
     ])
 
+    # Fix #14: Check if K was recently in oversold/overbought zone
+    # (within last 3 bars), not just on the exact cross bar.
+    was_oversold = pl.col("stoch_k").rolling_min(window_size=3) < oversold
+    was_overbought = pl.col("stoch_k").rolling_max(window_size=3) > overbought
+
     df = df.with_columns([
         (
             _crosses_above_expr(pl.col("stoch_k"), pl.col("stoch_d"))
-            & (pl.col("stoch_k") < oversold)
+            & was_oversold
         ).alias("entry_long_stoch"),
         (
             _crosses_below_expr(pl.col("stoch_k"), pl.col("stoch_d"))
-            & (pl.col("stoch_k") > overbought)
+            & was_overbought
         ).alias("entry_short_stoch"),
     ])
 
@@ -208,18 +214,20 @@ def cci(
     tp = (df["high"] + df["low"] + df["close"]) / 3.0
     tp_sma = tp.rolling_mean(window_size=period)
 
-    # Mean absolute deviation (rolling)
-    # Polars doesn't have a built-in rolling MAD, so we compute it via map.
-    tp_series = tp.to_list()
-    mad_vals: list[float | None] = [None] * len(tp_series)
-    for i in range(period - 1, len(tp_series)):
-        window = tp_series[i - period + 1 : i + 1]
-        if any(v is None for v in window):
-            continue
-        mean = sum(window) / period  # type: ignore[arg-type]
-        mad_vals[i] = sum(abs(v - mean) for v in window) / period  # type: ignore[arg-type, operator]
+    # Fix #20: Vectorized rolling MAD using numpy stride tricks
+    tp_arr = tp.to_numpy().astype(np.float64)
+    n = len(tp_arr)
+    mad_arr = np.full(n, np.nan)
 
-    mad = pl.Series("mad", mad_vals, dtype=pl.Float64)
+    if n >= period:
+        # Use sliding window view for vectorized MAD
+        from numpy.lib.stride_tricks import sliding_window_view
+        windows = sliding_window_view(tp_arr, period)  # shape: (n-period+1, period)
+        means = windows.mean(axis=1)
+        mads = np.abs(windows - means[:, np.newaxis]).mean(axis=1)
+        mad_arr[period - 1:] = mads
+
+    mad = pl.Series("mad", mad_arr, dtype=pl.Float64)
 
     cci_vals = (tp - tp_sma) / (0.015 * mad)
 

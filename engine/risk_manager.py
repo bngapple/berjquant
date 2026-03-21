@@ -1,6 +1,7 @@
 """Risk management layer — enforced before every order."""
 
-from datetime import datetime, time, timedelta
+import calendar as cal
+from datetime import datetime, date, time, timedelta
 from zoneinfo import ZoneInfo
 
 from engine.utils import (
@@ -47,7 +48,11 @@ class RiskManager:
         return time(int(parts[0]), int(parts[1]))
 
     def _parse_events(self):
-        """Pre-compute blackout windows from events calendar."""
+        """Pre-compute blackout windows from events calendar.
+
+        Fix #7: Also parse recurring_events and generate actual dates
+        for the backtest period (2024-2026).
+        """
         events = self.events_calendar.get("events", [])
         buffer = self.blackout_buffer
 
@@ -56,6 +61,69 @@ class RiskManager:
                 f"{event['date']} {event['time']}", "%Y-%m-%d %H:%M"
             ).replace(tzinfo=ET)
             self._blackout_windows.append((dt - buffer, dt + buffer))
+
+        # Generate dates from recurring event patterns
+        recurring = self.events_calendar.get("recurring_events", [])
+        for rec in recurring:
+            schedule = rec.get("schedule", "")
+            time_str = rec.get("time", "08:30")
+            h, m = map(int, time_str.split(":"))
+
+            for year in range(2024, 2027):
+                dates = self._generate_recurring_dates(schedule, year)
+                for d in dates:
+                    dt = datetime(d.year, d.month, d.day, h, m, tzinfo=ET)
+                    self._blackout_windows.append((dt - buffer, dt + buffer))
+
+    @staticmethod
+    def _generate_recurring_dates(schedule: str, year: int) -> list[date]:
+        """Generate dates for a recurring event schedule."""
+        dates: list[date] = []
+
+        if schedule == "first_friday":
+            # First Friday of each month
+            for month in range(1, 13):
+                for day in range(1, 8):
+                    d = date(year, month, day)
+                    if d.weekday() == 4:  # Friday
+                        dates.append(d)
+                        break
+
+        elif schedule == "first_business_day":
+            for month in range(1, 13):
+                for day in range(1, 5):
+                    d = date(year, month, day)
+                    if d.weekday() < 5:  # Mon-Fri
+                        dates.append(d)
+                        break
+
+        elif schedule == "monthly_mid":
+            # ~13th-15th of each month (approximate for CPI/PPI/Retail)
+            for month in range(1, 13):
+                d = date(year, month, 13)
+                while d.weekday() >= 5:
+                    d += timedelta(days=1)
+                dates.append(d)
+
+        elif schedule == "quarterly":
+            # End of Jan, Apr, Jul, Oct (GDP advance estimate)
+            for month in [1, 4, 7, 10]:
+                last_day = cal.monthrange(year, month)[1]
+                d = date(year, month, last_day)
+                while d.weekday() >= 5:
+                    d -= timedelta(days=1)
+                dates.append(d)
+
+        elif schedule == "weekly_thursday":
+            # Every Thursday
+            d = date(year, 1, 1)
+            while d.weekday() != 3:
+                d += timedelta(days=1)
+            while d.year == year:
+                dates.append(d)
+                d += timedelta(days=7)
+
+        return dates
 
     def init_account(self, starting_balance: float) -> AccountState:
         """Create fresh account state."""

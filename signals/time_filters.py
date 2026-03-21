@@ -2,10 +2,11 @@
 Time-based filter signals for NQ/MNQ futures trading.
 
 These are context/filter signals (not primary entry signals).  Each function
-takes a Polars DataFrame with a ``datetime`` column (US Eastern Time) and
-returns the same DataFrame with new boolean or numeric columns appended.
+takes a Polars DataFrame with a ``datetime`` column and returns the same
+DataFrame with new boolean or numeric columns appended.
 
-All times assume US Eastern Time.
+Fix #17: All time calculations convert to US/Eastern first so that
+EDT/EST transitions are handled correctly.
 """
 
 import polars as pl
@@ -15,15 +16,37 @@ import polars as pl
 # Helper
 # ---------------------------------------------------------------------------
 
-def _minute_of_day() -> pl.Expr:
-    """Return an i32 expression for the minute-of-day (0–1439).
+def _ensure_et_column(df: pl.DataFrame) -> pl.DataFrame:
+    """Add an _et_ts column with timestamps converted to US/Eastern.
 
-    Polars ``dt.hour()`` returns i8, which overflows when multiplied by 60,
-    so we cast to i32 first.
+    If timestamps are timezone-naive (assumed UTC), localize to UTC first.
+    If the column already exists, return unchanged.
     """
+    if "_et_ts" in df.columns:
+        return df
+    ts = pl.col("timestamp")
+    # If the column has no timezone info, assume UTC and convert
+    if df["timestamp"].dtype == pl.Datetime:
+        # Naive datetime — treat as UTC
+        return df.with_columns(
+            ts.dt.replace_time_zone("UTC")
+              .dt.convert_time_zone("US/Eastern")
+              .alias("_et_ts")
+        )
+    elif str(df["timestamp"].dtype).startswith("Datetime"):
+        # Already tz-aware — just convert
+        return df.with_columns(
+            ts.dt.convert_time_zone("US/Eastern").alias("_et_ts")
+        )
+    # Fallback: use raw timestamp
+    return df.with_columns(ts.alias("_et_ts"))
+
+
+def _minute_of_day() -> pl.Expr:
+    """Return an i32 expression for the minute-of-day in ET (0-1439)."""
     return (
-        pl.col("timestamp").dt.hour().cast(pl.Int32) * 60
-        + pl.col("timestamp").dt.minute().cast(pl.Int32)
+        pl.col("_et_ts").dt.hour().cast(pl.Int32) * 60
+        + pl.col("_et_ts").dt.minute().cast(pl.Int32)
     )
 
 
@@ -38,21 +61,23 @@ def time_of_day(
     end_hour: int,
     end_minute: int,
 ) -> pl.DataFrame:
-    """Filter bars to a specific time-of-day window.
+    """Filter bars to a specific time-of-day window (in ET).
 
     Adds ``signal_in_time_window`` (bool) — True when the bar falls within
-    [start_hour:start_minute, end_hour:end_minute).
+    [start_hour:start_minute, end_hour:end_minute) ET.
 
     Example: ``time_of_day(df, 9, 30, 11, 0)`` keeps the 9:30–11:00 ET window.
     """
+    df = _ensure_et_column(df)
     start_total = start_hour * 60 + start_minute
     end_total = end_hour * 60 + end_minute
     mod = _minute_of_day()
 
-    return df.with_columns(
+    df = df.with_columns(
         (mod.ge(start_total) & mod.lt(end_total))
         .alias("signal_in_time_window")
     )
+    return df.drop("_et_ts", strict=False)
 
 
 # ---------------------------------------------------------------------------
@@ -88,7 +113,7 @@ def day_of_week(
 # ---------------------------------------------------------------------------
 
 def session_segment(df: pl.DataFrame) -> pl.DataFrame:
-    """Tag each bar by market session.
+    """Tag each bar by market session (uses ET).
 
     Adds:
       - ``session_segment``      (str)  one of "pre_market", "core",
@@ -103,6 +128,7 @@ def session_segment(df: pl.DataFrame) -> pl.DataFrame:
       - post_close : 16:00 – 17:00
       - outside    : everything else
     """
+    df = _ensure_et_column(df)
     mod = _minute_of_day()
 
     pre_start = 8 * 60          # 08:00
@@ -130,7 +156,8 @@ def session_segment(df: pl.DataFrame) -> pl.DataFrame:
         (segment.eq(pl.lit("post_close"))).alias("signal_is_postclose"),
     ])
 
-    return df.with_columns(cols)
+    df = df.with_columns(cols)
+    return df.drop("_et_ts", strict=False)
 
 
 # ---------------------------------------------------------------------------
@@ -142,17 +169,19 @@ def minutes_since_open(
     open_hour: int = 9,
     open_minute: int = 30,
 ) -> pl.DataFrame:
-    """Compute elapsed minutes since market open for each bar.
+    """Compute elapsed minutes since market open (ET) for each bar.
 
     Adds ``minutes_since_open`` (i64).  Negative values indicate bars before
     the open.
     """
+    df = _ensure_et_column(df)
     open_total = open_hour * 60 + open_minute
     mod = _minute_of_day()
 
-    return df.with_columns(
+    df = df.with_columns(
         (mod - open_total).cast(pl.Int64).alias("minutes_since_open")
     )
+    return df.drop("_et_ts", strict=False)
 
 
 # ---------------------------------------------------------------------------
@@ -165,17 +194,19 @@ def first_n_minutes(
     open_hour: int = 9,
     open_minute: int = 30,
 ) -> pl.DataFrame:
-    """Flag bars that fall within the first *n* minutes after the open.
+    """Flag bars that fall within the first *n* minutes after the open (ET).
 
     Adds ``signal_first_n_minutes`` (bool).
     """
+    df = _ensure_et_column(df)
     open_total = open_hour * 60 + open_minute
     mod = _minute_of_day()
 
-    return df.with_columns(
+    df = df.with_columns(
         (mod.ge(open_total) & mod.lt(open_total + n))
         .alias("signal_first_n_minutes")
     )
+    return df.drop("_et_ts", strict=False)
 
 
 # ---------------------------------------------------------------------------
@@ -188,17 +219,19 @@ def last_n_minutes(
     close_hour: int = 16,
     close_minute: int = 0,
 ) -> pl.DataFrame:
-    """Flag bars that fall within the last *n* minutes before the close.
+    """Flag bars that fall within the last *n* minutes before the close (ET).
 
     Adds ``signal_last_n_minutes`` (bool).
     """
+    df = _ensure_et_column(df)
     close_total = close_hour * 60 + close_minute
     mod = _minute_of_day()
 
-    return df.with_columns(
+    df = df.with_columns(
         (mod.ge(close_total - n) & mod.lt(close_total))
         .alias("signal_last_n_minutes")
     )
+    return df.drop("_et_ts", strict=False)
 
 
 # ---------------------------------------------------------------------------
@@ -212,10 +245,12 @@ def london_overlap(df: pl.DataFrame) -> pl.DataFrame:
 
     Adds ``signal_london_overlap`` (bool).
     """
+    df = _ensure_et_column(df)
     mod = _minute_of_day()
     start = 8 * 60    # 08:00 ET
     end = 11 * 60     # 11:00 ET
 
-    return df.with_columns(
+    df = df.with_columns(
         (mod.ge(start) & mod.lt(end)).alias("signal_london_overlap")
     )
+    return df.drop("_et_ts", strict=False)

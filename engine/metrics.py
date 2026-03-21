@@ -14,7 +14,8 @@ from engine.utils import BacktestResult, PerformanceMetrics, Trade
 # ── Metrics Calculator ───────────────────────────────────────────────
 
 def calculate_metrics(
-    trades: list[Trade], account_size: float
+    trades: list[Trade], account_size: float,
+    equity_curve: list[tuple] | None = None,
 ) -> PerformanceMetrics:
     """Compute all performance metrics from a list of trades."""
     if not trades:
@@ -55,17 +56,30 @@ def calculate_metrics(
     else:
         sharpe_ratio = 0.0
 
-    # Max drawdown
-    equity = account_size
-    peak = account_size
-    max_dd = 0.0
-    for pnl in pnls:
-        equity += pnl
-        if equity > peak:
-            peak = equity
-        dd = equity - peak
-        if dd < max_dd:
-            max_dd = dd
+    # Max drawdown (fix #9: use equity curve for intrabar DD if available)
+    if equity_curve and len(equity_curve) > 0:
+        # Equity curve includes unrealized P&L — more realistic for prop firms
+        equities = [e[1] for e in equity_curve]
+        peak = equities[0]
+        max_dd = 0.0
+        for eq in equities:
+            if eq > peak:
+                peak = eq
+            dd = eq - peak
+            if dd < max_dd:
+                max_dd = dd
+    else:
+        # Fallback: trade-by-trade drawdown
+        equity = account_size
+        peak = account_size
+        max_dd = 0.0
+        for pnl in pnls:
+            equity += pnl
+            if equity > peak:
+                peak = equity
+            dd = equity - peak
+            if dd < max_dd:
+                max_dd = dd
 
     max_dd_pct = (max_dd / account_size) * 100 if account_size > 0 else 0.0
 

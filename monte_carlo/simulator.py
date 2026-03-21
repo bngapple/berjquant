@@ -46,9 +46,9 @@ class MCConfig:
     parameter_jitter: bool = True        # Jitter indicator params +/-10-20%
     gap_injection: bool = True           # Inject random adverse gap events
 
-    # Slippage perturbation params
-    slippage_min_ticks: int = 0          # Min additional slippage ticks
-    slippage_max_ticks: int = 4          # Max additional slippage ticks
+    # Slippage perturbation params (fix #5: bumped to match observed fills)
+    slippage_min_ticks: int = 1          # Min additional slippage ticks
+    slippage_max_ticks: int = 6          # Max additional slippage ticks
     tick_value: float = 0.50             # Dollar value per tick (MNQ default)
 
     # Parameter jitter
@@ -58,6 +58,9 @@ class MCConfig:
     gap_probability: float = 0.02        # 2% chance per trade of adverse gap
     gap_min_points: float = 5.0          # Min gap size in points
     gap_max_points: float = 25.0         # Max gap size
+
+    # Position sizing (fix #6: gap cost scales with contracts)
+    avg_contracts: int = 1               # Average contracts per trade
 
     # Prop firm evaluation simulation
     prop_firm_rules: Any = None          # PropFirmRules object (optional)
@@ -186,7 +189,7 @@ def _worker_run_simulation(args: tuple) -> dict:
         slippage_cost = extra_ticks * config_dict["tick_value"] * 2  # round-trip
         pnls = pnls - slippage_cost
 
-    # --- 4. Gap injection -----------------------------------------------
+    # --- 4. Gap injection (fix #6: multiply by avg contracts) -----------
     if config_dict["gap_injection"]:
         gap_mask = rng.random(len(pnls)) < config_dict["gap_probability"]
         if gap_mask.any():
@@ -198,7 +201,8 @@ def _worker_run_simulation(args: tuple) -> dict:
             # Convert points to dollars: point_value = tick_value / tick_size
             # For MNQ tick_size=0.25, tick_value=0.50 => point_value = 2.0
             point_value = config_dict["tick_value"] / 0.25
-            pnls[gap_mask] -= gap_sizes[gap_mask] * point_value
+            avg_contracts = config_dict.get("avg_contracts", 1)
+            pnls[gap_mask] -= gap_sizes[gap_mask] * point_value * avg_contracts
 
     # --- 5. Build equity curve ------------------------------------------
     equity = np.empty(len(pnls) + 1, dtype=np.float64)
@@ -497,6 +501,7 @@ class MonteCarloSimulator:
             "gap_min_points": cfg.gap_min_points,
             "gap_max_points": cfg.gap_max_points,
             "eval_trading_days": cfg.eval_trading_days,
+            "avg_contracts": getattr(cfg, "avg_contracts", 1),
             "worker_seed": None,  # filled per-sim
         }
 
@@ -722,7 +727,8 @@ class MonteCarloSimulator:
         )
         pnls = pnls.copy()
         point_value = self.config.tick_value / 0.25  # ticks -> points -> dollars
-        pnls[gap_mask] -= gap_sizes[gap_mask] * point_value
+        avg_contracts = self.config.avg_contracts
+        pnls[gap_mask] -= gap_sizes[gap_mask] * point_value * avg_contracts
         return pnls
 
     @staticmethod
