@@ -1,0 +1,202 @@
+{
+  "g4_insample": {
+    "trades": 53,
+    "pnl": 15514.3,
+    "avg_monthly": 7757.15,
+    "worst_monthly": 1031.4,
+    "wr": 43.4,
+    "pf": 1.77,
+    "monthly": {
+      "2024-03": 1031.4,
+      "2024-04": 14482.9
+    }
+  },
+  "g4_oos": {
+    "trades": 8,
+    "pnl": -4647.8,
+    "avg_monthly": -4647.8,
+    "monthly": {
+      "2024-11": -4647.8
+    },
+    "passed": false
+  },
+  "g4_mc": {
+    "8": {
+      "avg_monthly": 6598.0,
+      "worst_monthly": 916.8,
+      "trades": 55,
+      "mc_p_profit": 0.9116,
+      "mc_median": 12446.29,
+      "mc_5th": -2493.62,
+      "mc_95th": 29722.27,
+      "mc_p_ruin": 1.0,
+      "mc_pass_rate": 0.0,
+      "mc_composite": 38.02
+    },
+    "9": {
+      "avg_monthly": 7757.15,
+      "worst_monthly": 1031.4,
+      "trades": 53,
+      "mc_p_profit": 0.927,
+      "mc_median": 14621.84,
+      "mc_5th": -1701.33,
+      "mc_95th": 33662.99,
+      "mc_p_ruin": 1.0,
+      "mc_pass_rate": 0.0,
+      "mc_composite": 39.24
+    },
+    "10": {
+      "avg_monthly": -908.5,
+      "worst_monthly": -2963.0,
+      "trades": 26,
+      "mc_p_profit": 0.3348,
+      "mc_median": -2244.86,
+      "mc_5th": -10489.44,
+      "mc_95th": 7074.18,
+      "mc_p_ruin": 1.0,
+      "mc_pass_rate": 0.0,
+      "mc_composite": 2.46
+    }
+  },
+  "new_insample": {
+    "trades": 39,
+    "pnl": 29426.6,
+    "avg_monthly": 14713.3,
+    "wr": 53.85,
+    "monthly": {
+      "2024-03": 12247.5,
+      "2024-04": 17179.1
+    }
+  },
+  "new_oos": {
+    "trades": 4,
+    "pnl": -4893.2,
+    "monthly": {
+      "2024-11": -4893.2
+    },
+    "passed": false
+  },
+  "final": "g4_alone",
+  "generated_at": "2026-03-22T10:41:28",
+  "g4_strategy": {
+    "name": "rsi|opt_8422d9",
+    "entry_signals": [
+      {
+        "signal_name": "rsi",
+        "module": "signals.momentum",
+        "function": "rsi",
+        "params": {
+          "period": 2,
+          "overbought": 76.2349,
+          "oversold": 13.1966
+        },
+        "columns": {
+          "long": "entry_long_rsi",
+          "short": "entry_short_rsi"
+        }
+      }
+    ],
+    "entry_filters": [
+      {
+        "signal_name": "session_levels",
+        "module": "signals.price_action",
+        "function": "session_levels",
+        "params": {},
+        "column": "signal_at_session_high"
+      },
+      {
+        "signal_name": "time_of_day",
+        "module": "signals.time_filters",
+        "function": "time_of_day",
+        "params": {
+          "start_hour": 9,
+          "start_minute": 30,
+          "end_hour": 14,
+          "end_minute": 0
+        },
+        "column": "signal_time_allowed"
+      }
+    ],
+    "exit_rules": {
+      "stop_loss_type": "fixed_points",
+      "stop_loss_value": 43.7,
+      "take_profit_type": "fixed_points",
+      "take_profit_value": 300,
+      "trailing_stop": false,
+      "trailing_activation": 53.9,
+      "trailing_distance": 17.9,
+      "time_exit_minutes": null
+    },
+    "sizing_rules": {
+      "method": "fixed",
+      "fixed_contracts": 9,
+      "risk_pct": 0.02,
+      "atr_risk_multiple": 2.0
+    },
+    "primary_timeframe": "1m",
+    "require_all_entries": true
+  },
+  "new_strategy": {
+    "name": "new_f_bc9a2c",
+    "entry_signals": [
+      {
+        "signal_name": "bollinger_bands",
+        "module": "signals.volatility",
+        "function": "bollinger_bands",
+        "params": {
+          "period": 28,
+          "std_dev": 2.3704
+        },
+        "columns": {
+          "long": "entry_long_bb",
+          "short": "entry_short_bb"
+        }
+      }
+    ],
+    "entry_filters": [
+      {
+        "signal_name": "session_levels",
+        "module": "signals.price_action",
+        "function": "session_levels",
+        "params": {},
+        "column": "signal_at_session_high"
+      },
+      {
+        "signal_name": "time_of_day",
+        "module": "signals.time_filters",
+        "function": "time_of_day",
+        "params": {
+          "start_hour": 12,
+          "start_minute": 0,
+          "end_hour": 16,
+          "end_minute": 0
+        },
+        "column": "signal_time_allowed"
+      }
+    ],
+    "exit_rules": {
+      "stop_loss_type": "fixed_points",
+      "stop_loss_value": 45.4,
+      "take_profit_type": "fixed_points",
+      "take_profit_value": 170.5,
+      "trailing_stop": false,
+      "trailing_activation": 4.0,
+      "trailing_distance": 2.0,
+      "time_exit_minutes": null
+    },
+    "sizing_rules": {
+      "method": "fixed",
+      "fixed_contracts": 15,
+      "risk_pct": 0.02,
+      "atr_risk_multiple": 2.0
+    },
+    "primary_timeframe": "1m",
+    "require_all_entries": true
+  },
+  "verdicts": {
+    "g4_pass": true,
+    "g4_oos_pass": false,
+    "new_pass": false,
+    "new_oos_pass": false
+  }
+}

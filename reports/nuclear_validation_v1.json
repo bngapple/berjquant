@@ -1,0 +1,833 @@
+{
+  "g4_yr2": {
+    "6": {
+      "trades": 7,
+      "wr": 0.0,
+      "pf": 0.0,
+      "pnl": -4686.6,
+      "avg_mo": -4686.6,
+      "worst_mo": -4686.6,
+      "dd": -4764.6,
+      "safe": false,
+      "monthly": {
+        "2025-03": -4686.6
+      },
+      "sl_pct": 100.0,
+      "tp_pct": 0.0,
+      "avg_win": 0,
+      "avg_loss": -669.51,
+      "long_pct": 14.3,
+      "avg_dur": 11.7
+    },
+    "7": {
+      "trades": 6,
+      "wr": 0.0,
+      "pf": 0.0,
+      "pnl": -4651.4,
+      "avg_mo": -4651.4,
+      "worst_mo": -4651.4,
+      "dd": -4742.4,
+      "safe": false,
+      "monthly": {
+        "2025-03": -4651.4
+      },
+      "sl_pct": 100.0,
+      "tp_pct": 0.0,
+      "avg_win": 0,
+      "avg_loss": -775.23,
+      "long_pct": 16.7,
+      "avg_dur": 11.8
+    },
+    "8": {
+      "pnl": 0,
+      "safe": false
+    },
+    "9": {
+      "pnl": 0,
+      "safe": false
+    },
+    "10": {
+      "pnl": 0,
+      "safe": false
+    }
+  },
+  "dna": {
+    "Year 1": {
+      "trades": 53,
+      "wr": 43.39622641509434,
+      "pf": 1.7739310888401958,
+      "avg_mo": 7757.149999999839,
+      "worst_mo": 1031.3999999999346,
+      "long_pct": 32.075471698113205,
+      "avg_dur": 115.22641509433963,
+      "sl_pct": 49.056603773584904,
+      "tp_pct": 3.7735849056603774
+    }
+  },
+  "clones": [
+    {
+      "name": "stochastic|clone_f_dc0440",
+      "family": "stochastic",
+      "trades": 123,
+      "wr": 32.52,
+      "avg_monthly": 2679.43,
+      "worst_monthly": -431.2,
+      "strategy": {
+        "name": "stochastic|clone_f_dc0440",
+        "entry_signals": [
+          {
+            "signal_name": "stochastic",
+            "module": "signals.momentum",
+            "function": "stochastic",
+            "params": {
+              "k_period": 17,
+              "d_period": 3,
+              "overbought": 87.4642,
+              "oversold": 32.2354
+            },
+            "columns": {
+              "long": "entry_long_stoch",
+              "short": "entry_short_stoch"
+            }
+          }
+        ],
+        "entry_filters": [
+          {
+            "signal_name": "trapped_traders",
+            "module": "signals.orderflow",
+            "function": "trapped_traders",
+            "params": {
+              "lookback": 5,
+              "retrace_pct": 0.5738
+            },
+            "column": "signal_trapped_longs"
+          },
+          {
+            "signal_name": "time_of_day",
+            "module": "signals.time_filters",
+            "function": "time_of_day",
+            "params": {
+              "start_hour": 9,
+              "start_minute": 30,
+              "end_hour": 14,
+              "end_minute": 0
+            },
+            "column": "signal_time_allowed"
+          }
+        ],
+        "exit_rules": {
+          "stop_loss_type": "fixed_points",
+          "stop_loss_value": 56.0,
+          "take_profit_type": "fixed_points",
+          "take_profit_value": 213.9,
+          "trailing_stop": false,
+          "trailing_activation": 4.0,
+          "trailing_distance": 2.0,
+          "time_exit_minutes": null
+        },
+        "sizing_rules": {
+          "method": "fixed",
+          "fixed_contracts": 3,
+          "risk_pct": 0.02,
+          "atr_risk_multiple": 2.0
+        },
+        "primary_timeframe": "1m",
+        "require_all_entries": true
+      },
+      "monthly": {
+        "2025-03": 5746.8,
+        "2025-04": 2722.7,
+        "2025-05": -431.2
+      }
+    },
+    {
+      "name": "roc|clone_f_cae387",
+      "family": "roc",
+      "trades": 112,
+      "wr": 35.71,
+      "avg_monthly": 5741.1,
+      "worst_monthly": 1531.5,
+      "strategy": {
+        "name": "roc|clone_f_cae387",
+        "entry_signals": [
+          {
+            "signal_name": "roc",
+            "module": "signals.momentum",
+            "function": "roc",
+            "params": {
+              "period": 9
+            },
+            "columns": {
+              "long": "entry_long_roc",
+              "short": "entry_short_roc"
+            }
+          }
+        ],
+        "entry_filters": [
+          {
+            "signal_name": "ema_slope",
+            "module": "signals.trend",
+            "function": "ema_slope",
+            "params": {
+              "period": 18,
+              "slope_lookback": 3
+            },
+            "column": "signal_ema_slope_up"
+          },
+          {
+            "signal_name": "time_of_day",
+            "module": "signals.time_filters",
+            "function": "time_of_day",
+            "params": {
+              "start_hour": 9,
+              "start_minute": 30,
+              "end_hour": 14,
+              "end_minute": 0
+            },
+            "column": "signal_time_allowed"
+          }
+        ],
+        "exit_rules": {
+          "stop_loss_type": "fixed_points",
+          "stop_loss_value": 55.1,
+          "take_profit_type": "fixed_points",
+          "take_profit_value": 181.3,
+          "trailing_stop": false,
+          "trailing_activation": 4.0,
+          "trailing_distance": 2.0,
+          "time_exit_minutes": null
+        },
+        "sizing_rules": {
+          "method": "fixed",
+          "fixed_contracts": 3,
+          "risk_pct": 0.02,
+          "atr_risk_multiple": 2.0
+        },
+        "primary_timeframe": "1m",
+        "require_all_entries": true
+      },
+      "monthly": {
+        "2025-03": 1531.5,
+        "2025-04": 9950.7
+      }
+    },
+    {
+      "name": "macd|clone_f_190521",
+      "family": "macd",
+      "trades": 199,
+      "wr": 30.15,
+      "avg_monthly": 2523.95,
+      "worst_monthly": -1595.6,
+      "strategy": {
+        "name": "macd|clone_f_190521",
+        "entry_signals": [
+          {
+            "signal_name": "macd",
+            "module": "signals.momentum",
+            "function": "macd",
+            "params": {
+              "fast": 17,
+              "slow": 9,
+              "signal_period": 16
+            },
+            "columns": {
+              "long": "entry_long_macd",
+              "short": "entry_short_macd"
+            }
+          }
+        ],
+        "entry_filters": [
+          {
+            "signal_name": "supertrend",
+            "module": "signals.trend",
+            "function": "supertrend",
+            "params": {
+              "period": 9,
+              "multiplier": 1.7963
+            },
+            "column": "signal_supertrend_bullish"
+          },
+          {
+            "signal_name": "time_of_day",
+            "module": "signals.time_filters",
+            "function": "time_of_day",
+            "params": {
+              "start_hour": 9,
+              "start_minute": 30,
+              "end_hour": 14,
+              "end_minute": 0
+            },
+            "column": "signal_time_allowed"
+          }
+        ],
+        "exit_rules": {
+          "stop_loss_type": "fixed_points",
+          "stop_loss_value": 39.6,
+          "take_profit_type": "fixed_points",
+          "take_profit_value": 189.9,
+          "trailing_stop": false,
+          "trailing_activation": 4.0,
+          "trailing_distance": 2.0,
+          "time_exit_minutes": null
+        },
+        "sizing_rules": {
+          "method": "fixed",
+          "fixed_contracts": 3,
+          "risk_pct": 0.02,
+          "atr_risk_multiple": 2.0
+        },
+        "primary_timeframe": "1m",
+        "require_all_entries": true
+      },
+      "monthly": {
+        "2025-03": 3818.1,
+        "2025-04": 8892.3,
+        "2025-05": -1595.6,
+        "2025-06": -1019.0
+      }
+    },
+    {
+      "name": "cci|clone_f_8e4a6c",
+      "family": "cci",
+      "trades": 141,
+      "wr": 25.53,
+      "avg_monthly": 477.97,
+      "worst_monthly": -1373.0,
+      "strategy": {
+        "name": "cci|clone_f_8e4a6c",
+        "entry_signals": [
+          {
+            "signal_name": "cci",
+            "module": "signals.momentum",
+            "function": "cci",
+            "params": {
+              "period": 35
+            },
+            "columns": {
+              "long": "entry_long_cci",
+              "short": "entry_short_cci"
+            }
+          }
+        ],
+        "entry_filters": [
+          {
+            "signal_name": "large_trade_detection",
+            "module": "signals.orderflow",
+            "function": "large_trade_detection",
+            "params": {
+              "volume_lookback": 51,
+              "threshold": 1.5218
+            },
+            "column": "signal_large_trade"
+          },
+          {
+            "signal_name": "time_of_day",
+            "module": "signals.time_filters",
+            "function": "time_of_day",
+            "params": {
+              "start_hour": 8,
+              "start_minute": 0,
+              "end_hour": 16,
+              "end_minute": 0
+            },
+            "column": "signal_time_allowed"
+          }
+        ],
+        "exit_rules": {
+          "stop_loss_type": "fixed_points",
+          "stop_loss_value": 34.1,
+          "take_profit_type": "fixed_points",
+          "take_profit_value": 213.3,
+          "trailing_stop": false,
+          "trailing_activation": 4.0,
+          "trailing_distance": 2.0,
+          "time_exit_minutes": null
+        },
+        "sizing_rules": {
+          "method": "fixed",
+          "fixed_contracts": 3,
+          "risk_pct": 0.02,
+          "atr_risk_multiple": 2.0
+        },
+        "primary_timeframe": "1m",
+        "require_all_entries": true
+      },
+      "monthly": {
+        "2025-03": 1043.7,
+        "2025-04": 4335.0,
+        "2025-05": 1599.9,
+        "2025-06": -1162.8,
+        "2025-07": -1373.0,
+        "2025-08": -410.2,
+        "2025-09": -686.8
+      }
+    },
+    {
+      "name": "bollinger_bands|clone_6a55d0",
+      "family": "bollinger_bands",
+      "trades": 75,
+      "wr": 28.0,
+      "avg_monthly": 1162.15,
+      "worst_monthly": 244.4,
+      "strategy": {
+        "name": "bollinger_bands|clone_6a55d0",
+        "entry_signals": [
+          {
+            "signal_name": "bollinger_bands",
+            "module": "signals.volatility",
+            "function": "bollinger_bands",
+            "params": {
+              "period": 19,
+              "std_dev": 2.2484
+            },
+            "columns": {
+              "long": "entry_long_bb",
+              "short": "entry_short_bb"
+            }
+          }
+        ],
+        "entry_filters": [
+          {
+            "signal_name": "candle_patterns",
+            "module": "signals.price_action",
+            "function": "candle_patterns",
+            "params": {},
+            "column": "signal_hammer"
+          },
+          {
+            "signal_name": "time_of_day",
+            "module": "signals.time_filters",
+            "function": "time_of_day",
+            "params": {
+              "start_hour": 13,
+              "start_minute": 0,
+              "end_hour": 16,
+              "end_minute": 0
+            },
+            "column": "signal_time_allowed"
+          }
+        ],
+        "exit_rules": {
+          "stop_loss_type": "fixed_points",
+          "stop_loss_value": 52.1,
+          "take_profit_type": "fixed_points",
+          "take_profit_value": 178.1,
+          "trailing_stop": false,
+          "trailing_activation": 4.0,
+          "trailing_distance": 2.0,
+          "time_exit_minutes": null
+        },
+        "sizing_rules": {
+          "method": "fixed",
+          "fixed_contracts": 3,
+          "risk_pct": 0.02,
+          "atr_risk_multiple": 2.0
+        },
+        "primary_timeframe": "1m",
+        "require_all_entries": true
+      },
+      "monthly": {
+        "2025-03": 2079.9,
+        "2025-04": 244.4
+      }
+    },
+    {
+      "name": "keltner_channels|clone_f_588d86",
+      "family": "keltner_channels",
+      "trades": 130,
+      "wr": 27.69,
+      "avg_monthly": 2600.85,
+      "worst_monthly": 1963.2,
+      "strategy": {
+        "name": "keltner_channels|clone_f_588d86",
+        "entry_signals": [
+          {
+            "signal_name": "keltner_channels",
+            "module": "signals.volatility",
+            "function": "keltner_channels",
+            "params": {
+              "ema_period": 19,
+              "atr_period": 10,
+              "multiplier": 1.2471
+            },
+            "columns": {
+              "long": "entry_long_kc",
+              "short": "entry_short_kc"
+            }
+          }
+        ],
+        "entry_filters": [
+          {
+            "signal_name": "candle_patterns",
+            "module": "signals.price_action",
+            "function": "candle_patterns",
+            "params": {},
+            "column": "signal_hammer"
+          },
+          {
+            "signal_name": "time_of_day",
+            "module": "signals.time_filters",
+            "function": "time_of_day",
+            "params": {
+              "start_hour": 13,
+              "start_minute": 0,
+              "end_hour": 16,
+              "end_minute": 0
+            },
+            "column": "signal_time_allowed"
+          }
+        ],
+        "exit_rules": {
+          "stop_loss_type": "fixed_points",
+          "stop_loss_value": 54.2,
+          "take_profit_type": "fixed_points",
+          "take_profit_value": 223.4,
+          "trailing_stop": false,
+          "trailing_activation": 4.0,
+          "trailing_distance": 2.0,
+          "time_exit_minutes": null
+        },
+        "sizing_rules": {
+          "method": "fixed",
+          "fixed_contracts": 3,
+          "risk_pct": 0.02,
+          "atr_risk_multiple": 2.0
+        },
+        "primary_timeframe": "1m",
+        "require_all_entries": true
+      },
+      "monthly": {
+        "2025-03": 1963.2,
+        "2025-04": 3238.5
+      }
+    },
+    {
+      "name": "vwap|clone_f_13e444",
+      "family": "vwap",
+      "trades": 131,
+      "wr": 39.69,
+      "avg_monthly": 2597.03,
+      "worst_monthly": -1663.2,
+      "strategy": {
+        "name": "vwap|clone_f_13e444",
+        "entry_signals": [
+          {
+            "signal_name": "vwap",
+            "module": "signals.volume",
+            "function": "vwap",
+            "params": {},
+            "columns": {
+              "long": "entry_long_vwap",
+              "short": "entry_short_vwap"
+            }
+          }
+        ],
+        "entry_filters": [
+          {
+            "signal_name": "ema_slope",
+            "module": "signals.trend",
+            "function": "ema_slope",
+            "params": {
+              "period": 18,
+              "slope_lookback": 1
+            },
+            "column": "signal_ema_slope_up"
+          },
+          {
+            "signal_name": "time_of_day",
+            "module": "signals.time_filters",
+            "function": "time_of_day",
+            "params": {
+              "start_hour": 8,
+              "start_minute": 0,
+              "end_hour": 12,
+              "end_minute": 0
+            },
+            "column": "signal_time_allowed"
+          }
+        ],
+        "exit_rules": {
+          "stop_loss_type": "fixed_points",
+          "stop_loss_value": 58.8,
+          "take_profit_type": "fixed_points",
+          "take_profit_value": 177.6,
+          "trailing_stop": false,
+          "trailing_activation": 4.0,
+          "trailing_distance": 2.0,
+          "time_exit_minutes": null
+        },
+        "sizing_rules": {
+          "method": "fixed",
+          "fixed_contracts": 3,
+          "risk_pct": 0.02,
+          "atr_risk_multiple": 2.0
+        },
+        "primary_timeframe": "1m",
+        "require_all_entries": true
+      },
+      "monthly": {
+        "2025-03": 2869.8,
+        "2025-04": 4473.9,
+        "2025-05": 4707.6,
+        "2025-06": -1663.2
+      }
+    },
+    {
+      "name": "ema_crossover|clone_f_44af3a",
+      "family": "ema_crossover",
+      "trades": 275,
+      "wr": 41.82,
+      "avg_monthly": 2152.43,
+      "worst_monthly": -661.9,
+      "strategy": {
+        "name": "ema_crossover|clone_f_44af3a",
+        "entry_signals": [
+          {
+            "signal_name": "ema_crossover",
+            "module": "signals.trend",
+            "function": "ema_crossover",
+            "params": {
+              "fast_period": 3,
+              "slow_period": 23
+            },
+            "columns": {
+              "long": "entry_long_ema_cross",
+              "short": "entry_short_ema_cross"
+            }
+          }
+        ],
+        "entry_filters": [
+          {
+            "signal_name": "ema_slope",
+            "module": "signals.trend",
+            "function": "ema_slope",
+            "params": {
+              "period": 18,
+              "slope_lookback": 3
+            },
+            "column": "signal_ema_slope_up"
+          },
+          {
+            "signal_name": "time_of_day",
+            "module": "signals.time_filters",
+            "function": "time_of_day",
+            "params": {
+              "start_hour": 12,
+              "start_minute": 0,
+              "end_hour": 16,
+              "end_minute": 0
+            },
+            "column": "signal_time_allowed"
+          }
+        ],
+        "exit_rules": {
+          "stop_loss_type": "fixed_points",
+          "stop_loss_value": 54.5,
+          "take_profit_type": "fixed_points",
+          "take_profit_value": 142.6,
+          "trailing_stop": false,
+          "trailing_activation": 4.0,
+          "trailing_distance": 2.0,
+          "time_exit_minutes": null
+        },
+        "sizing_rules": {
+          "method": "fixed",
+          "fixed_contracts": 3,
+          "risk_pct": 0.02,
+          "atr_risk_multiple": 2.0
+        },
+        "primary_timeframe": "1m",
+        "require_all_entries": true
+      },
+      "monthly": {
+        "2025-03": 2772.9,
+        "2025-04": 9012.9,
+        "2025-05": 2868.3,
+        "2025-06": -601.3,
+        "2025-07": -661.9,
+        "2025-08": -476.3
+      }
+    },
+    {
+      "name": "range_breakout|clone_f_6b9ed8",
+      "family": "range_breakout",
+      "trades": 173,
+      "wr": 30.06,
+      "avg_monthly": 4045.23,
+      "worst_monthly": -871.6,
+      "strategy": {
+        "name": "range_breakout|clone_f_6b9ed8",
+        "entry_signals": [
+          {
+            "signal_name": "range_breakout",
+            "module": "signals.price_action",
+            "function": "range_breakout",
+            "params": {
+              "lookback": 9
+            },
+            "columns": {
+              "long": "entry_long_breakout",
+              "short": "entry_short_breakout"
+            }
+          }
+        ],
+        "entry_filters": [
+          {
+            "signal_name": "time_of_day",
+            "module": "signals.time_filters",
+            "function": "time_of_day",
+            "params": {
+              "start_hour": 9,
+              "start_minute": 30,
+              "end_hour": 14,
+              "end_minute": 0
+            },
+            "column": "signal_time_allowed"
+          }
+        ],
+        "exit_rules": {
+          "stop_loss_type": "fixed_points",
+          "stop_loss_value": 53.9,
+          "take_profit_type": "fixed_points",
+          "take_profit_value": 228.2,
+          "trailing_stop": false,
+          "trailing_activation": 4.0,
+          "trailing_distance": 2.0,
+          "time_exit_minutes": null
+        },
+        "sizing_rules": {
+          "method": "fixed",
+          "fixed_contracts": 3,
+          "risk_pct": 0.02,
+          "atr_risk_multiple": 2.0
+        },
+        "primary_timeframe": "1m",
+        "require_all_entries": true
+      },
+      "monthly": {
+        "2025-03": 4182.9,
+        "2025-04": 8824.4,
+        "2025-05": -871.6
+      }
+    }
+  ],
+  "stack": {
+    "g4_ct": 1,
+    "clone_cts": [
+      10
+    ],
+    "avg_monthly": -1881.3,
+    "worst_monthly": -3180.2,
+    "safe": true,
+    "monthly": {
+      "2025-03": -582.4,
+      "2025-04": -3180.2
+    },
+    "components": [
+      {
+        "role": "G4",
+        "ct": 1,
+        "trades": 212,
+        "wr": 15.09,
+        "avg_monthly": -1765.3
+      },
+      {
+        "role": "roc",
+        "ct": 10,
+        "trades": 11,
+        "wr": 27.27,
+        "avg_monthly": -232.0
+      }
+    ]
+  },
+  "yr1_cross": {
+    "avg_monthly": -580.88,
+    "worst_monthly": -3459.5,
+    "total_pnl": -5808.8,
+    "passed": false,
+    "monthly": {
+      "2024-03": -3066.4,
+      "2024-04": -570.0,
+      "2024-05": -6.3,
+      "2024-06": 288.9,
+      "2024-07": 1502.6,
+      "2024-08": -1012.9,
+      "2024-09": 1041.9,
+      "2024-10": 395.1,
+      "2024-11": -922.2,
+      "2024-12": -3459.5
+    }
+  },
+  "mc": {
+    "p_profit": 0.0426,
+    "median": -9670.01,
+    "p5": -18354.86,
+    "p_ruin": 1.0,
+    "composite": 2.4
+  },
+  "generated_at": "2026-03-22T12:38:27",
+  "g4_strategy": {
+    "name": "rsi|opt_8422d9",
+    "entry_signals": [
+      {
+        "signal_name": "rsi",
+        "module": "signals.momentum",
+        "function": "rsi",
+        "params": {
+          "period": 2,
+          "overbought": 76.2349,
+          "oversold": 13.1966
+        },
+        "columns": {
+          "long": "entry_long_rsi",
+          "short": "entry_short_rsi"
+        }
+      }
+    ],
+    "entry_filters": [
+      {
+        "signal_name": "session_levels",
+        "module": "signals.price_action",
+        "function": "session_levels",
+        "params": {},
+        "column": "signal_at_session_high"
+      },
+      {
+        "signal_name": "time_of_day",
+        "module": "signals.time_filters",
+        "function": "time_of_day",
+        "params": {
+          "start_hour": 9,
+          "start_minute": 30,
+          "end_hour": 14,
+          "end_minute": 0
+        },
+        "column": "signal_time_allowed"
+      }
+    ],
+    "exit_rules": {
+      "stop_loss_type": "fixed_points",
+      "stop_loss_value": 43.7,
+      "take_profit_type": "fixed_points",
+      "take_profit_value": 300,
+      "trailing_stop": false,
+      "trailing_activation": 53.9,
+      "trailing_distance": 17.9,
+      "time_exit_minutes": null
+    },
+    "sizing_rules": {
+      "method": "fixed",
+      "fixed_contracts": 6,
+      "risk_pct": 0.02,
+      "atr_risk_multiple": 2.0
+    },
+    "primary_timeframe": "1m",
+    "require_all_entries": true
+  },
+  "verdict": {
+    "g4_yr2_passed": false,
+    "clones_found": 9,
+    "hit_7k": false,
+    "yr1_cross_passed": false
+  }
+}

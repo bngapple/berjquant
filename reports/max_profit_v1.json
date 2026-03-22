@@ -1,0 +1,907 @@
+{
+  "generated_at": "2026-03-22T17:42:16",
+  "pipeline": "max_profit_v1",
+  "dual_year_count": 93,
+  "families_survived": [
+    "cci",
+    "roc",
+    "vwap"
+  ],
+  "best_single": {
+    "name": "vwap|mp_4c68b6",
+    "family": "vwap",
+    "max_ct": 9,
+    "proj_avg_monthly": 4052.17,
+    "strategy": {
+      "name": "vwap|mp_4c68b6",
+      "entry_signals": [
+        {
+          "signal_name": "vwap",
+          "module": "signals.volume",
+          "function": "vwap",
+          "params": {},
+          "columns": {
+            "long": "entry_long_vwap",
+            "short": "entry_short_vwap"
+          }
+        }
+      ],
+      "entry_filters": [
+        {
+          "signal_name": "supertrend",
+          "module": "signals.trend",
+          "function": "supertrend",
+          "params": {
+            "period": 11,
+            "multiplier": 1.4069
+          },
+          "column": "signal_supertrend_bullish"
+        },
+        {
+          "signal_name": "time_of_day",
+          "module": "signals.time_filters",
+          "function": "time_of_day",
+          "params": {
+            "start_hour": 8,
+            "start_minute": 0,
+            "end_hour": 12,
+            "end_minute": 0
+          },
+          "column": "signal_time_allowed"
+        }
+      ],
+      "exit_rules": {
+        "stop_loss_type": "fixed_points",
+        "stop_loss_value": 52.1,
+        "take_profit_type": "fixed_points",
+        "take_profit_value": 226.7,
+        "trailing_stop": false,
+        "trailing_activation": 4.0,
+        "trailing_distance": 2.0,
+        "time_exit_minutes": null
+      },
+      "sizing_rules": {
+        "method": "fixed",
+        "fixed_contracts": 3,
+        "risk_pct": 0.02,
+        "atr_risk_multiple": 2.0
+      },
+      "primary_timeframe": "1m",
+      "require_all_entries": true
+    }
+  },
+  "mc_conservative": {
+    "ct": 8,
+    "avg_monthly": 1296.6,
+    "worst_monthly": 164.8,
+    "trades": 35,
+    "mc_p_profit": 0.6216,
+    "mc_median": 2066.77,
+    "mc_p_ruin": 1.0,
+    "mc_5th": -8599.71,
+    "monthly": {
+      "2024-03": 164.8,
+      "2024-04": 2428.4
+    }
+  },
+  "mc_aggressive": {
+    "ct": 9,
+    "avg_monthly": -260.45,
+    "worst_monthly": -706.3,
+    "trades": 28,
+    "mc_p_profit": 0.4344,
+    "mc_median": -886.65,
+    "mc_p_ruin": 1.0,
+    "mc_5th": -9944.92,
+    "monthly": {
+      "2024-03": 185.4,
+      "2024-04": -706.3
+    }
+  },
+  "walk_forward": {
+    "windows": [
+      [
+        "2024-06",
+        6456.600000000119,
+        true
+      ],
+      [
+        "2024-09",
+        -4748.19999999984,
+        false
+      ],
+      [
+        "2024-12",
+        -6773.399999999777,
+        false
+      ],
+      [
+        "2025-03",
+        -4805.199999999861,
+        false
+      ],
+      [
+        "2025-06",
+        1003.1000000001793,
+        true
+      ],
+      [
+        "2025-09",
+        0,
+        false
+      ],
+      [
+        "2025-12",
+        -1038.8999999997789,
+        false
+      ]
+    ],
+    "passed": false
+  },
+  "top_survivors": [
+    {
+      "name": "vwap|mp_4c68b6",
+      "family": "vwap",
+      "max_ct": 9,
+      "proj_avg": 4052.17,
+      "strategy": {
+        "name": "vwap|mp_4c68b6",
+        "entry_signals": [
+          {
+            "signal_name": "vwap",
+            "module": "signals.volume",
+            "function": "vwap",
+            "params": {},
+            "columns": {
+              "long": "entry_long_vwap",
+              "short": "entry_short_vwap"
+            }
+          }
+        ],
+        "entry_filters": [
+          {
+            "signal_name": "supertrend",
+            "module": "signals.trend",
+            "function": "supertrend",
+            "params": {
+              "period": 11,
+              "multiplier": 1.4069
+            },
+            "column": "signal_supertrend_bullish"
+          },
+          {
+            "signal_name": "time_of_day",
+            "module": "signals.time_filters",
+            "function": "time_of_day",
+            "params": {
+              "start_hour": 8,
+              "start_minute": 0,
+              "end_hour": 12,
+              "end_minute": 0
+            },
+            "column": "signal_time_allowed"
+          }
+        ],
+        "exit_rules": {
+          "stop_loss_type": "fixed_points",
+          "stop_loss_value": 52.1,
+          "take_profit_type": "fixed_points",
+          "take_profit_value": 226.7,
+          "trailing_stop": false,
+          "trailing_activation": 4.0,
+          "trailing_distance": 2.0,
+          "time_exit_minutes": null
+        },
+        "sizing_rules": {
+          "method": "fixed",
+          "fixed_contracts": 3,
+          "risk_pct": 0.02,
+          "atr_risk_multiple": 2.0
+        },
+        "primary_timeframe": "1m",
+        "require_all_entries": true
+      },
+      "y1_monthly": {
+        "2024-03": 61.8,
+        "2024-04": 1975.8,
+        "2024-05": 2344.8,
+        "2024-06": -855.7
+      },
+      "y2_monthly": {
+        "2025-03": 1893.6,
+        "2025-04": 6671.1,
+        "2025-05": 1363.8,
+        "2025-06": -911.6,
+        "2025-07": -387.1
+      }
+    },
+    {
+      "name": "cci|mp_854680",
+      "family": "cci",
+      "max_ct": 6,
+      "proj_avg": 3826.62,
+      "strategy": {
+        "name": "cci|mp_854680",
+        "entry_signals": [
+          {
+            "signal_name": "cci",
+            "module": "signals.momentum",
+            "function": "cci",
+            "params": {
+              "period": 23
+            },
+            "columns": {
+              "long": "entry_long_cci",
+              "short": "entry_short_cci"
+            }
+          }
+        ],
+        "entry_filters": [
+          {
+            "signal_name": "large_trade_detection",
+            "module": "signals.orderflow",
+            "function": "large_trade_detection",
+            "params": {
+              "volume_lookback": 66,
+              "threshold": 0.6504
+            },
+            "column": "signal_large_trade"
+          },
+          {
+            "signal_name": "time_of_day",
+            "module": "signals.time_filters",
+            "function": "time_of_day",
+            "params": {
+              "start_hour": 8,
+              "start_minute": 0,
+              "end_hour": 16,
+              "end_minute": 0
+            },
+            "column": "signal_time_allowed"
+          }
+        ],
+        "exit_rules": {
+          "stop_loss_type": "fixed_points",
+          "stop_loss_value": 51.2,
+          "take_profit_type": "fixed_points",
+          "take_profit_value": 243.5,
+          "trailing_stop": false,
+          "trailing_activation": 4.0,
+          "trailing_distance": 2.0,
+          "time_exit_minutes": null
+        },
+        "sizing_rules": {
+          "method": "fixed",
+          "fixed_contracts": 3,
+          "risk_pct": 0.02,
+          "atr_risk_multiple": 2.0
+        },
+        "primary_timeframe": "1m",
+        "require_all_entries": true
+      },
+      "y1_monthly": {
+        "2024-03": 750.6,
+        "2024-04": 4206.0,
+        "2024-05": 1503.6,
+        "2024-06": -104.1,
+        "2024-07": 950.7,
+        "2024-08": 5568.6,
+        "2024-09": 4871.0,
+        "2024-10": -1193.3
+      },
+      "y2_monthly": {
+        "2025-03": 1980.6,
+        "2025-04": 3835.1,
+        "2025-05": -1322.4
+      }
+    },
+    {
+      "name": "roc|mp_e8e974",
+      "family": "roc",
+      "max_ct": 8,
+      "proj_avg": 3727.5,
+      "strategy": {
+        "name": "roc|mp_e8e974",
+        "entry_signals": [
+          {
+            "signal_name": "roc",
+            "module": "signals.momentum",
+            "function": "roc",
+            "params": {
+              "period": 9
+            },
+            "columns": {
+              "long": "entry_long_roc",
+              "short": "entry_short_roc"
+            }
+          }
+        ],
+        "entry_filters": [
+          {
+            "signal_name": "ema_slope",
+            "module": "signals.trend",
+            "function": "ema_slope",
+            "params": {
+              "period": 22,
+              "slope_lookback": 2
+            },
+            "column": "signal_ema_slope_up"
+          },
+          {
+            "signal_name": "time_of_day",
+            "module": "signals.time_filters",
+            "function": "time_of_day",
+            "params": {
+              "start_hour": 9,
+              "start_minute": 30,
+              "end_hour": 14,
+              "end_minute": 0
+            },
+            "column": "signal_time_allowed"
+          }
+        ],
+        "exit_rules": {
+          "stop_loss_type": "fixed_points",
+          "stop_loss_value": 45.8,
+          "take_profit_type": "fixed_points",
+          "take_profit_value": 185.7,
+          "trailing_stop": false,
+          "trailing_activation": 4.0,
+          "trailing_distance": 2.0,
+          "time_exit_minutes": null
+        },
+        "sizing_rules": {
+          "method": "fixed",
+          "fixed_contracts": 3,
+          "risk_pct": 0.02,
+          "atr_risk_multiple": 2.0
+        },
+        "primary_timeframe": "1m",
+        "require_all_entries": true
+      },
+      "y1_monthly": {
+        "2024-03": -699.0,
+        "2024-04": 4323.3,
+        "2024-05": -1013.1,
+        "2024-06": 1925.9,
+        "2024-07": -465.9,
+        "2024-08": -1112.5
+      },
+      "y2_monthly": {
+        "2025-03": 335.4,
+        "2025-04": 7888.4
+      }
+    },
+    {
+      "name": "vwap|mp_5e104b",
+      "family": "vwap",
+      "max_ct": 9,
+      "proj_avg": 3621.0,
+      "strategy": {
+        "name": "vwap|mp_5e104b",
+        "entry_signals": [
+          {
+            "signal_name": "vwap",
+            "module": "signals.volume",
+            "function": "vwap",
+            "params": {},
+            "columns": {
+              "long": "entry_long_vwap",
+              "short": "entry_short_vwap"
+            }
+          }
+        ],
+        "entry_filters": [
+          {
+            "signal_name": "supertrend",
+            "module": "signals.trend",
+            "function": "supertrend",
+            "params": {
+              "period": 13,
+              "multiplier": 1.4281
+            },
+            "column": "signal_supertrend_bullish"
+          },
+          {
+            "signal_name": "time_of_day",
+            "module": "signals.time_filters",
+            "function": "time_of_day",
+            "params": {
+              "start_hour": 13,
+              "start_minute": 0,
+              "end_hour": 16,
+              "end_minute": 0
+            },
+            "column": "signal_time_allowed"
+          }
+        ],
+        "exit_rules": {
+          "stop_loss_type": "fixed_points",
+          "stop_loss_value": 49.9,
+          "take_profit_type": "fixed_points",
+          "take_profit_value": 205.3,
+          "trailing_stop": false,
+          "trailing_activation": 4.0,
+          "trailing_distance": 2.0,
+          "time_exit_minutes": null
+        },
+        "sizing_rules": {
+          "method": "fixed",
+          "fixed_contracts": 3,
+          "risk_pct": 0.02,
+          "atr_risk_multiple": 2.0
+        },
+        "primary_timeframe": "1m",
+        "require_all_entries": true
+      },
+      "y1_monthly": {
+        "2024-03": 101.4,
+        "2024-04": 1956.6,
+        "2024-05": 2711.1,
+        "2024-06": -904.9
+      },
+      "y2_monthly": {
+        "2025-03": 659.4,
+        "2025-04": 5670.0,
+        "2025-05": 1773.3,
+        "2025-06": -640.1,
+        "2025-07": -463.8
+      }
+    },
+    {
+      "name": "vwap|mp_03c045",
+      "family": "vwap",
+      "max_ct": 8,
+      "proj_avg": 3486.25,
+      "strategy": {
+        "name": "vwap|mp_03c045",
+        "entry_signals": [
+          {
+            "signal_name": "vwap",
+            "module": "signals.volume",
+            "function": "vwap",
+            "params": {},
+            "columns": {
+              "long": "entry_long_vwap",
+              "short": "entry_short_vwap"
+            }
+          }
+        ],
+        "entry_filters": [
+          {
+            "signal_name": "supertrend",
+            "module": "signals.trend",
+            "function": "supertrend",
+            "params": {
+              "period": 14,
+              "multiplier": 1.5448
+            },
+            "column": "signal_supertrend_bullish"
+          },
+          {
+            "signal_name": "time_of_day",
+            "module": "signals.time_filters",
+            "function": "time_of_day",
+            "params": {
+              "start_hour": 9,
+              "start_minute": 30,
+              "end_hour": 11,
+              "end_minute": 0
+            },
+            "column": "signal_time_allowed"
+          }
+        ],
+        "exit_rules": {
+          "stop_loss_type": "fixed_points",
+          "stop_loss_value": 57.7,
+          "take_profit_type": "fixed_points",
+          "take_profit_value": 207.0,
+          "trailing_stop": false,
+          "trailing_activation": 4.0,
+          "trailing_distance": 2.0,
+          "time_exit_minutes": null
+        },
+        "sizing_rules": {
+          "method": "fixed",
+          "fixed_contracts": 3,
+          "risk_pct": 0.02,
+          "atr_risk_multiple": 2.0
+        },
+        "primary_timeframe": "1m",
+        "require_all_entries": true
+      },
+      "y1_monthly": {
+        "2024-03": 242.1,
+        "2024-04": 979.2,
+        "2024-05": 2483.4,
+        "2024-06": -1056.8
+      },
+      "y2_monthly": {
+        "2025-03": 1489.2,
+        "2025-04": 6732.6,
+        "2025-05": 2055.9,
+        "2025-06": -884.3,
+        "2025-07": -275.2
+      }
+    },
+    {
+      "name": "vwap|mp_72dae1",
+      "family": "vwap",
+      "max_ct": 7,
+      "proj_avg": 3460.3,
+      "strategy": {
+        "name": "vwap|mp_72dae1",
+        "entry_signals": [
+          {
+            "signal_name": "vwap",
+            "module": "signals.volume",
+            "function": "vwap",
+            "params": {},
+            "columns": {
+              "long": "entry_long_vwap",
+              "short": "entry_short_vwap"
+            }
+          }
+        ],
+        "entry_filters": [
+          {
+            "signal_name": "supertrend",
+            "module": "signals.trend",
+            "function": "supertrend",
+            "params": {
+              "period": 10,
+              "multiplier": 1.4612
+            },
+            "column": "signal_supertrend_bullish"
+          },
+          {
+            "signal_name": "time_of_day",
+            "module": "signals.time_filters",
+            "function": "time_of_day",
+            "params": {
+              "start_hour": 8,
+              "start_minute": 0,
+              "end_hour": 12,
+              "end_minute": 0
+            },
+            "column": "signal_time_allowed"
+          }
+        ],
+        "exit_rules": {
+          "stop_loss_type": "fixed_points",
+          "stop_loss_value": 52.7,
+          "take_profit_type": "fixed_points",
+          "take_profit_value": 241.9,
+          "trailing_stop": false,
+          "trailing_activation": 4.0,
+          "trailing_distance": 2.0,
+          "time_exit_minutes": null
+        },
+        "sizing_rules": {
+          "method": "fixed",
+          "fixed_contracts": 3,
+          "risk_pct": 0.02,
+          "atr_risk_multiple": 2.0
+        },
+        "primary_timeframe": "1m",
+        "require_all_entries": true
+      },
+      "y1_monthly": {
+        "2024-03": 957.0,
+        "2024-04": 1867.8,
+        "2024-05": 2848.8,
+        "2024-06": -786.1
+      },
+      "y2_monthly": {
+        "2025-03": 290.4,
+        "2025-04": 7263.0,
+        "2025-05": 643.8,
+        "2025-06": -1220.8
+      }
+    },
+    {
+      "name": "vwap|mp_c101b6",
+      "family": "vwap",
+      "max_ct": 7,
+      "proj_avg": 3206.13,
+      "strategy": {
+        "name": "vwap|mp_c101b6",
+        "entry_signals": [
+          {
+            "signal_name": "vwap",
+            "module": "signals.volume",
+            "function": "vwap",
+            "params": {},
+            "columns": {
+              "long": "entry_long_vwap",
+              "short": "entry_short_vwap"
+            }
+          }
+        ],
+        "entry_filters": [
+          {
+            "signal_name": "supertrend",
+            "module": "signals.trend",
+            "function": "supertrend",
+            "params": {
+              "period": 11,
+              "multiplier": 1.9167
+            },
+            "column": "signal_supertrend_bullish"
+          },
+          {
+            "signal_name": "time_of_day",
+            "module": "signals.time_filters",
+            "function": "time_of_day",
+            "params": {
+              "start_hour": 8,
+              "start_minute": 0,
+              "end_hour": 12,
+              "end_minute": 0
+            },
+            "column": "signal_time_allowed"
+          }
+        ],
+        "exit_rules": {
+          "stop_loss_type": "fixed_points",
+          "stop_loss_value": 52.8,
+          "take_profit_type": "fixed_points",
+          "take_profit_value": 300,
+          "trailing_stop": false,
+          "trailing_activation": 4.0,
+          "trailing_distance": 2.0,
+          "time_exit_minutes": null
+        },
+        "sizing_rules": {
+          "method": "fixed",
+          "fixed_contracts": 3,
+          "risk_pct": 0.02,
+          "atr_risk_multiple": 2.0
+        },
+        "primary_timeframe": "1m",
+        "require_all_entries": true
+      },
+      "y1_monthly": {
+        "2024-03": 955.2,
+        "2024-04": 2102.4,
+        "2024-05": 2465.1,
+        "2024-06": -1190.9,
+        "2024-07": 628.0,
+        "2024-08": -610.4,
+        "2024-09": -900.9
+      },
+      "y2_monthly": {
+        "2025-03": 3200.7,
+        "2025-04": 9759.6,
+        "2025-05": -465.9,
+        "2025-06": -828.3
+      }
+    },
+    {
+      "name": "vwap|mp_d376a7",
+      "family": "vwap",
+      "max_ct": 7,
+      "proj_avg": 3185.64,
+      "strategy": {
+        "name": "vwap|mp_d376a7",
+        "entry_signals": [
+          {
+            "signal_name": "vwap",
+            "module": "signals.volume",
+            "function": "vwap",
+            "params": {},
+            "columns": {
+              "long": "entry_long_vwap",
+              "short": "entry_short_vwap"
+            }
+          }
+        ],
+        "entry_filters": [
+          {
+            "signal_name": "ema_slope",
+            "module": "signals.trend",
+            "function": "ema_slope",
+            "params": {
+              "period": 14,
+              "slope_lookback": 1
+            },
+            "column": "signal_ema_slope_up"
+          },
+          {
+            "signal_name": "time_of_day",
+            "module": "signals.time_filters",
+            "function": "time_of_day",
+            "params": {
+              "start_hour": 8,
+              "start_minute": 0,
+              "end_hour": 11,
+              "end_minute": 0
+            },
+            "column": "signal_time_allowed"
+          }
+        ],
+        "exit_rules": {
+          "stop_loss_type": "fixed_points",
+          "stop_loss_value": 52.3,
+          "take_profit_type": "fixed_points",
+          "take_profit_value": 252.4,
+          "trailing_stop": false,
+          "trailing_activation": 4.0,
+          "trailing_distance": 2.0,
+          "time_exit_minutes": null
+        },
+        "sizing_rules": {
+          "method": "fixed",
+          "fixed_contracts": 3,
+          "risk_pct": 0.02,
+          "atr_risk_multiple": 2.0
+        },
+        "primary_timeframe": "1m",
+        "require_all_entries": true
+      },
+      "y1_monthly": {
+        "2024-03": 596.7,
+        "2024-04": 1722.0,
+        "2024-05": 3744.6,
+        "2024-06": -861.4
+      },
+      "y2_monthly": {
+        "2025-03": 2613.6,
+        "2025-04": 3015.6,
+        "2025-05": 1376.4,
+        "2025-06": -1285.3
+      }
+    },
+    {
+      "name": "vwap|mp_c590d3",
+      "family": "vwap",
+      "max_ct": 5,
+      "proj_avg": 3114.35,
+      "strategy": {
+        "name": "vwap|mp_c590d3",
+        "entry_signals": [
+          {
+            "signal_name": "vwap",
+            "module": "signals.volume",
+            "function": "vwap",
+            "params": {},
+            "columns": {
+              "long": "entry_long_vwap",
+              "short": "entry_short_vwap"
+            }
+          }
+        ],
+        "entry_filters": [
+          {
+            "signal_name": "ema_slope",
+            "module": "signals.trend",
+            "function": "ema_slope",
+            "params": {
+              "period": 20,
+              "slope_lookback": 1
+            },
+            "column": "signal_ema_slope_up"
+          },
+          {
+            "signal_name": "time_of_day",
+            "module": "signals.time_filters",
+            "function": "time_of_day",
+            "params": {
+              "start_hour": 8,
+              "start_minute": 0,
+              "end_hour": 11,
+              "end_minute": 0
+            },
+            "column": "signal_time_allowed"
+          }
+        ],
+        "exit_rules": {
+          "stop_loss_type": "fixed_points",
+          "stop_loss_value": 52.0,
+          "take_profit_type": "fixed_points",
+          "take_profit_value": 179.5,
+          "trailing_stop": false,
+          "trailing_activation": 4.0,
+          "trailing_distance": 2.0,
+          "time_exit_minutes": null
+        },
+        "sizing_rules": {
+          "method": "fixed",
+          "fixed_contracts": 3,
+          "risk_pct": 0.02,
+          "atr_risk_multiple": 2.0
+        },
+        "primary_timeframe": "1m",
+        "require_all_entries": true
+      },
+      "y1_monthly": {
+        "2024-03": 924.0,
+        "2024-04": 1599.6,
+        "2024-05": 4325.1,
+        "2024-06": -1286.2
+      },
+      "y2_monthly": {
+        "2025-03": 2117.4,
+        "2025-04": 4368.0,
+        "2025-05": 4472.4,
+        "2025-06": -1571.4
+      }
+    },
+    {
+      "name": "vwap|mp_e98b44",
+      "family": "vwap",
+      "max_ct": 7,
+      "proj_avg": 2891.31,
+      "strategy": {
+        "name": "vwap|mp_e98b44",
+        "entry_signals": [
+          {
+            "signal_name": "vwap",
+            "module": "signals.volume",
+            "function": "vwap",
+            "params": {},
+            "columns": {
+              "long": "entry_long_vwap",
+              "short": "entry_short_vwap"
+            }
+          }
+        ],
+        "entry_filters": [
+          {
+            "signal_name": "supertrend",
+            "module": "signals.trend",
+            "function": "supertrend",
+            "params": {
+              "period": 12,
+              "multiplier": 1.478
+            },
+            "column": "signal_supertrend_bullish"
+          },
+          {
+            "signal_name": "time_of_day",
+            "module": "signals.time_filters",
+            "function": "time_of_day",
+            "params": {
+              "start_hour": 12,
+              "start_minute": 0,
+              "end_hour": 16,
+              "end_minute": 0
+            },
+            "column": "signal_time_allowed"
+          }
+        ],
+        "exit_rules": {
+          "stop_loss_type": "fixed_points",
+          "stop_loss_value": 58.6,
+          "take_profit_type": "fixed_points",
+          "take_profit_value": 156.6,
+          "trailing_stop": false,
+          "trailing_activation": 4.0,
+          "trailing_distance": 2.0,
+          "time_exit_minutes": null
+        },
+        "sizing_rules": {
+          "method": "fixed",
+          "fixed_contracts": 3,
+          "risk_pct": 0.02,
+          "atr_risk_multiple": 2.0
+        },
+        "primary_timeframe": "1m",
+        "require_all_entries": true
+      },
+      "y1_monthly": {
+        "2024-03": 389.4,
+        "2024-04": 1287.0,
+        "2024-05": 1850.7,
+        "2024-06": -1145.6
+      },
+      "y2_monthly": {
+        "2025-03": 2245.8,
+        "2025-04": 5141.7,
+        "2025-05": 2903.1,
+        "2025-06": -1076.2,
+        "2025-07": -443.7
+      }
+    }
+  ]
+}

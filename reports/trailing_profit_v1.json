@@ -1,0 +1,373 @@
+{
+  "generated_at": "2026-03-22T18:45:28",
+  "pipeline": "trailing_profit_v1",
+  "trail_survivors": 9,
+  "portfolio_avg": 434.77,
+  "portfolio_worst": -1155.3,
+  "wf_pass": true,
+  "wf_rate": "3/5",
+  "mc": {
+    "conservative": {
+      "mc_p": 0.9556,
+      "median": 7451.02,
+      "ruin": 1.0,
+      "p5": 257.14
+    },
+    "aggressive": {
+      "mc_p": 0.9556,
+      "median": 7451.02,
+      "ruin": 1.0,
+      "p5": 257.14
+    }
+  },
+  "portfolio_components": [
+    {
+      "name": "bollinger_bands|ntf_7d17c9",
+      "strategy": {
+        "name": "bollinger_bands|ntf_7d17c9",
+        "entry_signals": [
+          {
+            "signal_name": "bollinger_bands",
+            "module": "signals.volatility",
+            "function": "bollinger_bands",
+            "params": {
+              "period": 12,
+              "std_dev": 3.0738
+            },
+            "columns": {
+              "long": "entry_long_bb",
+              "short": "entry_short_bb"
+            }
+          }
+        ],
+        "entry_filters": [
+          {
+            "signal_name": "trapped_traders",
+            "module": "signals.orderflow",
+            "function": "trapped_traders",
+            "params": {
+              "lookback": 3,
+              "retrace_pct": 0.6411
+            },
+            "column": "signal_trapped_longs"
+          },
+          {
+            "signal_name": "time_of_day",
+            "module": "signals.time_filters",
+            "function": "time_of_day",
+            "params": {
+              "start_hour": 12,
+              "start_minute": 0,
+              "end_hour": 16,
+              "end_minute": 0
+            },
+            "column": "signal_time_allowed"
+          }
+        ],
+        "exit_rules": {
+          "stop_loss_type": "fixed_points",
+          "stop_loss_value": 48.7,
+          "take_profit_type": "fixed_points",
+          "take_profit_value": 143.8,
+          "trailing_stop": true,
+          "trailing_activation": 46.9,
+          "trailing_distance": 22.1,
+          "time_exit_minutes": 30
+        },
+        "sizing_rules": {
+          "method": "fixed",
+          "fixed_contracts": 3,
+          "risk_pct": 0.02,
+          "atr_risk_multiple": 2.0
+        },
+        "primary_timeframe": "1m",
+        "require_all_entries": true
+      },
+      "contracts": 3
+    },
+    {
+      "name": "bollinger_bands|ntf_68a380",
+      "strategy": {
+        "name": "bollinger_bands|ntf_68a380",
+        "entry_signals": [
+          {
+            "signal_name": "bollinger_bands",
+            "module": "signals.volatility",
+            "function": "bollinger_bands",
+            "params": {
+              "period": 10,
+              "std_dev": 2.6298
+            },
+            "columns": {
+              "long": "entry_long_bb",
+              "short": "entry_short_bb"
+            }
+          }
+        ],
+        "entry_filters": [
+          {
+            "signal_name": "trapped_traders",
+            "module": "signals.orderflow",
+            "function": "trapped_traders",
+            "params": {
+              "lookback": 3,
+              "retrace_pct": 0.6411
+            },
+            "column": "signal_trapped_longs"
+          },
+          {
+            "signal_name": "time_of_day",
+            "module": "signals.time_filters",
+            "function": "time_of_day",
+            "params": {
+              "start_hour": 12,
+              "start_minute": 0,
+              "end_hour": 16,
+              "end_minute": 0
+            },
+            "column": "signal_time_allowed"
+          }
+        ],
+        "exit_rules": {
+          "stop_loss_type": "fixed_points",
+          "stop_loss_value": 53.1,
+          "take_profit_type": "fixed_points",
+          "take_profit_value": 143.8,
+          "trailing_stop": true,
+          "trailing_activation": 56.9,
+          "trailing_distance": 22.8,
+          "time_exit_minutes": 30
+        },
+        "sizing_rules": {
+          "method": "fixed",
+          "fixed_contracts": 3,
+          "risk_pct": 0.02,
+          "atr_risk_multiple": 2.0
+        },
+        "primary_timeframe": "1m",
+        "require_all_entries": true
+      },
+      "contracts": 1
+    },
+    {
+      "name": "bollinger_bands|nt_8d4f29",
+      "strategy": {
+        "name": "bollinger_bands|nt_8d4f29",
+        "entry_signals": [
+          {
+            "signal_name": "bollinger_bands",
+            "module": "signals.volatility",
+            "function": "bollinger_bands",
+            "params": {
+              "period": 13,
+              "std_dev": 2.8231
+            },
+            "columns": {
+              "long": "entry_long_bb",
+              "short": "entry_short_bb"
+            }
+          }
+        ],
+        "entry_filters": [
+          {
+            "signal_name": "trapped_traders",
+            "module": "signals.orderflow",
+            "function": "trapped_traders",
+            "params": {
+              "lookback": 7,
+              "retrace_pct": 0.6234
+            },
+            "column": "signal_trapped_longs"
+          },
+          {
+            "signal_name": "time_of_day",
+            "module": "signals.time_filters",
+            "function": "time_of_day",
+            "params": {
+              "start_hour": 14,
+              "start_minute": 0,
+              "end_hour": 16,
+              "end_minute": 0
+            },
+            "column": "signal_time_allowed"
+          }
+        ],
+        "exit_rules": {
+          "stop_loss_type": "fixed_points",
+          "stop_loss_value": 16.5,
+          "take_profit_type": "fixed_points",
+          "take_profit_value": 278.2,
+          "trailing_stop": true,
+          "trailing_activation": 77.3,
+          "trailing_distance": 53.7,
+          "time_exit_minutes": 30
+        },
+        "sizing_rules": {
+          "method": "fixed",
+          "fixed_contracts": 3,
+          "risk_pct": 0.02,
+          "atr_risk_multiple": 2.0
+        },
+        "primary_timeframe": "1m",
+        "require_all_entries": true
+      },
+      "contracts": 1
+    },
+    {
+      "name": "bollinger_bands|ntf_7b738e",
+      "strategy": {
+        "name": "bollinger_bands|ntf_7b738e",
+        "entry_signals": [
+          {
+            "signal_name": "bollinger_bands",
+            "module": "signals.volatility",
+            "function": "bollinger_bands",
+            "params": {
+              "period": 15,
+              "std_dev": 2.5266
+            },
+            "columns": {
+              "long": "entry_long_bb",
+              "short": "entry_short_bb"
+            }
+          }
+        ],
+        "entry_filters": [
+          {
+            "signal_name": "trapped_traders",
+            "module": "signals.orderflow",
+            "function": "trapped_traders",
+            "params": {
+              "lookback": 7,
+              "retrace_pct": 0.6234
+            },
+            "column": "signal_trapped_longs"
+          },
+          {
+            "signal_name": "time_of_day",
+            "module": "signals.time_filters",
+            "function": "time_of_day",
+            "params": {
+              "start_hour": 14,
+              "start_minute": 0,
+              "end_hour": 16,
+              "end_minute": 0
+            },
+            "column": "signal_time_allowed"
+          }
+        ],
+        "exit_rules": {
+          "stop_loss_type": "fixed_points",
+          "stop_loss_value": 16.2,
+          "take_profit_type": "fixed_points",
+          "take_profit_value": 278.2,
+          "trailing_stop": true,
+          "trailing_activation": 74.4,
+          "trailing_distance": 62.4,
+          "time_exit_minutes": 30
+        },
+        "sizing_rules": {
+          "method": "fixed",
+          "fixed_contracts": 3,
+          "risk_pct": 0.02,
+          "atr_risk_multiple": 2.0
+        },
+        "primary_timeframe": "1m",
+        "require_all_entries": true
+      },
+      "contracts": 1
+    }
+  ],
+  "portfolio_monthly": {
+    "2024-03": 196.9,
+    "2024-04": 1799.6,
+    "2024-05": 1341.3,
+    "2024-06": 312.7,
+    "2024-07": -1155.3,
+    "2024-08": -832.5,
+    "2024-09": 3159.2,
+    "2024-10": 505.4,
+    "2024-11": 351.5,
+    "2024-12": -772.6,
+    "2025-01": -77.1,
+    "2025-02": -46.1,
+    "2025-03": 1840.8,
+    "2025-04": -769.0,
+    "2025-05": -38.5,
+    "2025-06": -1118.8,
+    "2025-07": -160.6,
+    "2025-08": 947.0,
+    "2025-09": 1026.3,
+    "2025-10": 1824.8,
+    "2025-11": 135.7,
+    "2025-12": 702.2,
+    "2026-01": 262.6,
+    "2026-02": -442.8,
+    "2026-03": 1876.5
+  },
+  "top10": [
+    {
+      "name": "bollinger_bands|ntf_7d17c9",
+      "combined_avg": 300.75,
+      "orig_avg": 0,
+      "y1_avg": 389.98,
+      "y2_avg": 211.52
+    },
+    {
+      "name": "bollinger_bands|ntf_8ede4d",
+      "combined_avg": 223.09,
+      "orig_avg": 0,
+      "y1_avg": 314.5,
+      "y2_avg": 131.68
+    },
+    {
+      "name": "bollinger_bands|ntf_43c943",
+      "combined_avg": 178.29,
+      "orig_avg": 0,
+      "y1_avg": 290.24,
+      "y2_avg": 66.35
+    },
+    {
+      "name": "bollinger_bands|nt_003b53",
+      "combined_avg": 170.25,
+      "orig_avg": 0,
+      "y1_avg": 271.8,
+      "y2_avg": 68.7
+    },
+    {
+      "name": "bollinger_bands|ntf_1a84c0",
+      "combined_avg": 159.32,
+      "orig_avg": 0,
+      "y1_avg": 287.49,
+      "y2_avg": 31.15
+    },
+    {
+      "name": "bollinger_bands|ntf_a0a16e",
+      "combined_avg": 133.38,
+      "orig_avg": 0,
+      "y1_avg": 168.99,
+      "y2_avg": 97.78
+    },
+    {
+      "name": "bollinger_bands|ntf_68a380",
+      "combined_avg": 124.62,
+      "orig_avg": 0,
+      "y1_avg": 221.84,
+      "y2_avg": 27.39
+    },
+    {
+      "name": "bollinger_bands|nt_8d4f29",
+      "combined_avg": 123.13,
+      "orig_avg": 0,
+      "y1_avg": 232.75,
+      "y2_avg": 13.5
+    },
+    {
+      "name": "bollinger_bands|ntf_7b738e",
+      "combined_avg": 52.11,
+      "orig_avg": 0,
+      "y1_avg": 7.42,
+      "y2_avg": 96.79
+    }
+  ]
+}

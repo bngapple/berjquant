@@ -332,11 +332,11 @@ class GeneratedStrategy:
         else:
             contracts = min(1, max_allowed)
 
-        # Fix #30: DD-protection scaling
+        # Fix #30: DD-protection scaling (relaxed to 10% of max DD)
         dd_remaining = abs(prop_rules.max_drawdown) - abs(account_state.current_drawdown)
         dd_limit = abs(prop_rules.max_drawdown)
-        if dd_limit > 0 and dd_remaining < dd_limit * 0.25:
-            # Within 25% of max DD — halve position size
+        if dd_limit > 0 and dd_remaining < dd_limit * 0.10:
+            # Within 10% of max DD ($4,050) — halve position size
             contracts = max(1, contracts // 2)
 
         return contracts
