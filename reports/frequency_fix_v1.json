@@ -1,0 +1,15 @@
+{
+  "generated_at": "2026-03-22T20:14:31",
+  "pipeline": "frequency_fix_v1",
+  "avg_monthly": 0,
+  "worst_monthly": 0,
+  "active_months": 0,
+  "total_months": 0,
+  "trades_per_month": 0.0,
+  "total_trades": 0,
+  "wf_pass": false,
+  "wf_rate": "0/5",
+  "mc_p": null,
+  "combined_monthly": {},
+  "components": []
+}
