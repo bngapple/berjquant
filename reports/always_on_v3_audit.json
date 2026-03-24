@@ -1,0 +1,51 @@
+{
+  "timestamp": "2026-03-24T12:40:44.169879",
+  "issues_found": [
+    "CRITICAL: Trailing stop uses FAVORABLE intrabar ordering (trail updates before stop check)",
+    "Estimated P&L inflation from favorable ordering: $210,210 on Y2",
+    "Exchange fees ($0.27/contract/side) not included in original backtest",
+    "Missing cost per trade: $8.10"
+  ],
+  "conservative_y2": {
+    "monthly_avg": -3196.3153846153828,
+    "wr": 10.256410256410255,
+    "worst_month": -6534.599999999993,
+    "worst_day": -387.59999999999997,
+    "max_dd": -42631.79999999992,
+    "months_profitable": 0,
+    "n_months": 13,
+    "total_trades": 663
+  },
+  "conservative_blind": {
+    "monthly_avg": -3523.810714285711,
+    "wr": 13.088330109606705,
+    "worst_month": -6606.299999999992,
+    "worst_day": -387.59999999999997,
+    "max_dd": -99631.5000000002,
+    "months_profitable": 0,
+    "n_months": 28,
+    "total_trades": 1551
+  },
+  "original_y2": {
+    "monthly_avg": 11209.476923076922,
+    "wr": 73.60482654600303,
+    "worst_month": 4979.400000000001,
+    "worst_day": -179.7,
+    "max_dd": -179.6999999999971,
+    "months_profitable": 13,
+    "n_months": 13
+  },
+  "original_blind": {
+    "monthly_avg": 10194.782142857139,
+    "wr": 70.92198581560284,
+    "worst_month": 2613.9000000000005,
+    "worst_day": -280.79999999999995,
+    "max_dd": -468.89999999990687,
+    "months_profitable": 28,
+    "n_months": 28
+  },
+  "conservative_all_months_profitable": 0,
+  "conservative_all_months_total": 41,
+  "conservative_avg_monthly": -3419.970731707314,
+  "verdict": "SYSTEM IS FRAGILE"
+}

@@ -1,0 +1,110 @@
+{
+  "timestamp": "2026-03-24 19:25:52.182722",
+  "combo_selected_on_y1": [
+    "RSI",
+    "IB",
+    "MOM"
+  ],
+  "y1_sharpe": 6.939081192165779,
+  "aggressive": {
+    "contracts": 3,
+    "y2": {
+      "pnl": 92822.10000000303,
+      "n": 1810,
+      "wr": 26.96132596685083,
+      "monthly_avg": 7140.161538461772,
+      "worst_month": 3008.519999999993,
+      "best_month": 12208.43999999998,
+      "worst_day": -1043.4,
+      "best_day": 3216.5999999999995,
+      "max_dd": -1761.300000000003,
+      "bars_mean": 1.777900552486188,
+      "n_months": 13,
+      "months_pos": 13,
+      "consistency": 3.4653385346807433,
+      "trades_per_day": 7.0703125
+    },
+    "blind": {
+      "pnl": 90764.64000000429,
+      "n": 4129,
+      "wr": 24.703317994671835,
+      "monthly_avg": 3241.594285714439,
+      "worst_month": -1404.3599999999972,
+      "best_month": 10228.259999999995,
+      "worst_day": -1386.4199999999998,
+      "best_day": 2816.7599999999993,
+      "max_dd": -4361.6999999999825,
+      "bars_mean": 2.0280939694841367,
+      "n_months": 28,
+      "months_pos": 20,
+      "consistency": 3.103367126228745,
+      "trades_per_day": 7.1808695652173915
+    },
+    "blind_mll_breached": false,
+    "mc": {
+      "baseline": {
+        "pass_rate": 0.9962,
+        "blowup": 0.0038,
+        "med_days": 25,
+        "p95_days": 43
+      },
+      "conservative": {
+        "pass_rate": 1.0,
+        "blowup": 0.0,
+        "med_days": 35,
+        "p95_days": 56
+      }
+    }
+  },
+  "conservative": {
+    "contracts": 2,
+    "y2": {
+      "pnl": 61881.400000001275,
+      "n": 1810,
+      "wr": 26.96132596685083,
+      "monthly_avg": 4760.107692307791,
+      "worst_month": 2005.6800000000035,
+      "best_month": 8138.959999999991,
+      "worst_day": -695.5999999999999,
+      "best_day": 2144.4,
+      "max_dd": -1174.2000000000007,
+      "bars_mean": 1.777900552486188,
+      "n_months": 13,
+      "months_pos": 13,
+      "consistency": 3.4653385346807863,
+      "trades_per_day": 7.0703125
+    },
+    "blind": {
+      "pnl": 60509.76000000168,
+      "n": 4129,
+      "wr": 24.703317994671835,
+      "monthly_avg": 2161.0628571429174,
+      "worst_month": -936.2399999999964,
+      "best_month": 6818.839999999997,
+      "worst_day": -924.2799999999997,
+      "best_day": 1877.8400000000004,
+      "max_dd": -2907.8000000000175,
+      "bars_mean": 2.0280939694841367,
+      "n_months": 28,
+      "months_pos": 20,
+      "consistency": 3.103367126228807,
+      "trades_per_day": 7.1808695652173915
+    },
+    "blind_mll_breached": false,
+    "mc": {
+      "baseline": {
+        "pass_rate": 1.0,
+        "blowup": 0.0,
+        "med_days": 37,
+        "p95_days": 58
+      },
+      "conservative": {
+        "pass_rate": 1.0,
+        "blowup": 0.0,
+        "med_days": 53,
+        "p95_days": 76
+      }
+    }
+  },
+  "verdict": "$4,760/month Y2, $2,161/month blind, 100% MC pass (conservative)"
+}
