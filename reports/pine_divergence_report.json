@@ -1,0 +1,47 @@
+{
+  "timestamp": "2026-03-24 21:38:07.607570",
+  "python_pnl_jan_mar_2026": 28102.73999999995,
+  "python_trades": 414,
+  "tv_reported": 1536,
+  "divergences": [
+    {
+      "issue": "IB period: Pine uses 0930-0945 (1 bar), Python uses 0930-1000 (2 bars)",
+      "python": "hhmm < 1000 \u2192 includes 9:30 and 9:45 bars",
+      "pine": "time('0930-0945') \u2192 only 9:30 bar",
+      "impact": "HIGH \u2014 IB range is ~half in Pine, breakout levels wrong",
+      "fix": "Change Pine to '0930-0959:23456'"
+    },
+    {
+      "issue": "Session close: Pine=3:45 PM, Python LucidFlex=4:45 PM",
+      "python": "flatten_hhmm=1645",
+      "pine": "flatten at 1545",
+      "impact": "MEDIUM \u2014 misses ~$901/month of extra-hour trades",
+      "fix": "Change to '0930-1645' and EOD at 16:45"
+    },
+    {
+      "issue": "Free plan: 1 position at a time vs Python's 3 simultaneous",
+      "python": "3 independent positions (1 per strategy)",
+      "pine": "1 position total (free plan limitation)",
+      "impact": "HIGH \u2014 ~3x fewer trades, ~3x less P&L",
+      "fix": "Upgrade to paid plan OR use 3 separate indicators with alerts"
+    },
+    {
+      "issue": "RSI warmup may differ slightly",
+      "python": "SMA seed + Wilder smoothing",
+      "pine": "ta.rsi() = RMA (same as Wilder)",
+      "impact": "LOW \u2014 converges after warmup",
+      "fix": "None needed"
+    }
+  ],
+  "expected_tv_after_fix": 9367.579999999984,
+  "trades_by_strategy": {
+    "IB": 36,
+    "RSI": 224,
+    "MOM": 154
+  },
+  "signals": {
+    "rsi": 405,
+    "ib": 36,
+    "mom": 223
+  }
+}

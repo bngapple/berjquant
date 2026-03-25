@@ -1,0 +1,24 @@
+{
+  "timestamp": "2026-03-24 21:39:47.521443",
+  "total_trades": 414,
+  "winners": 109,
+  "losers": 305,
+  "tp_reachable": 109,
+  "tp_unreachable": 0,
+  "tp_price_match": 94,
+  "tp_price_mismatch": 0,
+  "sl_price_match": 303,
+  "sl_price_mismatch": 0,
+  "overlapping_trades": 0,
+  "winner_exit_reasons": {
+    "take_profit": 94,
+    "max_hold": 15
+  },
+  "loser_exit_reasons": {
+    "stop_loss": 303,
+    "max_hold": 2
+  },
+  "avg_bars_held_winners": 2.036697247706422,
+  "avg_bars_held_losers": 1.340983606557377,
+  "verdict": "ALL CHECKS PASS"
+}
