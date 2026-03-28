@@ -1,0 +1,9 @@
+.secret_key
+venv/
+__pycache__/
+*.pyc
+test_config.json
+test_secret_key
+logs/
+dashboard/node_modules/
+dashboard/dist/
