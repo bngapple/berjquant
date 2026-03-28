@@ -6,6 +6,7 @@ import { api } from "../api/client";
 
 const nav = [
   { to: "/", label: "Dashboard", d: "M3 3h7v9H3zm11-0h7v5h-7zm0 9h7v9h-7zM3 16h7v5H3z" },
+  { to: "/calendar", label: "Calendar", d: "M8 7V3m8 4V3m-9 4h10a2 2 0 012 2v11a2 2 0 01-2 2H7a2 2 0 01-2-2V9a2 2 0 012-2zm-2 4h14" },
   { to: "/cockpit", label: "Cockpit", d: "M4 6h6v6H4zm10 0h6v6h-6zM7 14v4m10-4v4M7 18h10" },
   { to: "/setup", label: "Setup", d: "M12 12a4 4 0 100-8 4 4 0 000 8zm0 2c-4 0-8 2-8 4v2h16v-2c0-2-4-4-8-4z" },
   { to: "/settings", label: "Settings", d: "M4 21V14m0-4V3m8 18v-9m0-4V3m8 18v-5m0-4V3M1 14h6m2-6h6m2 8h6" },
@@ -56,9 +57,9 @@ export function Layout() {
           style={{ background: "var(--bg)", borderRight: "1px solid var(--border)" }}>
           <div className="flex-1 py-3 flex flex-col gap-0.5">
             {nav.map(n => (
-              <NavLink key={n.to} to={n.to} end={n.to === "/"}
+              <NavLink key={n.to} to={n.to} end={n.to === "/"} title={n.label}
                 className={({ isActive }) => `flex items-center h-10 gap-3 text-[13px] whitespace-nowrap ${isActive ? "text-white" : "text-zinc-500 hover:text-zinc-300"}`}
-                style={({ isActive }) => ({ paddingLeft: isActive ? 13 : 16, borderLeft: isActive ? "3px solid var(--accent)" : "3px solid transparent" })}>
+                style={({ isActive }) => ({ paddingLeft: isActive ? 13 : 16, borderLeft: isActive ? "3px solid rgba(255,255,255,0.5)" : "3px solid transparent" })}>
                 <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round" className="shrink-0">
                   <path d={n.d} />
                 </svg>
