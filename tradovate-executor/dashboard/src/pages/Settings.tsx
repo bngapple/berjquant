@@ -4,59 +4,39 @@ import { api } from "../api/client";
 const STRATEGIES = [
   {
     name: "RSI Extremes",
-    key: "RSI",
-    params: [
-      { label: "RSI Period", value: "5" },
-      { label: "Oversold", value: "35" },
-      { label: "Overbought", value: "65" },
-      { label: "Contracts", value: "3" },
-      { label: "Stop Loss", value: "10 pts" },
-      { label: "Take Profit", value: "100 pts" },
-      { label: "Max Hold", value: "5 bars (75 min)" },
+    rows: [
+      ["RSI Period", "5"],
+      ["Oversold / Overbought", "35 / 65"],
+      ["Contracts", "3"],
+      ["Stop Loss", "10 pts"],
+      ["Take Profit", "100 pts"],
+      ["Max Hold", "5 bars (75 min)"],
     ],
   },
   {
     name: "IB Breakout",
-    key: "IB",
-    params: [
-      { label: "IB Window", value: "9:30 – 10:00 ET" },
-      { label: "Range Filter", value: "P25 – P75 (50 day)" },
-      { label: "Contracts", value: "3" },
-      { label: "Stop Loss", value: "10 pts" },
-      { label: "Take Profit", value: "120 pts" },
-      { label: "Max Hold", value: "15 bars (225 min)" },
-      { label: "Max/Day", value: "1" },
+    rows: [
+      ["IB Window", "9:30 – 10:00 ET"],
+      ["Range Filter", "P25 – P75 (50 day)"],
+      ["Contracts", "3"],
+      ["Stop Loss", "10 pts"],
+      ["Take Profit", "120 pts"],
+      ["Max Hold", "15 bars (225 min)"],
+      ["Max / Day", "1"],
     ],
   },
   {
     name: "Momentum Bars",
-    key: "MOM",
-    params: [
-      { label: "ATR Period", value: "14" },
-      { label: "EMA Period", value: "21" },
-      { label: "Vol SMA", value: "20" },
-      { label: "Contracts", value: "3" },
-      { label: "Stop Loss", value: "15 pts" },
-      { label: "Take Profit", value: "100 pts" },
-      { label: "Max Hold", value: "5 bars (75 min)" },
+    rows: [
+      ["ATR Period", "14"],
+      ["EMA Period", "21"],
+      ["Volume SMA", "20"],
+      ["Contracts", "3"],
+      ["Stop Loss", "15 pts"],
+      ["Take Profit", "100 pts"],
+      ["Max Hold", "5 bars (75 min)"],
     ],
   },
-];
-
-const SESSION = [
-  { label: "Session Start", value: "9:30 AM ET" },
-  { label: "No New Entries", value: "4:30 PM ET" },
-  { label: "Flatten Time", value: "4:45 PM ET" },
-  { label: "Daily Loss Limit", value: "-$3,000" },
-  { label: "Monthly Loss Limit", value: "-$4,500" },
-  { label: "Timezone", value: "US/Eastern" },
-];
-
-const CONTRACT = [
-  { label: "Symbol", value: "MNQ (Micro Nasdaq 100)" },
-  { label: "Front Month", value: "MNQM6 (June 2026)" },
-  { label: "Tick Size", value: "0.25 pts = $0.50/contract" },
-  { label: "Point Value", value: "$2.00/contract/point" },
 ];
 
 export function Settings() {
@@ -67,81 +47,80 @@ export function Settings() {
   }, []);
 
   return (
-    <div className="space-y-6">
-      <h2 className="text-xl font-bold">Settings</h2>
+    <div className="p-5 max-w-[900px] mx-auto space-y-6">
+      <h2 className="text-lg font-semibold" style={{ color: "var(--text-primary)" }}>
+        Settings
+      </h2>
 
-      {/* Environment */}
-      <div className="bg-gray-900 rounded-lg border border-gray-800 p-4">
-        <div className="flex justify-between items-center">
-          <div>
-            <h3 className="font-semibold">Environment</h3>
-            <p className="text-sm text-gray-400">
-              Current: {environment.toUpperCase()}
-            </p>
-          </div>
+      {/* Session info — prominent */}
+      <div className="panel rounded-lg overflow-hidden">
+        <div className="px-5 py-3 flex items-center justify-between" style={{ borderBottom: "1px solid var(--border)" }}>
+          <span className="text-sm font-medium" style={{ color: "var(--text-primary)" }}>Session</span>
           <span
-            className={`px-3 py-1.5 rounded text-xs font-bold uppercase tracking-wider ${
-              environment === "demo"
-                ? "bg-yellow-900/50 text-yellow-300 border border-yellow-700"
-                : "bg-red-900/50 text-red-300 border border-red-700"
-            }`}
+            className="text-[10px] px-2 py-0.5 rounded font-bold uppercase tracking-wider"
+            style={{
+              background: environment === "demo" ? "rgba(245,158,11,0.1)" : "rgba(239,68,68,0.1)",
+              color: environment === "demo" ? "var(--accent-yellow)" : "var(--accent-red)",
+            }}
           >
             {environment}
           </span>
         </div>
-      </div>
-
-      {/* Strategies */}
-      <div>
-        <h3 className="font-semibold mb-3">Strategy Parameters</h3>
-        <div className="grid grid-cols-3 gap-4">
-          {STRATEGIES.map((strat) => (
-            <div
-              key={strat.key}
-              className="bg-gray-900 rounded-lg border border-gray-800 p-4"
-            >
-              <h4 className="font-medium text-sm mb-3">{strat.name}</h4>
-              <div className="space-y-1.5">
-                {strat.params.map((p) => (
-                  <div
-                    key={p.label}
-                    className="flex justify-between text-xs"
-                  >
-                    <span className="text-gray-400">{p.label}</span>
-                    <span className="font-mono text-gray-200">{p.value}</span>
-                  </div>
-                ))}
-              </div>
-            </div>
-          ))}
+        <div className="grid grid-cols-3 divide-x" style={{ borderColor: "var(--border)" }}>
+          <div className="px-5 py-4 text-center">
+            <div className="text-xl font-mono font-semibold" style={{ color: "var(--text-primary)" }}>9:30 – 4:45</div>
+            <div className="text-[10px] mt-1" style={{ color: "var(--text-muted)" }}>Trading Session (ET)</div>
+          </div>
+          <div className="px-5 py-4 text-center">
+            <div className="text-xl font-mono font-semibold" style={{ color: "var(--accent-red)" }}>-$3,000</div>
+            <div className="text-[10px] mt-1" style={{ color: "var(--text-muted)" }}>Daily Loss Limit</div>
+          </div>
+          <div className="px-5 py-4 text-center">
+            <div className="text-xl font-mono font-semibold" style={{ color: "var(--accent-red)" }}>-$4,500</div>
+            <div className="text-[10px] mt-1" style={{ color: "var(--text-muted)" }}>Monthly Loss Limit</div>
+          </div>
+        </div>
+        <div className="px-5 py-2 text-[11px] flex gap-6" style={{ color: "var(--text-muted)", borderTop: "1px solid var(--border)" }}>
+          <span>No new entries after 4:30 PM ET</span>
+          <span>Flatten at 4:45 PM ET</span>
+          <span>Timezone: US/Eastern</span>
         </div>
       </div>
 
-      {/* Session Config */}
-      <div className="grid grid-cols-2 gap-4">
-        <div className="bg-gray-900 rounded-lg border border-gray-800 p-4">
-          <h3 className="font-semibold mb-3 text-sm">Session Rules</h3>
-          <div className="space-y-1.5">
-            {SESSION.map((p) => (
-              <div key={p.label} className="flex justify-between text-xs">
-                <span className="text-gray-400">{p.label}</span>
-                <span className="font-mono text-gray-200">{p.value}</span>
-              </div>
-            ))}
-          </div>
-        </div>
-        <div className="bg-gray-900 rounded-lg border border-gray-800 p-4">
-          <h3 className="font-semibold mb-3 text-sm">Contract Info</h3>
-          <div className="space-y-1.5">
-            {CONTRACT.map((p) => (
-              <div key={p.label} className="flex justify-between text-xs">
-                <span className="text-gray-400">{p.label}</span>
-                <span className="font-mono text-gray-200">{p.value}</span>
-              </div>
-            ))}
-          </div>
+      {/* Contract info */}
+      <div className="panel rounded-lg px-5 py-3">
+        <div className="flex items-center gap-6 text-xs">
+          <span style={{ color: "var(--text-muted)" }}>Contract</span>
+          <span className="font-mono" style={{ color: "var(--text-primary)" }}>MNQM6</span>
+          <span style={{ color: "var(--text-muted)" }}>MNQ Micro Nasdaq 100</span>
+          <span className="ml-auto flex gap-4" style={{ color: "var(--text-secondary)" }}>
+            <span>Tick: 0.25 = $0.50</span>
+            <span>Point: $2.00</span>
+          </span>
         </div>
       </div>
+
+      {/* Strategy params — table format */}
+      {STRATEGIES.map((strat) => (
+        <div key={strat.name} className="panel rounded-lg overflow-hidden">
+          <div className="px-5 py-2.5 text-xs font-medium" style={{ color: "var(--text-secondary)", borderBottom: "1px solid var(--border)" }}>
+            {strat.name}
+          </div>
+          <table className="w-full text-xs">
+            <tbody>
+              {strat.rows.map(([label, value], i) => (
+                <tr
+                  key={label}
+                  style={i < strat.rows.length - 1 ? { borderBottom: "1px solid var(--border)" } : undefined}
+                >
+                  <td className="px-5 py-2" style={{ color: "var(--text-muted)", width: "40%" }}>{label}</td>
+                  <td className="px-5 py-2 font-mono" style={{ color: "var(--text-primary)" }}>{value}</td>
+                </tr>
+              ))}
+            </tbody>
+          </table>
+        </div>
+      ))}
     </div>
   );
 }
