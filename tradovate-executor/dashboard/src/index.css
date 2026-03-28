@@ -1,31 +1,102 @@
 @import "tailwindcss";
 
-/* Trading terminal dark theme */
+/* ── Custom color tokens ───────────────────────────────────── */
+:root {
+  --bg-base: #0a0a0f;
+  --bg-panel: #111116;
+  --bg-surface: #1a1a22;
+  --bg-hover: #222230;
+  --border: rgba(255, 255, 255, 0.06);
+  --border-strong: rgba(255, 255, 255, 0.1);
+  --text-primary: #e4e4e7;
+  --text-secondary: #71717a;
+  --text-muted: #3f3f46;
+  --accent-green: #10b981;
+  --accent-red: #ef4444;
+  --accent-yellow: #f59e0b;
+  --accent-blue: #3b82f6;
+}
+
+@theme {
+  --color-base: #0a0a0f;
+  --color-panel: #111116;
+  --color-surface: #1a1a22;
+  --color-hover: #222230;
+  --color-subtle-border: rgba(255, 255, 255, 0.06);
+  --color-pnl-green: #10b981;
+  --color-pnl-red: #ef4444;
+}
+
 body {
-  @apply bg-gray-950 text-gray-100 antialiased;
-  font-family: "Inter", "SF Pro Display", -apple-system, BlinkMacSystemFont, sans-serif;
+  background: var(--bg-base);
+  color: var(--text-primary);
+  font-family: "Inter", "SF Pro Display", -apple-system, BlinkMacSystemFont, system-ui, sans-serif;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
 }
 
-/* Monospace for numbers */
 .font-mono {
-  font-family: "SF Mono", "Fira Code", "Cascadia Code", monospace;
+  font-family: "SF Mono", "JetBrains Mono", "Fira Code", "Cascadia Code", monospace;
 }
 
-/* Scrollbar styling */
+/* ── Global transitions ────────────────────────────────────── */
+* {
+  transition-timing-function: cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+button, a, [role="button"] {
+  transition: all 150ms ease;
+}
+
+/* ── Scrollbar ─────────────────────────────────────────────── */
 ::-webkit-scrollbar {
-  width: 6px;
-  height: 6px;
+  width: 4px;
+  height: 4px;
 }
 
 ::-webkit-scrollbar-track {
-  background: rgb(17 24 39);
+  background: transparent;
 }
 
 ::-webkit-scrollbar-thumb {
-  background: rgb(55 65 81);
-  border-radius: 3px;
+  background: rgba(255, 255, 255, 0.08);
+  border-radius: 2px;
 }
 
 ::-webkit-scrollbar-thumb:hover {
-  background: rgb(75 85 99);
+  background: rgba(255, 255, 255, 0.15);
+}
+
+/* ── Utility classes ───────────────────────────────────────── */
+.panel {
+  background: var(--bg-panel);
+  border: 1px solid var(--border);
+}
+
+.surface {
+  background: var(--bg-surface);
+  border: 1px solid var(--border);
+}
+
+/* Skeleton loading */
+@keyframes shimmer {
+  0% { background-position: -200% 0; }
+  100% { background-position: 200% 0; }
+}
+
+.skeleton {
+  background: linear-gradient(90deg, var(--bg-surface) 25%, var(--bg-hover) 50%, var(--bg-surface) 75%);
+  background-size: 200% 100%;
+  animation: shimmer 1.5s infinite;
+  border-radius: 4px;
+}
+
+/* P&L calendar cell hover */
+.cal-cell {
+  transition: transform 100ms ease, box-shadow 100ms ease;
+}
+.cal-cell:hover {
+  transform: scale(1.8);
+  z-index: 10;
+  box-shadow: 0 0 8px rgba(0,0,0,0.5);
 }

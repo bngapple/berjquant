@@ -1,6 +1,11 @@
 import { useEffect, useRef, useState, useCallback } from "react";
 import type { Position, PnL, Signal, Trade, EngineStatus } from "../types";
 
+export interface EquityPoint {
+  time: string;
+  value: number;
+}
+
 export function useWebSocket() {
   const wsRef = useRef<WebSocket | null>(null);
   const reconnectRef = useRef<ReturnType<typeof setTimeout>>();
@@ -12,6 +17,7 @@ export function useWebSocket() {
   const [pnl, setPnl] = useState<PnL | null>(null);
   const [signals, setSignals] = useState<Signal[]>([]);
   const [trades, setTrades] = useState<Trade[]>([]);
+  const [equityHistory, setEquityHistory] = useState<EquityPoint[]>([]);
 
   const connect = useCallback(() => {
     const protocol = window.location.protocol === "https:" ? "wss:" : "ws:";
@@ -42,9 +48,22 @@ export function useWebSocket() {
             [(msg.data as Position).strategy]: msg.data as Position,
           }));
           break;
-        case "pnl":
-          setPnl(msg.data as PnL);
+        case "pnl": {
+          const pnlData = msg.data as PnL;
+          setPnl(pnlData);
+          setEquityHistory((prev) => [
+            ...prev.slice(-200),
+            {
+              time: new Date().toLocaleTimeString("en-US", {
+                hour: "2-digit",
+                minute: "2-digit",
+                hour12: false,
+              }),
+              value: pnlData.daily,
+            },
+          ]);
           break;
+        }
         case "signal":
           setSignals((prev) => [
             ...prev.slice(-49),
@@ -54,13 +73,21 @@ export function useWebSocket() {
         case "fill":
           setTrades((prev) => [
             ...prev.slice(-49),
-            { ...(msg.data as Trade), timestamp: msg.timestamp, action: "entry" as const },
+            {
+              ...(msg.data as Trade),
+              timestamp: msg.timestamp,
+              action: "entry" as const,
+            },
           ]);
           break;
         case "exit":
           setTrades((prev) => [
             ...prev.slice(-49),
-            { ...(msg.data as Trade), timestamp: msg.timestamp, action: "exit" as const },
+            {
+              ...(msg.data as Trade),
+              timestamp: msg.timestamp,
+              action: "exit" as const,
+            },
           ]);
           setPositions((prev) => ({
             ...prev,
@@ -79,5 +106,13 @@ export function useWebSocket() {
     };
   }, [connect]);
 
-  return { connected, status, positions, pnl, signals, trades };
+  return {
+    connected,
+    status,
+    positions,
+    pnl,
+    signals,
+    trades,
+    equityHistory,
+  };
 }
