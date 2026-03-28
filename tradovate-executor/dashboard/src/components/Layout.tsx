@@ -1,101 +1,79 @@
+import { useState } from "react";
 import { NavLink, Outlet } from "react-router-dom";
+import { useWebSocket } from "../hooks/useWebSocket";
+import { FlattenModal } from "./FlattenModal";
+import { api } from "../api/client";
 
-const navItems = [
-  {
-    to: "/",
-    label: "Dashboard",
-    icon: (
-      <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round">
-        <rect x="3" y="3" width="7" height="9" rx="1" />
-        <rect x="14" y="3" width="7" height="5" rx="1" />
-        <rect x="14" y="12" width="7" height="9" rx="1" />
-        <rect x="3" y="16" width="7" height="5" rx="1" />
-      </svg>
-    ),
-  },
-  {
-    to: "/setup",
-    label: "Setup",
-    icon: (
-      <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round">
-        <circle cx="12" cy="12" r="3" />
-        <path d="M12 1v2M12 21v2M4.22 4.22l1.42 1.42M18.36 18.36l1.42 1.42M1 12h2M21 12h2M4.22 19.78l1.42-1.42M18.36 5.64l1.42-1.42" />
-      </svg>
-    ),
-  },
-  {
-    to: "/settings",
-    label: "Settings",
-    icon: (
-      <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round">
-        <line x1="4" y1="21" x2="4" y2="14" /><line x1="4" y1="10" x2="4" y2="3" />
-        <line x1="12" y1="21" x2="12" y2="12" /><line x1="12" y1="8" x2="12" y2="3" />
-        <line x1="20" y1="21" x2="20" y2="16" /><line x1="20" y1="12" x2="20" y2="3" />
-        <line x1="1" y1="14" x2="7" y2="14" /><line x1="9" y1="8" x2="15" y2="8" /><line x1="17" y1="16" x2="23" y2="16" />
-      </svg>
-    ),
-  },
+const nav = [
+  { to: "/", label: "Dashboard", d: "M3 3h7v9H3zm11-0h7v5h-7zm0 9h7v9h-7zM3 16h7v5H3z" },
+  { to: "/cockpit", label: "Cockpit", d: "M4 6h6v6H4zm10 0h6v6h-6zM7 14v4m10-4v4M7 18h10" },
+  { to: "/setup", label: "Setup", d: "M12 12a4 4 0 100-8 4 4 0 000 8zm0 2c-4 0-8 2-8 4v2h16v-2c0-2-4-4-8-4z" },
+  { to: "/settings", label: "Settings", d: "M4 21V14m0-4V3m8 18v-9m0-4V3m8 18v-5m0-4V3M1 14h6m2-6h6m2 8h6" },
 ];
 
 export function Layout() {
+  const ws = useWebSocket();
+  const [loading, setLoading] = useState("");
+  const [showFlatten, setShowFlatten] = useState(false);
+  const running = ws.status?.running ?? false;
+
+  const act = async (key: string, fn: () => Promise<unknown>) => {
+    setLoading(key);
+    try { await fn(); } catch (e) { console.error(e); } finally { setLoading(""); }
+  };
+
   return (
-    <div className="flex h-screen" style={{ background: "var(--bg-base)" }}>
-      {/* Slim sidebar — icon only, expand on hover */}
-      <nav className="group/nav flex flex-col shrink-0 w-[52px] hover:w-[180px] transition-all duration-200 overflow-hidden"
-           style={{ background: "var(--bg-panel)", borderRight: "1px solid var(--border)" }}>
-        {/* Logo */}
-        <div className="flex items-center h-12 px-3.5 gap-3 shrink-0"
-             style={{ borderBottom: "1px solid var(--border)" }}>
-          <div className="w-[22px] h-[22px] rounded bg-emerald-500/20 flex items-center justify-center shrink-0">
-            <span className="text-emerald-400 text-[10px] font-bold">T</span>
+    <div className="flex flex-col h-screen" style={{ background: "var(--bg)" }}>
+      {/* ── Top Header (48px) ────────────────────────────── */}
+      <header className="flex items-center justify-between h-12 px-4 shrink-0" style={{ background: "var(--bg)", borderBottom: "1px solid var(--border)" }}>
+        <span className="text-sm font-semibold tracking-tight" style={{ color: "var(--text)" }}>HTF Executor</span>
+        <div className="flex items-center gap-2">
+          <span className={`w-2 h-2 rounded-full ${running ? "bg-emerald-400 pulse-dot" : "bg-zinc-600"}`} />
+          <span className="text-xs" style={{ color: "var(--text-muted)" }}>{running ? "Running" : "Stopped"}</span>
+        </div>
+        <div className="flex items-center gap-1.5">
+          <button onClick={() => act("start", api.startEngine)} disabled={running || loading === "start"}
+            className="px-3 py-1 text-[11px] font-medium rounded disabled:opacity-30" style={{ color: "var(--accent)", border: "1px solid rgba(0,212,170,0.3)" }}>
+            {loading === "start" ? "..." : "Start"}
+          </button>
+          <button onClick={() => act("stop", api.stopEngine)} disabled={!running || loading === "stop"}
+            className="px-3 py-1 text-[11px] font-medium rounded disabled:opacity-30" style={{ color: "var(--text-muted)", border: "1px solid var(--border)" }}>
+            Stop
+          </button>
+          <button onClick={() => setShowFlatten(true)} disabled={loading === "flatten"}
+            className="px-3 py-1 text-[11px] font-medium rounded bg-red-600 hover:bg-red-500 text-white disabled:opacity-30">
+            Flatten All
+          </button>
+        </div>
+      </header>
+
+      {showFlatten && <FlattenModal onConfirm={async () => { setShowFlatten(false); await act("flatten", api.flattenAll); }} onCancel={() => setShowFlatten(false)} />}
+
+      {/* ── Body ─────────────────────────────────────────── */}
+      <div className="flex flex-1 overflow-hidden">
+        {/* Sidebar (56px, expand to 200px on hover) */}
+        <nav className="group/s flex flex-col shrink-0 w-14 hover:w-[200px] transition-all duration-150 overflow-hidden"
+          style={{ background: "var(--bg)", borderRight: "1px solid var(--border)" }}>
+          <div className="flex-1 py-3 flex flex-col gap-0.5">
+            {nav.map(n => (
+              <NavLink key={n.to} to={n.to} end={n.to === "/"}
+                className={({ isActive }) => `flex items-center h-10 gap-3 text-[13px] whitespace-nowrap ${isActive ? "text-white" : "text-zinc-500 hover:text-zinc-300"}`}
+                style={({ isActive }) => ({ paddingLeft: isActive ? 13 : 16, borderLeft: isActive ? "3px solid var(--accent)" : "3px solid transparent" })}>
+                <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round" className="shrink-0">
+                  <path d={n.d} />
+                </svg>
+                <span className="opacity-0 group-hover/s:opacity-100 transition-opacity duration-150">{n.label}</span>
+              </NavLink>
+            ))}
           </div>
-          <span className="text-sm font-semibold whitespace-nowrap opacity-0 group-hover/nav:opacity-100 transition-opacity duration-200"
-                style={{ color: "var(--text-primary)" }}>
-            Tradovate
-          </span>
-        </div>
+        </nav>
 
-        {/* Nav items */}
-        <div className="flex-1 py-3 flex flex-col gap-0.5">
-          {navItems.map((item) => (
-            <NavLink
-              key={item.to}
-              to={item.to}
-              end={item.to === "/"}
-              className={({ isActive }) =>
-                `flex items-center h-9 px-[15px] gap-3 text-[13px] whitespace-nowrap transition-colors ${
-                  isActive
-                    ? "text-white"
-                    : "text-zinc-500 hover:text-zinc-300"
-                }`
-              }
-              style={({ isActive }) =>
-                isActive
-                  ? { background: "rgba(255,255,255,0.04)" }
-                  : undefined
-              }
-            >
-              <span className="shrink-0">{item.icon}</span>
-              <span className="opacity-0 group-hover/nav:opacity-100 transition-opacity duration-200">
-                {item.label}
-              </span>
-            </NavLink>
-          ))}
-        </div>
-
-        {/* Version */}
-        <div className="px-4 py-3 opacity-0 group-hover/nav:opacity-100 transition-opacity duration-200"
-             style={{ borderTop: "1px solid var(--border)" }}>
-          <span className="text-[10px]" style={{ color: "var(--text-muted)" }}>
-            HTF Swing v3
-          </span>
-        </div>
-      </nav>
-
-      {/* Main content */}
-      <main className="flex-1 overflow-auto">
-        <Outlet />
-      </main>
+        {/* Content */}
+        <main className="flex-1 overflow-auto">
+          {loading && <div className="h-0.5 overflow-hidden" style={{ background: "var(--panel)" }}><div className="h-full w-1/3 loading-bar" style={{ background: "var(--accent)" }} /></div>}
+          <Outlet context={ws} />
+        </main>
+      </div>
     </div>
   );
 }

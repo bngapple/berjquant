@@ -1,6 +1,7 @@
 import { Routes, Route } from "react-router-dom";
 import { Layout } from "./components/Layout";
 import { Dashboard } from "./pages/Dashboard";
+import { Cockpit } from "./pages/Cockpit";
 import { Setup } from "./pages/Setup";
 import { Settings } from "./pages/Settings";
 
@@ -9,6 +10,7 @@ export default function App() {
     <Routes>
       <Route element={<Layout />}>
         <Route path="/" element={<Dashboard />} />
+        <Route path="/cockpit" element={<Cockpit />} />
         <Route path="/setup" element={<Setup />} />
         <Route path="/settings" element={<Settings />} />
       </Route>
