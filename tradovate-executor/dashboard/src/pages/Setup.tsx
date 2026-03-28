@@ -52,7 +52,7 @@ export function Setup() {
         </div>
       </div>
 
-      <div className="panel rounded-lg overflow-hidden">
+      <div className="panel rounded overflow-hidden">
         <table className="w-full text-[11px]">
           <thead><tr style={{ color: "var(--text-dim)", borderBottom: "1px solid var(--border)" }}>
             <th className="text-left font-normal px-4 py-2.5">Name</th>

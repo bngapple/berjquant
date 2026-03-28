@@ -64,7 +64,7 @@ export function Cockpit() {
         </div>
       </div>
 
-      <div className="panel rounded-lg overflow-hidden">
+      <div className="panel rounded overflow-hidden">
         <table className="w-full text-[11px]">
           <thead><tr style={{ color: "var(--text-dim)", borderBottom: "1px solid var(--border)" }}>
             <th className="text-left font-normal px-4 py-2.5">Status</th>
@@ -110,13 +110,22 @@ export function Cockpit() {
         </table>
       </div>
 
-      <div className="grid grid-cols-3 gap-3">
-        <div className="col-span-2 panel rounded-lg overflow-hidden">
-          <div className="px-4 py-2 text-[10px] font-light uppercase tracking-wider" style={{ color: "var(--text-muted)", borderBottom: "1px solid var(--border)" }}>Copy Activity</div>
-          <div className="max-h-64 overflow-y-auto">
-            {copyFeed.length === 0 && <div className="p-4 text-xs" style={{ color: "var(--text-dim)" }}>No activity</div>}
-            {copyFeed.map(entry => (
-              <div key={entry.id} className="flex items-center gap-2 px-4 py-1.5 text-[11px]" style={{ borderBottom: "1px solid var(--border)" }}>
+      <div className="flex items-center gap-6 px-4 py-2.5 text-[11px]" style={{ color: "var(--text-muted)" }}>
+        <span>Connected: <span style={{ color: "var(--text)" }}>{fleet.connected}/{fleet.total}</span></span>
+        <span>Open: <span style={{ color: "var(--text)" }}>{fleet.withPos}</span></span>
+        <span>Contracts: <span style={{ color: "var(--text)" }}>{fleet.totalContracts}</span></span>
+        <span>Day P&L: <span className="font-mono tabular" style={{ color: clr(fleet.fleetDayPnl) }}>{fmt(fleet.fleetDayPnl)}</span></span>
+        <span>Month P&L: <span className="font-mono tabular" style={{ color: clr(fleet.fleetMonthPnl) }}>{fmt(fleet.fleetMonthPnl)}</span></span>
+      </div>
+
+      <div className="panel rounded overflow-hidden">
+        <div className="px-4 py-2 text-[10px] font-normal tracking-wider" style={{ color: "var(--text-muted)", borderBottom: "1px solid var(--border)" }}>Copy Activity</div>
+        <div className="max-h-48 overflow-y-auto">
+          {copyFeed.length === 0 ? (
+            <div className="py-8 text-center text-xs" style={{ color: "var(--text-dim)" }}>No copy activity yet</div>
+          ) : (
+            copyFeed.map(entry => (
+              <div key={entry.id} className="flex items-center gap-2 px-4 py-1 text-[11px]" style={{ borderBottom: "1px solid var(--border)" }}>
                 <span style={{ color: entry.success ? "var(--accent)" : "var(--red)" }}>{entry.success ? "\u2713" : "\u2717"}</span>
                 <span style={{ color: "var(--text)" }}>
                   {entry.action === "entry" ? `${entry.side} ${entry.contracts} MNQ @${entry.fill_price?.toFixed(2)}` : `Exit ${entry.strategy} @${entry.exit_price?.toFixed(2)}`}
@@ -124,27 +133,10 @@ export function Cockpit() {
                 <span style={{ color: "var(--text-dim)" }}>&rarr; {entry.target}</span>
                 {!entry.success && <span style={{ color: "var(--red)" }}>rejected</span>}
               </div>
-            ))}
-          </div>
-        </div>
-        <div className="panel rounded-lg p-4 space-y-3">
-          <div className="text-[10px] font-light uppercase tracking-wider" style={{ color: "var(--text-muted)" }}>Fleet Summary</div>
-          <FleetRow label="Connected" value={`${fleet.connected} / ${fleet.total}`} />
-          <FleetRow label="Open Positions" value={`${fleet.withPos} accounts`} />
-          <FleetRow label="Total Contracts" value={String(fleet.totalContracts)} />
-          <FleetRow label="Fleet P&L (day)" value={fmt(fleet.fleetDayPnl)} color={clr(fleet.fleetDayPnl)} />
-          <FleetRow label="Fleet P&L (month)" value={fmt(fleet.fleetMonthPnl)} color={clr(fleet.fleetMonthPnl)} />
+            ))
+          )}
         </div>
       </div>
-    </div>
-  );
-}
-
-function FleetRow({ label, value, color }: { label: string; value: string; color?: string }) {
-  return (
-    <div className="flex justify-between text-[11px]">
-      <span style={{ color: "var(--text-muted)" }}>{label}</span>
-      <span className="font-mono tabular" style={{ color: color ?? "var(--text)" }}>{value}</span>
     </div>
   );
 }
