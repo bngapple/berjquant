@@ -1,19 +1,12 @@
 import { useEffect, useRef, useState, useCallback } from "react";
-import type { Position, PnL, Signal, Trade, EngineStatus } from "../types";
+import type { Position, PnL, Signal, Trade, EngineStatus, EquityPoint, WSData } from "../types";
 
-export interface EquityPoint {
-  time: string;
-  value: number;
-}
-
-export function useWebSocket() {
+export function useWebSocket(): WSData {
   const wsRef = useRef<WebSocket | null>(null);
   const reconnectRef = useRef<ReturnType<typeof setTimeout>>();
   const [connected, setConnected] = useState(false);
   const [status, setStatus] = useState<EngineStatus | null>(null);
-  const [positions, setPositions] = useState<Record<string, Position | null>>(
-    {}
-  );
+  const [positions, setPositions] = useState<Record<string, Position | null>>({});
   const [pnl, setPnl] = useState<PnL | null>(null);
   const [signals, setSignals] = useState<Signal[]>([]);
   const [trades, setTrades] = useState<Trade[]>([]);
@@ -23,96 +16,31 @@ export function useWebSocket() {
     const protocol = window.location.protocol === "https:" ? "wss:" : "ws:";
     const ws = new WebSocket(`${protocol}//${window.location.host}/ws/live`);
     wsRef.current = ws;
-
     ws.onopen = () => setConnected(true);
-
-    ws.onclose = () => {
-      setConnected(false);
-      reconnectRef.current = setTimeout(connect, 3000);
-    };
-
-    ws.onerror = () => {
-      ws.close();
-    };
-
+    ws.onclose = () => { setConnected(false); reconnectRef.current = setTimeout(connect, 3000); };
+    ws.onerror = () => { ws.close(); };
     ws.onmessage = (event) => {
       const msg = JSON.parse(event.data);
-
       switch (msg.type) {
-        case "status":
-          setStatus(msg.data as EngineStatus);
-          break;
-        case "position":
-          setPositions((prev) => ({
-            ...prev,
-            [(msg.data as Position).strategy]: msg.data as Position,
-          }));
-          break;
+        case "status": setStatus(msg.data as EngineStatus); break;
+        case "position": setPositions(p => ({ ...p, [(msg.data as Position).strategy]: msg.data as Position })); break;
         case "pnl": {
-          const pnlData = msg.data as PnL;
-          setPnl(pnlData);
-          setEquityHistory((prev) => [
-            ...prev.slice(-200),
-            {
-              time: new Date().toLocaleTimeString("en-US", {
-                hour: "2-digit",
-                minute: "2-digit",
-                hour12: false,
-              }),
-              value: pnlData.daily,
-            },
-          ]);
+          const d = msg.data as PnL;
+          setPnl(d);
+          setEquityHistory(prev => [...prev.slice(-200), { time: new Date().toLocaleTimeString("en-US", { hour: "2-digit", minute: "2-digit", hour12: false }), value: d.daily }]);
           break;
         }
-        case "signal":
-          setSignals((prev) => [
-            ...prev.slice(-49),
-            { ...(msg.data as Signal), timestamp: msg.timestamp },
-          ]);
-          break;
-        case "fill":
-          setTrades((prev) => [
-            ...prev.slice(-49),
-            {
-              ...(msg.data as Trade),
-              timestamp: msg.timestamp,
-              action: "entry" as const,
-            },
-          ]);
-          break;
+        case "signal": setSignals(p => [...p.slice(-49), { ...(msg.data as Signal), timestamp: msg.timestamp }]); break;
+        case "fill": setTrades(p => [...p.slice(-49), { ...(msg.data as Trade), timestamp: msg.timestamp, action: "entry" as const }]); break;
         case "exit":
-          setTrades((prev) => [
-            ...prev.slice(-49),
-            {
-              ...(msg.data as Trade),
-              timestamp: msg.timestamp,
-              action: "exit" as const,
-            },
-          ]);
-          setPositions((prev) => ({
-            ...prev,
-            [(msg.data as { strategy: string }).strategy]: null,
-          }));
+          setTrades(p => [...p.slice(-49), { ...(msg.data as Trade), timestamp: msg.timestamp, action: "exit" as const }]);
+          setPositions(p => ({ ...p, [(msg.data as { strategy: string }).strategy]: null }));
           break;
       }
     };
   }, []);
 
-  useEffect(() => {
-    connect();
-    return () => {
-      clearTimeout(reconnectRef.current);
-      wsRef.current?.close();
-    };
-  }, [connect]);
+  useEffect(() => { connect(); return () => { clearTimeout(reconnectRef.current); wsRef.current?.close(); }; }, [connect]);
 
-  return {
-    connected,
-    status,
-    positions,
-    pnl,
-    signals,
-    trades,
-    equityHistory,
-  };
+  return { connected, status, positions, pnl, signals, trades, equityHistory };
 }

@@ -1,102 +1,56 @@
 @import "tailwindcss";
 
-/* ── Custom color tokens ───────────────────────────────────── */
 :root {
-  --bg-base: #0a0a0f;
-  --bg-panel: #111116;
-  --bg-surface: #1a1a22;
-  --bg-hover: #222230;
-  --border: rgba(255, 255, 255, 0.06);
-  --border-strong: rgba(255, 255, 255, 0.1);
-  --text-primary: #e4e4e7;
-  --text-secondary: #71717a;
-  --text-muted: #3f3f46;
-  --accent-green: #10b981;
-  --accent-red: #ef4444;
-  --accent-yellow: #f59e0b;
-  --accent-blue: #3b82f6;
+  --bg: #0d0d0d;
+  --panel: #161616;
+  --elevated: #1e1e1e;
+  --border: rgba(255,255,255,0.05);
+  --border-strong: rgba(255,255,255,0.1);
+  --accent: #00d4aa;
+  --red: #ef4444;
+  --amber: #f59e0b;
+  --blue: #3b82f6;
+  --text: #e8e8e8;
+  --text-muted: #6b7280;
+  --text-dim: #3f3f46;
 }
 
 @theme {
-  --color-base: #0a0a0f;
-  --color-panel: #111116;
-  --color-surface: #1a1a22;
-  --color-hover: #222230;
-  --color-subtle-border: rgba(255, 255, 255, 0.06);
-  --color-pnl-green: #10b981;
-  --color-pnl-red: #ef4444;
+  --color-bg: #0d0d0d;
+  --color-panel: #161616;
+  --color-elevated: #1e1e1e;
 }
 
 body {
-  background: var(--bg-base);
-  color: var(--text-primary);
-  font-family: "Inter", "SF Pro Display", -apple-system, BlinkMacSystemFont, system-ui, sans-serif;
+  background: var(--bg);
+  color: var(--text);
+  font-family: "Inter", -apple-system, BlinkMacSystemFont, system-ui, sans-serif;
   -webkit-font-smoothing: antialiased;
-  -moz-osx-font-smoothing: grayscale;
 }
 
 .font-mono {
-  font-family: "SF Mono", "JetBrains Mono", "Fira Code", "Cascadia Code", monospace;
+  font-family: "SF Mono", "JetBrains Mono", "Fira Code", monospace;
+  font-variant-numeric: tabular-nums;
 }
 
-/* ── Global transitions ────────────────────────────────────── */
-* {
-  transition-timing-function: cubic-bezier(0.4, 0, 0.2, 1);
-}
+.tabular { font-variant-numeric: tabular-nums; }
 
-button, a, [role="button"] {
-  transition: all 150ms ease;
-}
+button, a { transition: all 150ms ease-out; }
 
-/* ── Scrollbar ─────────────────────────────────────────────── */
-::-webkit-scrollbar {
-  width: 4px;
-  height: 4px;
-}
+* { scrollbar-width: thin; scrollbar-color: transparent transparent; }
+*:hover { scrollbar-color: rgba(255,255,255,0.08) transparent; }
+::-webkit-scrollbar { width: 4px; height: 4px; }
+::-webkit-scrollbar-track { background: transparent; }
+::-webkit-scrollbar-thumb { background: transparent; border-radius: 2px; }
+*:hover::-webkit-scrollbar-thumb { background: rgba(255,255,255,0.08); }
 
-::-webkit-scrollbar-track {
-  background: transparent;
-}
+.panel { background: var(--panel); border: 1px solid var(--border); }
 
-::-webkit-scrollbar-thumb {
-  background: rgba(255, 255, 255, 0.08);
-  border-radius: 2px;
-}
+@keyframes load-bar { 0% { transform: translateX(-100%); } 100% { transform: translateX(200%); } }
+.loading-bar { animation: load-bar 1.2s ease-in-out infinite; }
 
-::-webkit-scrollbar-thumb:hover {
-  background: rgba(255, 255, 255, 0.15);
-}
+@keyframes pulse-dot { 0%,100% { opacity: 0.7; } 50% { opacity: 1; } }
+.pulse-dot { animation: pulse-dot 2s ease-in-out infinite; }
 
-/* ── Utility classes ───────────────────────────────────────── */
-.panel {
-  background: var(--bg-panel);
-  border: 1px solid var(--border);
-}
-
-.surface {
-  background: var(--bg-surface);
-  border: 1px solid var(--border);
-}
-
-/* Skeleton loading */
-@keyframes shimmer {
-  0% { background-position: -200% 0; }
-  100% { background-position: 200% 0; }
-}
-
-.skeleton {
-  background: linear-gradient(90deg, var(--bg-surface) 25%, var(--bg-hover) 50%, var(--bg-surface) 75%);
-  background-size: 200% 100%;
-  animation: shimmer 1.5s infinite;
-  border-radius: 4px;
-}
-
-/* P&L calendar cell hover */
-.cal-cell {
-  transition: transform 100ms ease, box-shadow 100ms ease;
-}
-.cal-cell:hover {
-  transform: scale(1.8);
-  z-index: 10;
-  box-shadow: 0 0 8px rgba(0,0,0,0.5);
-}
+.cal-cell { transition: transform 100ms ease, box-shadow 100ms ease; }
+.cal-cell:hover { transform: scale(1.5); z-index: 10; box-shadow: 0 0 8px rgba(0,0,0,0.6); }

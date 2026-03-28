@@ -90,8 +90,17 @@ export interface PnL {
   monthly_limit: number;
 }
 
-export interface WSMessage {
-  type: "status" | "position" | "pnl" | "signal" | "fill" | "exit";
-  data: unknown;
-  timestamp: string;
+export interface EquityPoint {
+  time: string;
+  value: number;
+}
+
+export interface WSData {
+  connected: boolean;
+  status: EngineStatus | null;
+  positions: Record<string, Position | null>;
+  pnl: PnL | null;
+  signals: Signal[];
+  trades: Trade[];
+  equityHistory: EquityPoint[];
 }
