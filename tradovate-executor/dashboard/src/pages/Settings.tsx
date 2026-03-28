@@ -1,126 +1,84 @@
 import { useState, useEffect } from "react";
 import { api } from "../api/client";
 
-const STRATEGIES = [
-  {
-    name: "RSI Extremes",
-    rows: [
-      ["RSI Period", "5"],
-      ["Oversold / Overbought", "35 / 65"],
-      ["Contracts", "3"],
-      ["Stop Loss", "10 pts"],
-      ["Take Profit", "100 pts"],
-      ["Max Hold", "5 bars (75 min)"],
-    ],
-  },
-  {
-    name: "IB Breakout",
-    rows: [
-      ["IB Window", "9:30 – 10:00 ET"],
-      ["Range Filter", "P25 – P75 (50 day)"],
-      ["Contracts", "3"],
-      ["Stop Loss", "10 pts"],
-      ["Take Profit", "120 pts"],
-      ["Max Hold", "15 bars (225 min)"],
-      ["Max / Day", "1"],
-    ],
-  },
-  {
-    name: "Momentum Bars",
-    rows: [
-      ["ATR Period", "14"],
-      ["EMA Period", "21"],
-      ["Volume SMA", "20"],
-      ["Contracts", "3"],
-      ["Stop Loss", "15 pts"],
-      ["Take Profit", "100 pts"],
-      ["Max Hold", "5 bars (75 min)"],
-    ],
-  },
-];
-
 export function Settings() {
-  const [environment, setEnvironment] = useState("demo");
-
-  useEffect(() => {
-    api.getEnvironment().then((d) => setEnvironment(d.environment));
-  }, []);
+  const [env, setEnv] = useState("demo");
+  useEffect(() => { api.getEnvironment().then(d => setEnv(d.environment)); }, []);
 
   return (
-    <div className="p-5 max-w-[900px] mx-auto space-y-6">
-      <h2 className="text-lg font-semibold" style={{ color: "var(--text-primary)" }}>
-        Settings
-      </h2>
-
-      {/* Session info — prominent */}
-      <div className="panel rounded-lg overflow-hidden">
-        <div className="px-5 py-3 flex items-center justify-between" style={{ borderBottom: "1px solid var(--border)" }}>
-          <span className="text-sm font-medium" style={{ color: "var(--text-primary)" }}>Session</span>
-          <span
-            className="text-[10px] px-2 py-0.5 rounded font-bold uppercase tracking-wider"
-            style={{
-              background: environment === "demo" ? "rgba(245,158,11,0.1)" : "rgba(239,68,68,0.1)",
-              color: environment === "demo" ? "var(--accent-yellow)" : "var(--accent-red)",
-            }}
-          >
-            {environment}
-          </span>
+    <div className="p-5 max-w-[800px] mx-auto space-y-6">
+      <Section title="Session">
+        <div className="grid grid-cols-3" style={{ borderBottom: "1px solid var(--border)" }}>
+          <BigStat label="Trading Session" value="9:30 – 4:45 ET" />
+          <BigStat label="Daily Loss Limit" value="-$3,000" color="var(--red)" />
+          <BigStat label="Monthly Loss Limit" value="-$4,500" color="var(--red)" />
         </div>
-        <div className="grid grid-cols-3 divide-x" style={{ borderColor: "var(--border)" }}>
-          <div className="px-5 py-4 text-center">
-            <div className="text-xl font-mono font-semibold" style={{ color: "var(--text-primary)" }}>9:30 – 4:45</div>
-            <div className="text-[10px] mt-1" style={{ color: "var(--text-muted)" }}>Trading Session (ET)</div>
-          </div>
-          <div className="px-5 py-4 text-center">
-            <div className="text-xl font-mono font-semibold" style={{ color: "var(--accent-red)" }}>-$3,000</div>
-            <div className="text-[10px] mt-1" style={{ color: "var(--text-muted)" }}>Daily Loss Limit</div>
-          </div>
-          <div className="px-5 py-4 text-center">
-            <div className="text-xl font-mono font-semibold" style={{ color: "var(--accent-red)" }}>-$4,500</div>
-            <div className="text-[10px] mt-1" style={{ color: "var(--text-muted)" }}>Monthly Loss Limit</div>
-          </div>
-        </div>
-        <div className="px-5 py-2 text-[11px] flex gap-6" style={{ color: "var(--text-muted)", borderTop: "1px solid var(--border)" }}>
+        <div className="px-5 py-2.5 flex gap-6 text-[11px]" style={{ color: "var(--text-muted)" }}>
           <span>No new entries after 4:30 PM ET</span>
           <span>Flatten at 4:45 PM ET</span>
-          <span>Timezone: US/Eastern</span>
+          <span>US/Eastern</span>
+          <span className="ml-auto px-2 py-0.5 rounded text-[9px] font-bold uppercase" style={{ background: env === "demo" ? "rgba(245,158,11,0.1)" : "rgba(239,68,68,0.1)", color: env === "demo" ? "var(--amber)" : "var(--red)" }}>{env}</span>
         </div>
-      </div>
+      </Section>
 
-      {/* Contract info */}
-      <div className="panel rounded-lg px-5 py-3">
-        <div className="flex items-center gap-6 text-xs">
-          <span style={{ color: "var(--text-muted)" }}>Contract</span>
-          <span className="font-mono" style={{ color: "var(--text-primary)" }}>MNQM6</span>
+      <Section title="Contract">
+        <div className="px-5 py-3 flex items-center gap-6 text-xs">
+          <span className="font-mono font-semibold" style={{ color: "var(--text)" }}>MNQM6</span>
           <span style={{ color: "var(--text-muted)" }}>MNQ Micro Nasdaq 100</span>
-          <span className="ml-auto flex gap-4" style={{ color: "var(--text-secondary)" }}>
-            <span>Tick: 0.25 = $0.50</span>
-            <span>Point: $2.00</span>
+          <span className="ml-auto flex gap-4" style={{ color: "var(--text-muted)" }}>
+            <span>Tick: 0.25 = $0.50</span><span>Point: $2.00</span>
           </span>
         </div>
-      </div>
+      </Section>
 
-      {/* Strategy params — table format */}
-      {STRATEGIES.map((strat) => (
-        <div key={strat.name} className="panel rounded-lg overflow-hidden">
-          <div className="px-5 py-2.5 text-xs font-medium" style={{ color: "var(--text-secondary)", borderBottom: "1px solid var(--border)" }}>
-            {strat.name}
-          </div>
-          <table className="w-full text-xs">
-            <tbody>
-              {strat.rows.map(([label, value], i) => (
-                <tr
-                  key={label}
-                  style={i < strat.rows.length - 1 ? { borderBottom: "1px solid var(--border)" } : undefined}
-                >
-                  <td className="px-5 py-2" style={{ color: "var(--text-muted)", width: "40%" }}>{label}</td>
-                  <td className="px-5 py-2 font-mono" style={{ color: "var(--text-primary)" }}>{value}</td>
-                </tr>
-              ))}
-            </tbody>
-          </table>
-        </div>
-      ))}
+      <Section title="Strategy Parameters">
+        <table className="w-full text-[11px]">
+          <thead><tr style={{ color: "var(--text-dim)", borderBottom: "1px solid var(--border)" }}>
+            <th className="text-left font-normal px-5 py-2.5 w-[35%]">Parameter</th>
+            <th className="text-center font-normal px-3 py-2.5">RSI</th>
+            <th className="text-center font-normal px-3 py-2.5">IB</th>
+            <th className="text-center font-normal px-3 py-2.5">MOM</th>
+          </tr></thead>
+          <tbody>
+            {PARAMS.map(([label, rsi, ib, mom], i) => (
+              <tr key={label} style={{ background: i % 2 === 1 ? "rgba(255,255,255,0.015)" : "transparent", borderTop: "1px solid var(--border)" }}>
+                <td className="px-5 py-2" style={{ color: "var(--text-muted)" }}>{label}</td>
+                <td className="px-3 py-2 text-center font-mono tabular" style={{ color: "var(--text)" }}>{rsi}</td>
+                <td className="px-3 py-2 text-center font-mono tabular" style={{ color: "var(--text)" }}>{ib}</td>
+                <td className="px-3 py-2 text-center font-mono tabular" style={{ color: "var(--text)" }}>{mom}</td>
+              </tr>
+            ))}
+          </tbody>
+        </table>
+      </Section>
+    </div>
+  );
+}
+
+const PARAMS: [string, string, string, string][] = [
+  ["Contracts", "3", "3", "3"],
+  ["Stop Loss", "10 pts", "10 pts", "15 pts"],
+  ["Take Profit", "100 pts", "120 pts", "100 pts"],
+  ["Max Hold", "5 bars", "15 bars", "5 bars"],
+  ["Period / Window", "RSI(5)", "9:30–10:00 ET", "ATR(14)"],
+  ["Thresholds", "35 / 65", "P25–P75 (50d)", "EMA(21)"],
+  ["Extra", "—", "Max 1/day", "Vol > SMA(20)"],
+];
+
+function Section({ title, children }: { title: string; children: React.ReactNode }) {
+  return (
+    <div className="panel rounded-lg overflow-hidden" style={{ borderTop: "2px solid var(--accent)" }}>
+      <div className="px-5 py-2.5 text-[10px] font-light uppercase tracking-widest" style={{ color: "var(--text-muted)", borderBottom: "1px solid var(--border)" }}>{title}</div>
+      {children}
+    </div>
+  );
+}
+
+function BigStat({ label, value, color }: { label: string; value: string; color?: string }) {
+  return (
+    <div className="px-5 py-4 text-center">
+      <div className="text-lg font-mono font-semibold tabular" style={{ color: color ?? "var(--text)" }}>{value}</div>
+      <div className="text-[10px] mt-0.5 font-light" style={{ color: "var(--text-muted)" }}>{label}</div>
     </div>
   );
 }
