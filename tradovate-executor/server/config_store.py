@@ -43,7 +43,7 @@ def _decrypt(stored: str) -> str:
 
 def load_config() -> dict:
     if not os.path.exists(CONFIG_PATH):
-        return dict(_DEFAULT_CONFIG)
+        return json.loads(json.dumps(_DEFAULT_CONFIG))
     with open(CONFIG_PATH) as f:
         data = json.load(f)
     for acct in data.get("accounts", []):

@@ -141,9 +141,17 @@ class TestConfigStore:
 
 
 from fastapi.testclient import TestClient
-from server.api import app
+from server.api import app, _engine_state
 
 client = TestClient(app)
+
+
+@pytest.fixture(autouse=True)
+def reset_engine_state():
+    """Reset engine state before each test to avoid cross-test pollution."""
+    _engine_state["running"] = False
+    yield
+    _engine_state["running"] = False
 
 
 class TestAccountEndpoints:
@@ -224,3 +232,52 @@ class TestAccountEndpoints:
         target = [a for a in accounts if a["name"] == "mask-test"][0]
         assert target["password"] == "********"
         assert target["sec"] == "********"
+
+
+class TestEngineEndpoints:
+    def test_status_when_stopped(self):
+        resp = client.get("/api/engine/status")
+        assert resp.status_code == 200
+        data = resp.json()
+        assert data["running"] is False
+
+    def test_start_engine(self):
+        resp = client.post("/api/engine/start")
+        assert resp.status_code == 200
+        assert resp.json()["status"] == "started"
+        # Stop it for other tests
+        client.post("/api/engine/stop")
+
+    def test_start_already_running_returns_409(self):
+        client.post("/api/engine/start")
+        resp = client.post("/api/engine/start")
+        assert resp.status_code == 409
+        client.post("/api/engine/stop")
+
+    def test_stop_not_running_returns_409(self):
+        resp = client.post("/api/engine/stop")
+        assert resp.status_code == 409
+
+    def test_flatten(self):
+        client.post("/api/engine/start")
+        resp = client.post("/api/engine/flatten")
+        assert resp.status_code == 200
+        assert resp.json()["status"] == "flattened"
+
+
+class TestEnvironmentEndpoints:
+    def test_get_environment(self):
+        resp = client.get("/api/environment")
+        assert resp.status_code == 200
+        assert resp.json()["environment"] in ("demo", "live")
+
+    def test_set_environment(self):
+        resp = client.put("/api/environment", json={"environment": "live"})
+        assert resp.status_code == 200
+        assert resp.json()["environment"] == "live"
+        # Reset
+        client.put("/api/environment", json={"environment": "demo"})
+
+    def test_set_invalid_environment(self):
+        resp = client.put("/api/environment", json={"environment": "staging"})
+        assert resp.status_code == 400
