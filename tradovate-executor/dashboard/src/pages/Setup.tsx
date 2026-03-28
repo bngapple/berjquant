@@ -18,10 +18,9 @@ export function Setup() {
   const [accounts, setAccounts] = useState<Account[]>([]);
   const [form, setForm] = useState<AccountCreate>({ ...EMPTY_FORM });
   const [editing, setEditing] = useState<string | null>(null);
+  const [showForm, setShowForm] = useState(false);
   const [error, setError] = useState("");
-  const [testResults, setTestResults] = useState<
-    Record<string, AuthTestResult>
-  >({});
+  const [testResults, setTestResults] = useState<Record<string, AuthTestResult>>({});
   const [testingName, setTestingName] = useState<string | null>(null);
   const [environment, setEnvironment] = useState("demo");
 
@@ -30,28 +29,16 @@ export function Setup() {
     api.getEnvironment().then((d) => setEnvironment(d.environment));
   };
 
-  useEffect(() => {
-    reload();
-  }, []);
+  useEffect(() => { reload(); }, []);
 
-  const handleSubmit = async (e: FormEvent) => {
-    e.preventDefault();
+  const openAdd = () => {
+    setEditing(null);
+    setForm({ ...EMPTY_FORM });
     setError("");
-    try {
-      if (editing) {
-        await api.updateAccount(editing, form);
-      } else {
-        await api.createAccount(form);
-      }
-      setForm({ ...EMPTY_FORM });
-      setEditing(null);
-      reload();
-    } catch (err) {
-      setError(err instanceof Error ? err.message : "Failed");
-    }
+    setShowForm(true);
   };
 
-  const handleEdit = (acct: Account) => {
+  const openEdit = (acct: Account) => {
     setEditing(acct.name);
     setForm({
       name: acct.name,
@@ -64,6 +51,26 @@ export function Setup() {
       sizing_mode: acct.sizing_mode,
       account_size: acct.account_size,
     });
+    setError("");
+    setShowForm(true);
+  };
+
+  const handleSubmit = async (e: FormEvent) => {
+    e.preventDefault();
+    setError("");
+    try {
+      if (editing) {
+        await api.updateAccount(editing, form);
+      } else {
+        await api.createAccount(form);
+      }
+      setShowForm(false);
+      setForm({ ...EMPTY_FORM });
+      setEditing(null);
+      reload();
+    } catch (err) {
+      setError(err instanceof Error ? err.message : "Failed");
+    }
   };
 
   const handleDelete = async (name: string) => {
@@ -74,16 +81,14 @@ export function Setup() {
 
   const handleTestAuth = async (name: string) => {
     setTestingName(name);
+    setTestResults((prev) => ({ ...prev, [name]: undefined as unknown as AuthTestResult }));
     try {
       const result = await api.testAuth(name);
       setTestResults((prev) => ({ ...prev, [name]: result }));
     } catch (err) {
       setTestResults((prev) => ({
         ...prev,
-        [name]: {
-          success: false,
-          error: err instanceof Error ? err.message : "Failed",
-        },
+        [name]: { success: false, error: err instanceof Error ? err.message : "Failed" },
       }));
     } finally {
       setTestingName(null);
@@ -96,215 +101,238 @@ export function Setup() {
     setEnvironment(next);
   };
 
+  const SIZING_MODES = ["mirror", "fixed", "scaled"] as const;
+
   const inputCls =
-    "w-full bg-gray-800 border border-gray-700 rounded px-3 py-2 text-sm text-gray-100 placeholder-gray-500 focus:outline-none focus:border-blue-500";
+    "w-full rounded px-3 py-2 text-sm outline-none placeholder:text-zinc-600 transition-colors focus:border-blue-500/50" +
+    " " +
+    "bg-[var(--bg-surface)] border border-[rgba(255,255,255,0.06)] text-[var(--text-primary)]";
 
   return (
-    <div className="space-y-6">
-      <div className="flex justify-between items-center">
-        <h2 className="text-xl font-bold">Account Setup</h2>
-        <button
-          onClick={toggleEnv}
-          className={`px-3 py-1.5 rounded text-xs font-bold uppercase tracking-wider ${
-            environment === "demo"
-              ? "bg-yellow-900/50 text-yellow-300 border border-yellow-700"
-              : "bg-red-900/50 text-red-300 border border-red-700"
-          }`}
-        >
-          {environment}
-        </button>
+    <div className="p-5 max-w-[1000px] mx-auto space-y-6">
+      {/* Header */}
+      <div className="flex items-center justify-between">
+        <h2 className="text-lg font-semibold" style={{ color: "var(--text-primary)" }}>Accounts</h2>
+        <div className="flex items-center gap-3">
+          <button
+            onClick={toggleEnv}
+            className="px-2.5 py-1 rounded text-[10px] font-bold uppercase tracking-wider"
+            style={{
+              background: environment === "demo" ? "rgba(245,158,11,0.1)" : "rgba(239,68,68,0.1)",
+              color: environment === "demo" ? "var(--accent-yellow)" : "var(--accent-red)",
+              border: `1px solid ${environment === "demo" ? "rgba(245,158,11,0.2)" : "rgba(239,68,68,0.2)"}`,
+            }}
+          >
+            {environment}
+          </button>
+          <button
+            onClick={openAdd}
+            className="px-3 py-1.5 text-xs font-medium rounded text-emerald-400 border border-emerald-500/30 hover:bg-emerald-500/10"
+          >
+            + Add Account
+          </button>
+        </div>
       </div>
 
-      <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
-        {/* Form */}
-        <div className="bg-gray-900 rounded-lg border border-gray-800 p-5">
-          <h3 className="font-semibold mb-4">
-            {editing ? `Edit: ${editing}` : "Add Account"}
-          </h3>
-          {error && (
-            <div className="mb-3 text-sm text-red-400 bg-red-900/20 border border-red-800 rounded p-2">
-              {error}
-            </div>
-          )}
-          <form onSubmit={handleSubmit} className="space-y-3">
-            <input
-              className={inputCls}
-              placeholder="Account name"
-              value={form.name}
-              onChange={(e) => setForm({ ...form, name: e.target.value })}
-              disabled={!!editing}
-              required
-            />
-            <input
-              className={inputCls}
-              placeholder="Tradovate username"
-              value={form.username}
-              onChange={(e) => setForm({ ...form, username: e.target.value })}
-              required
-            />
-            <input
-              className={inputCls}
-              type="password"
-              placeholder={editing ? "New password (leave blank to keep)" : "Password"}
-              value={form.password}
-              onChange={(e) => setForm({ ...form, password: e.target.value })}
-              required={!editing}
-            />
-            <div className="grid grid-cols-2 gap-3">
-              <input
-                className={inputCls}
-                type="number"
-                placeholder="CID"
-                value={form.cid || ""}
-                onChange={(e) =>
-                  setForm({ ...form, cid: parseInt(e.target.value) || 0 })
-                }
-              />
-              <input
-                className={inputCls}
-                type="password"
-                placeholder="API Secret"
-                value={form.sec}
-                onChange={(e) => setForm({ ...form, sec: e.target.value })}
-              />
-            </div>
-            <input
-              className={inputCls}
-              placeholder="Device ID (auto-generated if empty)"
-              value={form.device_id}
-              onChange={(e) => setForm({ ...form, device_id: e.target.value })}
-            />
-            <div className="grid grid-cols-2 gap-3">
-              <select
-                className={inputCls}
-                value={form.sizing_mode}
-                onChange={(e) =>
-                  setForm({ ...form, sizing_mode: e.target.value })
-                }
-              >
-                <option value="mirror">Mirror</option>
-                <option value="fixed">Fixed</option>
-                <option value="scaled">Scaled</option>
-              </select>
-              <input
-                className={inputCls}
-                type="number"
-                placeholder="Account size"
-                value={form.account_size}
-                onChange={(e) =>
-                  setForm({
-                    ...form,
-                    account_size: parseFloat(e.target.value) || 0,
-                  })
-                }
-              />
-            </div>
-            <label className="flex items-center gap-2 text-sm text-gray-300">
-              <input
-                type="checkbox"
-                checked={form.is_master}
-                onChange={(e) =>
-                  setForm({ ...form, is_master: e.target.checked })
-                }
-                className="rounded bg-gray-800 border-gray-600"
-              />
-              Master account
-            </label>
-            <div className="flex gap-2">
-              <button
-                type="submit"
-                className="flex-1 bg-blue-600 hover:bg-blue-500 text-white text-sm font-medium py-2 rounded transition-colors"
-              >
-                {editing ? "Update" : "Add Account"}
-              </button>
-              {editing && (
-                <button
-                  type="button"
-                  onClick={() => {
-                    setEditing(null);
-                    setForm({ ...EMPTY_FORM });
-                  }}
-                  className="px-4 bg-gray-800 hover:bg-gray-700 text-gray-300 text-sm rounded transition-colors"
-                >
-                  Cancel
-                </button>
-              )}
-            </div>
-          </form>
-        </div>
+      {/* Account List */}
+      <div className="space-y-2">
+        {accounts.length === 0 && (
+          <div className="panel rounded-lg p-8 text-center">
+            <p className="text-sm" style={{ color: "var(--text-muted)" }}>
+              No accounts configured. Add one to get started.
+            </p>
+          </div>
+        )}
+        {accounts.map((acct) => {
+          const testResult = testResults[acct.name];
+          const isTesting = testingName === acct.name;
 
-        {/* Account List */}
-        <div className="space-y-3">
-          {accounts.length === 0 && (
-            <p className="text-gray-500 text-sm">No accounts configured.</p>
-          )}
-          {accounts.map((acct) => {
-            const testResult = testResults[acct.name];
-            const isTesting = testingName === acct.name;
-            return (
-              <div
-                key={acct.name}
-                className="bg-gray-900 rounded-lg border border-gray-800 p-4"
+          return (
+            <div
+              key={acct.name}
+              className="group/card panel rounded-lg p-4 relative transition-colors hover:border-[rgba(255,255,255,0.1)]"
+              style={acct.is_master ? { borderColor: "rgba(245,158,11,0.2)" } : undefined}
+            >
+              {/* Hover delete X */}
+              <button
+                onClick={() => handleDelete(acct.name)}
+                className="absolute top-3 right-3 w-5 h-5 rounded flex items-center justify-center text-zinc-600 hover:text-red-400 hover:bg-red-500/10 opacity-0 group-hover/card:opacity-100 transition-opacity"
               >
-                <div className="flex justify-between items-start mb-2">
-                  <div>
-                    <span className="font-semibold">{acct.name}</span>
-                    {acct.is_master && (
-                      <span className="ml-2 text-xs bg-blue-900/50 text-blue-300 px-1.5 py-0.5 rounded">
-                        MASTER
+                <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
+                  <line x1="18" y1="6" x2="6" y2="18" /><line x1="6" y1="6" x2="18" y2="18" />
+                </svg>
+              </button>
+
+              <div className="flex items-center justify-between mb-2">
+                <div className="flex items-center gap-2">
+                  {acct.is_master && (
+                    <span className="text-amber-400 text-xs">&#9733;</span>
+                  )}
+                  <span className="text-sm font-medium" style={{ color: "var(--text-primary)" }}>
+                    {acct.name}
+                  </span>
+                  {acct.is_master && (
+                    <span className="text-[10px] px-1.5 py-0.5 rounded" style={{ background: "rgba(245,158,11,0.1)", color: "var(--accent-yellow)" }}>
+                      MASTER
+                    </span>
+                  )}
+                </div>
+                <span className="text-[10px] uppercase font-medium" style={{ color: "var(--text-muted)" }}>
+                  {acct.sizing_mode}
+                </span>
+              </div>
+
+              <div className="flex items-center gap-4 text-xs mb-3" style={{ color: "var(--text-secondary)" }}>
+                <span>{acct.username}</span>
+                <span className="font-mono">${acct.account_size.toLocaleString()}</span>
+              </div>
+
+              <div className="flex items-center gap-2">
+                <button
+                  onClick={() => handleTestAuth(acct.name)}
+                  disabled={isTesting}
+                  className="text-[11px] px-2.5 py-1 rounded transition-colors disabled:opacity-50"
+                  style={{ background: "rgba(255,255,255,0.04)", color: "var(--text-secondary)", border: "1px solid var(--border)" }}
+                >
+                  {isTesting ? "Testing..." : "Test Connection"}
+                </button>
+                <button
+                  onClick={() => openEdit(acct)}
+                  className="text-[11px] px-2.5 py-1 rounded transition-colors"
+                  style={{ background: "rgba(255,255,255,0.04)", color: "var(--text-secondary)", border: "1px solid var(--border)" }}
+                >
+                  Edit
+                </button>
+
+                {/* Test result indicator */}
+                {testResult && !isTesting && (
+                  <span className="flex items-center gap-1 text-[11px] ml-1">
+                    {testResult.success ? (
+                      <span className="flex items-center gap-1" style={{ color: "var(--accent-green)" }}>
+                        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5">
+                          <polyline points="20 6 9 17 4 12" />
+                        </svg>
+                        Connected (ID: {testResult.account_id})
+                      </span>
+                    ) : (
+                      <span className="flex items-center gap-1" style={{ color: "var(--accent-red)" }}>
+                        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5">
+                          <line x1="18" y1="6" x2="6" y2="18" /><line x1="6" y1="6" x2="18" y2="18" />
+                        </svg>
+                        {testResult.error}
                       </span>
                     )}
-                  </div>
-                  <span className="text-xs text-gray-500 uppercase">
-                    {acct.sizing_mode}
                   </span>
-                </div>
-                <div className="text-sm text-gray-400 mb-3">
-                  <span>{acct.username}</span>
-                  <span className="mx-2">·</span>
-                  <span className="font-mono">
-                    ${acct.account_size.toLocaleString()}
-                  </span>
-                </div>
-                <div className="flex gap-2">
-                  <button
-                    onClick={() => handleTestAuth(acct.name)}
-                    disabled={isTesting}
-                    className="text-xs bg-gray-800 hover:bg-gray-700 text-gray-300 px-3 py-1.5 rounded transition-colors disabled:opacity-50"
-                  >
-                    {isTesting ? "Testing..." : "Test Connection"}
-                  </button>
-                  <button
-                    onClick={() => handleEdit(acct)}
-                    className="text-xs bg-gray-800 hover:bg-gray-700 text-gray-300 px-3 py-1.5 rounded transition-colors"
-                  >
-                    Edit
-                  </button>
-                  <button
-                    onClick={() => handleDelete(acct.name)}
-                    className="text-xs bg-gray-800 hover:bg-red-900/50 text-gray-400 hover:text-red-300 px-3 py-1.5 rounded transition-colors"
-                  >
-                    Delete
-                  </button>
-                </div>
-                {testResult && (
-                  <div
-                    className={`mt-2 text-xs p-2 rounded ${
-                      testResult.success
-                        ? "bg-green-900/20 text-green-400 border border-green-800"
-                        : "bg-red-900/20 text-red-400 border border-red-800"
-                    }`}
-                  >
-                    {testResult.success
-                      ? `Connected — Account ID: ${testResult.account_id}, User ID: ${testResult.user_id}`
-                      : `Failed: ${testResult.error}`}
-                  </div>
                 )}
               </div>
-            );
-          })}
-        </div>
+            </div>
+          );
+        })}
       </div>
+
+      {/* ── Slide-out Form Modal ─────────────────────────────── */}
+      {showForm && (
+        <div className="fixed inset-0 z-50 flex justify-end" onClick={() => setShowForm(false)}>
+          <div className="absolute inset-0 bg-black/50" />
+          <div
+            className="relative w-[400px] h-full overflow-y-auto p-6 space-y-4"
+            style={{ background: "var(--bg-panel)", borderLeft: "1px solid var(--border)" }}
+            onClick={(e) => e.stopPropagation()}
+          >
+            <div className="flex items-center justify-between mb-2">
+              <h3 className="text-sm font-semibold" style={{ color: "var(--text-primary)" }}>
+                {editing ? `Edit: ${editing}` : "New Account"}
+              </h3>
+              <button onClick={() => setShowForm(false)} className="text-zinc-500 hover:text-zinc-300">
+                <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
+                  <line x1="18" y1="6" x2="6" y2="18" /><line x1="6" y1="6" x2="18" y2="18" />
+                </svg>
+              </button>
+            </div>
+
+            {error && (
+              <div className="text-xs p-2 rounded" style={{ background: "rgba(239,68,68,0.1)", color: "var(--accent-red)", border: "1px solid rgba(239,68,68,0.2)" }}>
+                {error}
+              </div>
+            )}
+
+            <form onSubmit={handleSubmit} className="space-y-3">
+              <label className="block">
+                <span className="text-[11px] mb-1 block" style={{ color: "var(--text-muted)" }}>Account Name</span>
+                <input className={inputCls} value={form.name} onChange={(e) => setForm({ ...form, name: e.target.value })} disabled={!!editing} required />
+              </label>
+              <label className="block">
+                <span className="text-[11px] mb-1 block" style={{ color: "var(--text-muted)" }}>Username</span>
+                <input className={inputCls} value={form.username} onChange={(e) => setForm({ ...form, username: e.target.value })} required />
+              </label>
+              <label className="block">
+                <span className="text-[11px] mb-1 block" style={{ color: "var(--text-muted)" }}>
+                  {editing ? "Password (leave blank to keep)" : "Password"}
+                </span>
+                <input className={inputCls} type="password" value={form.password} onChange={(e) => setForm({ ...form, password: e.target.value })} required={!editing} />
+              </label>
+              <div className="grid grid-cols-2 gap-3">
+                <label className="block">
+                  <span className="text-[11px] mb-1 block" style={{ color: "var(--text-muted)" }}>CID</span>
+                  <input className={inputCls} type="number" value={form.cid || ""} onChange={(e) => setForm({ ...form, cid: parseInt(e.target.value) || 0 })} />
+                </label>
+                <label className="block">
+                  <span className="text-[11px] mb-1 block" style={{ color: "var(--text-muted)" }}>API Secret</span>
+                  <input className={inputCls} type="password" value={form.sec} onChange={(e) => setForm({ ...form, sec: e.target.value })} />
+                </label>
+              </div>
+              <label className="block">
+                <span className="text-[11px] mb-1 block" style={{ color: "var(--text-muted)" }}>Device ID</span>
+                <input className={inputCls} placeholder="Auto-generated if empty" value={form.device_id} onChange={(e) => setForm({ ...form, device_id: e.target.value })} />
+              </label>
+
+              {/* Sizing mode segmented control */}
+              <div>
+                <span className="text-[11px] mb-1.5 block" style={{ color: "var(--text-muted)" }}>Sizing Mode</span>
+                <div className="flex rounded overflow-hidden" style={{ border: "1px solid var(--border)" }}>
+                  {SIZING_MODES.map((mode) => (
+                    <button
+                      key={mode}
+                      type="button"
+                      onClick={() => setForm({ ...form, sizing_mode: mode })}
+                      className="flex-1 py-1.5 text-xs font-medium capitalize transition-colors"
+                      style={{
+                        background: form.sizing_mode === mode ? "rgba(255,255,255,0.08)" : "transparent",
+                        color: form.sizing_mode === mode ? "var(--text-primary)" : "var(--text-muted)",
+                        borderRight: mode !== "scaled" ? "1px solid var(--border)" : undefined,
+                      }}
+                    >
+                      {mode}
+                    </button>
+                  ))}
+                </div>
+              </div>
+
+              <label className="block">
+                <span className="text-[11px] mb-1 block" style={{ color: "var(--text-muted)" }}>Account Size</span>
+                <input className={inputCls} type="number" value={form.account_size} onChange={(e) => setForm({ ...form, account_size: parseFloat(e.target.value) || 0 })} />
+              </label>
+
+              <label className="flex items-center gap-2 text-xs cursor-pointer" style={{ color: "var(--text-secondary)" }}>
+                <input
+                  type="checkbox"
+                  checked={form.is_master}
+                  onChange={(e) => setForm({ ...form, is_master: e.target.checked })}
+                  className="rounded"
+                />
+                Master account
+              </label>
+
+              <button
+                type="submit"
+                className="w-full py-2 text-sm font-medium rounded bg-blue-600 hover:bg-blue-500 text-white transition-colors"
+              >
+                {editing ? "Update Account" : "Add Account"}
+              </button>
+            </form>
+          </div>
+        </div>
+      )}
     </div>
   );
 }
