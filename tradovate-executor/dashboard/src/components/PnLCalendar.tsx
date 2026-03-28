@@ -1,107 +1,79 @@
 import { useState, useMemo } from "react";
 
-interface Props {
-  /** Map of "YYYY-MM-DD" -> daily P&L in USD */
-  data: Record<string, number>;
-}
+interface Props { data: Record<string, number>; }
 
 export function PnLCalendar({ data }: Props) {
-  const [offset, setOffset] = useState(0); // 0 = current month, -1 = prev, etc.
+  const [offset, setOffset] = useState(0);
 
-  const { label, days } = useMemo(() => {
+  const { label, weeks } = useMemo(() => {
     const now = new Date();
     now.setMonth(now.getMonth() + offset);
-    const y = now.getFullYear();
-    const m = now.getMonth();
+    const y = now.getFullYear(), m = now.getMonth();
     const label = now.toLocaleString("en-US", { month: "long", year: "numeric" });
 
-    const firstDay = new Date(y, m, 1).getDay(); // 0=Sun
+    const first = new Date(y, m, 1);
     const daysInMonth = new Date(y, m + 1, 0).getDate();
+    const startDay = (first.getDay() + 6) % 7;
 
-    const days: { day: number; key: string; pnl: number | null }[] = [];
-    // Padding
-    for (let i = 0; i < firstDay; i++) {
-      days.push({ day: 0, key: `pad-${i}`, pnl: null });
-    }
+    const cells: { day: number; key: string; pnl: number | null }[] = [];
+    for (let i = 0; i < startDay; i++) cells.push({ day: 0, key: `pad-${i}`, pnl: null });
     for (let d = 1; d <= daysInMonth; d++) {
       const key = `${y}-${String(m + 1).padStart(2, "0")}-${String(d).padStart(2, "0")}`;
-      days.push({ day: d, key, pnl: data[key] ?? null });
+      cells.push({ day: d, key, pnl: data[key] ?? null });
     }
-    return { label, days };
+
+    const weeks: typeof cells[] = [];
+    for (let i = 0; i < cells.length; i += 7) weeks.push(cells.slice(i, i + 7));
+    const last = weeks[weeks.length - 1];
+    while (last && last.length < 7) last.push({ day: 0, key: `end-${last.length}`, pnl: null });
+
+    return { label, weeks };
   }, [offset, data]);
 
-  const cellColor = (pnl: number | null): string => {
+  const bg = (pnl: number | null) => {
     if (pnl === null) return "transparent";
-    if (pnl === 0) return "rgba(255,255,255,0.03)";
-    if (pnl > 0) {
-      const intensity = Math.min(pnl / 500, 1);
-      return `rgba(16,185,129,${0.15 + intensity * 0.5})`;
-    }
-    const intensity = Math.min(Math.abs(pnl) / 500, 1);
-    return `rgba(239,68,68,${0.15 + intensity * 0.5})`;
+    if (pnl === 0) return "rgba(255,255,255,0.02)";
+    if (pnl > 0) return `rgba(0,212,170,${Math.min(0.1 + (pnl / 500) * 0.3, 0.4)})`;
+    return `rgba(239,68,68,${Math.min(0.1 + (Math.abs(pnl) / 500) * 0.3, 0.4)})`;
   };
 
-  const weekdays = ["S", "M", "T", "W", "T", "F", "S"];
+  const cols = ["Mon", "Tue", "Wed", "Thu", "Fri", "Sat", "Sun"];
 
   return (
     <div>
-      {/* Header */}
       <div className="flex items-center justify-between mb-3">
-        <button
-          onClick={() => setOffset((o) => o - 1)}
-          className="text-zinc-500 hover:text-zinc-300 text-xs px-1.5 py-0.5"
-        >
-          &larr;
-        </button>
-        <span className="text-xs font-medium" style={{ color: "var(--text-secondary)" }}>
-          {label}
-        </span>
-        <button
-          onClick={() => setOffset((o) => Math.min(o + 1, 0))}
-          disabled={offset >= 0}
-          className="text-zinc-500 hover:text-zinc-300 text-xs px-1.5 py-0.5 disabled:opacity-20"
-        >
-          &rarr;
-        </button>
+        <button onClick={() => setOffset(o => o - 1)} className="text-xs px-1.5" style={{ color: "var(--text-muted)" }}>&larr;</button>
+        <span className="text-xs font-medium" style={{ color: "var(--text-muted)" }}>{label}</span>
+        <button onClick={() => setOffset(o => Math.min(o + 1, 0))} disabled={offset >= 0} className="text-xs px-1.5 disabled:opacity-20" style={{ color: "var(--text-muted)" }}>&rarr;</button>
       </div>
 
-      {/* Weekday headers */}
-      <div className="grid grid-cols-7 gap-[3px] mb-[3px]">
-        {weekdays.map((d, i) => (
-          <div key={i} className="text-center text-[9px]" style={{ color: "var(--text-muted)" }}>
-            {d}
-          </div>
-        ))}
-      </div>
-
-      {/* Calendar grid */}
-      <div className="grid grid-cols-7 gap-[3px]">
-        {days.map((d) => (
-          <div
-            key={d.key}
-            className="cal-cell relative aspect-square rounded-[3px] flex items-center justify-center group/cell"
-            style={{ background: cellColor(d.pnl) }}
-            title={d.pnl !== null ? `$${d.pnl.toFixed(0)}` : undefined}
-          >
-            {d.day > 0 && (
-              <span className="text-[8px]" style={{ color: d.pnl !== null ? "rgba(255,255,255,0.5)" : "var(--text-muted)" }}>
-                {d.day}
-              </span>
-            )}
-            {/* Tooltip on hover */}
-            {d.pnl !== null && (
-              <div className="absolute -top-7 left-1/2 -translate-x-1/2 px-1.5 py-0.5 rounded text-[9px] font-mono whitespace-nowrap opacity-0 group-hover/cell:opacity-100 pointer-events-none z-20"
-                   style={{
-                     background: "var(--bg-surface)",
-                     border: "1px solid var(--border-strong)",
-                     color: d.pnl >= 0 ? "var(--accent-green)" : "var(--accent-red)",
-                   }}>
-                {d.pnl >= 0 ? "+" : ""}${d.pnl.toFixed(0)}
-              </div>
-            )}
-          </div>
-        ))}
-      </div>
+      <table className="w-full border-collapse text-[10px]">
+        <thead>
+          <tr>
+            {cols.map(c => <th key={c} className="font-normal pb-1.5 text-center" style={{ color: "var(--text-dim)" }}>{c}</th>)}
+          </tr>
+        </thead>
+        <tbody>
+          {weeks.map((week, wi) => (
+            <tr key={wi}>
+              {week.map(cell => (
+                <td key={cell.key} className="cal-cell relative p-0 text-center h-9" style={{ background: bg(cell.pnl), border: "1px solid var(--border)" }}>
+                  {cell.day > 0 && (
+                    <div className="flex flex-col items-center justify-center h-full">
+                      <span style={{ color: "var(--text-dim)", fontSize: 8 }}>{cell.day}</span>
+                      {cell.pnl !== null && (
+                        <span className="font-mono font-medium" style={{ color: cell.pnl >= 0 ? "var(--accent)" : "var(--red)", fontSize: 9 }}>
+                          {cell.pnl >= 0 ? "+" : ""}{cell.pnl.toFixed(0)}
+                        </span>
+                      )}
+                    </div>
+                  )}
+                </td>
+              ))}
+            </tr>
+          ))}
+        </tbody>
+      </table>
     </div>
   );
 }
