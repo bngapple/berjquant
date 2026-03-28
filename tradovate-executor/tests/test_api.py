@@ -138,3 +138,89 @@ class TestConfigStore:
         acct = config_store.get_account("plain")
         assert acct["password"] == "plaintext_pass"
         assert acct["sec"] == "plain_sec"
+
+
+from fastapi.testclient import TestClient
+from server.api import app
+
+client = TestClient(app)
+
+
+class TestAccountEndpoints:
+    def test_list_accounts_empty(self):
+        resp = client.get("/api/accounts")
+        assert resp.status_code == 200
+        assert resp.json() == []
+
+    def test_create_account(self):
+        resp = client.post("/api/accounts", json={
+            "name": "api-test-1",
+            "username": "testuser",
+            "password": "testpass",
+            "cid": 123,
+            "sec": "secret",
+        })
+        assert resp.status_code == 201
+        data = resp.json()
+        assert data["name"] == "api-test-1"
+        assert data["password"] == "********"
+        assert data["sec"] == "********"
+        assert data["sizing_mode"] == "mirror"
+
+    def test_create_duplicate_returns_409(self):
+        client.post("/api/accounts", json={
+            "name": "dup-api",
+            "username": "u",
+            "password": "p",
+        })
+        resp = client.post("/api/accounts", json={
+            "name": "dup-api",
+            "username": "u2",
+            "password": "p2",
+        })
+        assert resp.status_code == 409
+
+    def test_update_account(self):
+        client.post("/api/accounts", json={
+            "name": "upd-api",
+            "username": "u",
+            "password": "p",
+        })
+        resp = client.put("/api/accounts/upd-api", json={
+            "sizing_mode": "fixed",
+            "account_size": 50000.0,
+        })
+        assert resp.status_code == 200
+        assert resp.json()["sizing_mode"] == "fixed"
+        assert resp.json()["account_size"] == 50000.0
+
+    def test_update_nonexistent_returns_404(self):
+        resp = client.put("/api/accounts/ghost", json={"sizing_mode": "fixed"})
+        assert resp.status_code == 404
+
+    def test_delete_account(self):
+        client.post("/api/accounts", json={
+            "name": "del-api",
+            "username": "u",
+            "password": "p",
+        })
+        resp = client.delete("/api/accounts/del-api")
+        assert resp.status_code == 204
+        accounts = client.get("/api/accounts").json()
+        assert not any(a["name"] == "del-api" for a in accounts)
+
+    def test_delete_nonexistent_returns_404(self):
+        resp = client.delete("/api/accounts/ghost")
+        assert resp.status_code == 404
+
+    def test_list_masks_passwords(self):
+        client.post("/api/accounts", json={
+            "name": "mask-test",
+            "username": "u",
+            "password": "supersecret",
+            "sec": "api_key",
+        })
+        accounts = client.get("/api/accounts").json()
+        target = [a for a in accounts if a["name"] == "mask-test"][0]
+        assert target["password"] == "********"
+        assert target["sec"] == "********"
