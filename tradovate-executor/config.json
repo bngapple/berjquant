@@ -1,0 +1,42 @@
+{
+  "environment": "demo",
+  "symbol": "MNQM6",
+  "accounts": [
+    {
+      "name": "copy-150k-2",
+      "username": "YOUR_USERNAME_2",
+      "password": "enc:gAAAAABpx0tltEPGnAsB0Y5a6jYTEl-6BGmTkymTZom4NYANWXZkfjWCgXYoWZYarTkSvlkD69TK07mTSXB9gJrkUg4Pye4n8A==",
+      "device_id": "unique-device-id-2",
+      "app_id": "HTFSwing",
+      "app_version": "1.0.0",
+      "cid": 0,
+      "sec": "",
+      "is_master": false,
+      "sizing_mode": "mirror",
+      "account_size": 150000,
+      "fixed_sizes": {
+        "RSI": 3,
+        "IB": 3,
+        "MOM": 3
+      }
+    },
+    {
+      "name": "copy-150k-3",
+      "username": "YOUR_USERNAME_3",
+      "password": "enc:gAAAAABpx0tlxrFFtCLaOdf1GlKJQAUuNH5ZLlh5-oNSx4FBN6Lzv7Dm6oOHSuIiY9VrZiQR17ij3HnxBUJhP8mitqAu7U-VLw==",
+      "device_id": "unique-device-id-3",
+      "app_id": "HTFSwing",
+      "app_version": "1.0.0",
+      "cid": 0,
+      "sec": "",
+      "is_master": false,
+      "sizing_mode": "mirror",
+      "account_size": 150000,
+      "fixed_sizes": {
+        "RSI": 3,
+        "IB": 3,
+        "MOM": 3
+      }
+    }
+  ]
+}

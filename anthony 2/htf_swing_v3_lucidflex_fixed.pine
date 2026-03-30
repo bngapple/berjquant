@@ -1,0 +1,289 @@
+// This Pine Script™ code is subject to the terms of the Mozilla Public License 2.0 at https://mozilla.org/MPL/2.0/
+// © berjquant — HTF Swing v3 LucidFlex (Fixed)
+//
+// FIXES vs original htf_swing_v3.pine:
+//   1. IB period: "0930-0945" → "0930-0959" (captures 2 bars: 9:30 + 9:45)
+//   2. Session: 3:45 PM → 4:45 PM (LucidFlex extended session)
+//   3. Post-IB window: until 4:30 PM (was 3:30 PM)
+//   4. EOD flatten: 4:45 PM (was 3:45 PM)
+//
+// NOTE: TradingView free plan limits to 1 position at a time.
+// Python runs 3 simultaneous positions. Expected TV result ≈ Python / 3.
+
+//@version=6
+strategy("HTF Swing v3 LF", overlay=true,
+     default_qty_type=strategy.fixed,
+     default_qty_value=3,
+     initial_capital=150000,
+     commission_type=strategy.commission.cash_per_contract,
+     commission_value=0.89,
+     slippage=2,
+     process_orders_on_close=false,
+     calc_on_every_tick=false,
+     max_bars_back=500)
+
+// ═══════════════════════════════════════════════════════════════════
+// INPUTS
+// ═══════════════════════════════════════════════════════════════════
+
+contracts      = input.int(3, "Contracts per strategy", minval=1, maxval=15, group="General")
+enable_rsi     = input.bool(true, "Enable RSI Strategy", group="General")
+enable_ib      = input.bool(true, "Enable IB Breakout", group="General")
+enable_mom     = input.bool(true, "Enable Momentum", group="General")
+
+// RSI — Python: sig_rsi_extreme(d, 7, 70, 30), sl=60t, tp=400t, hold=5
+rsi_period     = input.int(7, "RSI Period", minval=2, maxval=50, group="RSI Strategy")
+rsi_oversold   = input.int(30, "RSI Oversold", minval=5, maxval=45, group="RSI Strategy")
+rsi_overbought = input.int(70, "RSI Overbought", minval=55, maxval=95, group="RSI Strategy")
+rsi_sl_pts     = input.float(15.0, "RSI Stop Loss (points)", group="RSI Strategy")
+rsi_tp_pts     = input.float(100.0, "RSI Take Profit (points)", group="RSI Strategy")
+rsi_max_hold   = input.int(5, "RSI Max Hold (bars)", minval=1, maxval=50, group="RSI Strategy")
+
+// IB — Python: sig_ib_breakout(d), sl=80t, tp=480t, hold=10
+ib_sl_pts      = input.float(20.0, "IB Stop Loss (points)", group="IB Strategy")
+ib_tp_pts      = input.float(120.0, "IB Take Profit (points)", group="IB Strategy")
+ib_max_hold    = input.int(10, "IB Max Hold (bars)", minval=1, maxval=50, group="IB Strategy")
+ib_min_range   = input.float(2.0, "IB Min Range (points)", group="IB Strategy")
+ib_use_filter  = input.bool(true, "IB Percentile Filter (25th-75th)", group="IB Strategy")
+
+// MOM — Python: sig_momentum_bar(d, 1.0, 1.0), sl=60t, tp=400t, hold=5
+mom_atr_mult   = input.float(1.0, "MOM ATR Multiplier", minval=0.5, maxval=3.0, step=0.1, group="MOM Strategy")
+mom_vol_mult   = input.float(1.0, "MOM Volume Multiplier", minval=0.5, maxval=3.0, step=0.1, group="MOM Strategy")
+mom_sl_pts     = input.float(15.0, "MOM Stop Loss (points)", group="MOM Strategy")
+mom_tp_pts     = input.float(100.0, "MOM Take Profit (points)", group="MOM Strategy")
+mom_max_hold   = input.int(5, "MOM Max Hold (bars)", minval=1, maxval=50, group="MOM Strategy")
+
+// ═══════════════════════════════════════════════════════════════════
+// SESSION & TIME — LucidFlex: session through 4:45 PM ET
+// ═══════════════════════════════════════════════════════════════════
+
+// FIX #2: Extended session for LucidFlex (was 0930-1545)
+in_session = not na(time(timeframe.period, "0930-1645:23456", "America/New_York"))
+
+// FIX #1: IB period = 9:30-10:00 ET = 2 bars on 15m chart
+// Python: hhmm < 1000 captures 9:30 bar AND 9:45 bar
+// Old Pine had "0930-0945" which only captured the 9:30 bar
+in_ib_period = not na(time(timeframe.period, "0930-0959:23456", "America/New_York"))
+
+// FIX #3: Post-IB trading window extended (was 1000-1530)
+post_ib = not na(time(timeframe.period, "1000-1630:23456", "America/New_York"))
+
+// FIX #4: EOD flatten at 4:45 PM (was 3:45 PM)
+t_et = time("1", "0000-0000:1234567", "America/New_York")
+hour_et = hour(t_et, "America/New_York")
+min_et  = minute(t_et, "America/New_York")
+at_eod  = hour_et == 16 and min_et >= 45
+
+is_new_day = ta.change(time("D")) != 0
+
+// ═══════════════════════════════════════════════════════════════════
+// INDICATORS
+// ═══════════════════════════════════════════════════════════════════
+
+rsi_val = ta.rsi(close, rsi_period)
+atr_val = ta.atr(14)
+ema21 = ta.ema(close, 21)
+avg_vol = ta.sma(volume, 20)
+
+// ═══════════════════════════════════════════════════════════════════
+// STRATEGY 1: RSI EXTREMES
+// Python: fires every bar RSI is in the zone (level check, not crossover)
+// ═══════════════════════════════════════════════════════════════════
+
+rsi_long_sig  = enable_rsi and in_session and rsi_val < rsi_oversold
+rsi_short_sig = enable_rsi and in_session and rsi_val > rsi_overbought
+
+var int rsi_entry_bar = 0
+
+if rsi_long_sig and strategy.opentrades.size(strategy.opentrades - 1) == 0
+    strategy.entry("RSI_L", strategy.long, qty=contracts)
+    rsi_entry_bar := bar_index + 1
+
+if rsi_short_sig and strategy.opentrades.size(strategy.opentrades - 1) == 0
+    strategy.entry("RSI_S", strategy.short, qty=contracts)
+    rsi_entry_bar := bar_index + 1
+
+if strategy.position_size > 0 and strategy.opentrades.entry_id(strategy.opentrades - 1) == "RSI_L"
+    strategy.exit("RSI_LX", "RSI_L",
+         stop=strategy.opentrades.entry_price(strategy.opentrades - 1) - rsi_sl_pts,
+         limit=strategy.opentrades.entry_price(strategy.opentrades - 1) + rsi_tp_pts)
+
+if strategy.position_size < 0 and strategy.opentrades.entry_id(strategy.opentrades - 1) == "RSI_S"
+    strategy.exit("RSI_SX", "RSI_S",
+         stop=strategy.opentrades.entry_price(strategy.opentrades - 1) + rsi_sl_pts,
+         limit=strategy.opentrades.entry_price(strategy.opentrades - 1) - rsi_tp_pts)
+
+if strategy.position_size != 0 and rsi_entry_bar > 0
+    entry_id = strategy.opentrades.entry_id(strategy.opentrades - 1)
+    if (entry_id == "RSI_L" or entry_id == "RSI_S") and bar_index - rsi_entry_bar >= rsi_max_hold
+        strategy.close(entry_id, comment="RSI MaxHold")
+
+// ═══════════════════════════════════════════════════════════════════
+// STRATEGY 2: IB BREAKOUT
+// Python: IB = high/low of all bars where hhmm < 1000
+// Breakout: high > IB high (bar wick, not close)
+// 1 trade per day, percentile filter on IB range
+// ═══════════════════════════════════════════════════════════════════
+
+var float ib_high = na
+var float ib_low  = na
+var bool  ib_complete = false
+var bool  ib_traded_today = false
+var array<float> ib_range_history = array.new_float(0)
+
+if is_new_day
+    ib_high := na
+    ib_low := na
+    ib_complete := false
+    ib_traded_today := false
+
+// Build IB — now captures both 9:30 and 9:45 bars (FIX #1)
+if in_ib_period
+    if na(ib_high)
+        ib_high := high
+        ib_low := low
+    else
+        ib_high := math.max(ib_high, high)
+        ib_low := math.min(ib_low, low)
+
+if not in_ib_period and not na(ib_high) and not ib_complete
+    ib_complete := true
+    float ib_r = ib_high - ib_low
+    if ib_r > 0
+        array.push(ib_range_history, ib_r)
+        if array.size(ib_range_history) > 50
+            array.shift(ib_range_history)
+
+float ib_range = ib_complete ? ib_high - ib_low : na
+
+bool ib_range_ok = false
+if ib_complete and not na(ib_range) and ib_range >= ib_min_range
+    if ib_use_filter and array.size(ib_range_history) > 20
+        float p25 = array.percentile_nearest_rank(ib_range_history, 25)
+        float p75 = array.percentile_nearest_rank(ib_range_history, 75)
+        ib_range_ok := ib_range >= p25 and ib_range <= p75
+    else
+        ib_range_ok := true
+
+bool ib_long_sig  = enable_ib and post_ib and ib_complete and not ib_traded_today and ib_range_ok and high > ib_high
+bool ib_short_sig = enable_ib and post_ib and ib_complete and not ib_traded_today and ib_range_ok and low < ib_low
+
+var int ib_entry_bar = 0
+
+if ib_long_sig and strategy.opentrades.size(strategy.opentrades - 1) == 0
+    strategy.entry("IB_L", strategy.long, qty=contracts)
+    ib_entry_bar := bar_index + 1
+    ib_traded_today := true
+
+if ib_short_sig and strategy.opentrades.size(strategy.opentrades - 1) == 0
+    strategy.entry("IB_S", strategy.short, qty=contracts)
+    ib_entry_bar := bar_index + 1
+    ib_traded_today := true
+
+if strategy.position_size > 0 and strategy.opentrades.entry_id(strategy.opentrades - 1) == "IB_L"
+    strategy.exit("IB_LX", "IB_L",
+         stop=strategy.opentrades.entry_price(strategy.opentrades - 1) - ib_sl_pts,
+         limit=strategy.opentrades.entry_price(strategy.opentrades - 1) + ib_tp_pts)
+
+if strategy.position_size < 0 and strategy.opentrades.entry_id(strategy.opentrades - 1) == "IB_S"
+    strategy.exit("IB_SX", "IB_S",
+         stop=strategy.opentrades.entry_price(strategy.opentrades - 1) + ib_sl_pts,
+         limit=strategy.opentrades.entry_price(strategy.opentrades - 1) - ib_tp_pts)
+
+if strategy.position_size != 0 and ib_entry_bar > 0
+    entry_id = strategy.opentrades.entry_id(strategy.opentrades - 1)
+    if (entry_id == "IB_L" or entry_id == "IB_S") and bar_index - ib_entry_bar >= ib_max_hold
+        strategy.close(entry_id, comment="IB MaxHold")
+
+// ═══════════════════════════════════════════════════════════════════
+// STRATEGY 3: MOMENTUM BAR
+// Python: range > 1.0 * ATR(14), vol > 1.0 * SMA(vol,20)
+// Bar dir must agree with EMA(21) trend
+// ═══════════════════════════════════════════════════════════════════
+
+float bar_range = high - low
+bool is_momentum_bar = bar_range > mom_atr_mult * atr_val and volume > mom_vol_mult * avg_vol and not na(atr_val) and not na(avg_vol)
+
+int bar_dir   = close > open ? 1 : -1
+int trend_dir = close > ema21 ? 1 : -1
+bool dir_agrees = bar_dir == trend_dir
+
+bool mom_long_sig  = enable_mom and in_session and is_momentum_bar and dir_agrees and bar_dir == 1
+bool mom_short_sig = enable_mom and in_session and is_momentum_bar and dir_agrees and bar_dir == -1
+
+var int mom_entry_bar = 0
+
+if mom_long_sig and strategy.opentrades.size(strategy.opentrades - 1) == 0
+    strategy.entry("MOM_L", strategy.long, qty=contracts)
+    mom_entry_bar := bar_index + 1
+
+if mom_short_sig and strategy.opentrades.size(strategy.opentrades - 1) == 0
+    strategy.entry("MOM_S", strategy.short, qty=contracts)
+    mom_entry_bar := bar_index + 1
+
+if strategy.position_size > 0 and strategy.opentrades.entry_id(strategy.opentrades - 1) == "MOM_L"
+    strategy.exit("MOM_LX", "MOM_L",
+         stop=strategy.opentrades.entry_price(strategy.opentrades - 1) - mom_sl_pts,
+         limit=strategy.opentrades.entry_price(strategy.opentrades - 1) + mom_tp_pts)
+
+if strategy.position_size < 0 and strategy.opentrades.entry_id(strategy.opentrades - 1) == "MOM_S"
+    strategy.exit("MOM_SX", "MOM_S",
+         stop=strategy.opentrades.entry_price(strategy.opentrades - 1) + mom_sl_pts,
+         limit=strategy.opentrades.entry_price(strategy.opentrades - 1) - mom_tp_pts)
+
+if strategy.position_size != 0 and mom_entry_bar > 0
+    entry_id = strategy.opentrades.entry_id(strategy.opentrades - 1)
+    if (entry_id == "MOM_L" or entry_id == "MOM_S") and bar_index - mom_entry_bar >= mom_max_hold
+        strategy.close(entry_id, comment="MOM MaxHold")
+
+// ═══════════════════════════════════════════════════════════════════
+// EOD FLATTEN — LucidFlex at 4:45 PM ET
+// ═══════════════════════════════════════════════════════════════════
+
+if at_eod and strategy.position_size != 0
+    strategy.close_all(comment="EOD Flatten")
+
+// ═══════════════════════════════════════════════════════════════════
+// VISUALS
+// ═══════════════════════════════════════════════════════════════════
+
+plotshape(rsi_long_sig and strategy.position_size == 0, style=shape.triangleup,
+     location=location.belowbar, color=color.new(color.green, 20), size=size.small, text="RSI")
+plotshape(rsi_short_sig and strategy.position_size == 0, style=shape.triangledown,
+     location=location.abovebar, color=color.new(color.red, 20), size=size.small, text="RSI")
+
+plotshape(ib_long_sig and strategy.position_size == 0, style=shape.triangleup,
+     location=location.belowbar, color=color.new(color.blue, 20), size=size.small, text="IB")
+plotshape(ib_short_sig and strategy.position_size == 0, style=shape.triangledown,
+     location=location.abovebar, color=color.new(color.blue, 20), size=size.small, text="IB")
+
+plotshape(mom_long_sig and strategy.position_size == 0, style=shape.triangleup,
+     location=location.belowbar, color=color.new(color.orange, 20), size=size.small, text="MOM")
+plotshape(mom_short_sig and strategy.position_size == 0, style=shape.triangledown,
+     location=location.abovebar, color=color.new(color.orange, 20), size=size.small, text="MOM")
+
+plot(ib_complete and post_ib ? ib_high : na, "IB High", color=color.new(color.blue, 50), style=plot.style_linebr, linewidth=2)
+plot(ib_complete and post_ib ? ib_low : na, "IB Low", color=color.new(color.blue, 50), style=plot.style_linebr, linewidth=2)
+plot(ema21, "EMA 21", color=color.new(color.gray, 60), linewidth=1)
+bgcolor(in_ib_period ? color.new(color.blue, 95) : na)
+
+// ═══════════════════════════════════════════════════════════════════
+// INFO TABLE
+// ═══════════════════════════════════════════════════════════════════
+
+var table info = table.new(position.top_right, 2, 7, bgcolor=color.new(color.gray, 90))
+if barstate.islast
+    table.cell(info, 0, 0, "HTF Swing v3 LF", text_color=color.white, bgcolor=color.new(color.blue, 30))
+    table.cell(info, 1, 0, str.tostring(contracts) + " MNQ each", text_color=color.white, bgcolor=color.new(color.blue, 30))
+    table.cell(info, 0, 1, "RSI(" + str.tostring(rsi_period) + ")")
+    table.cell(info, 1, 1, enable_rsi ? "ON" : "OFF", text_color=enable_rsi ? color.green : color.red)
+    table.cell(info, 0, 2, "IB Breakout")
+    table.cell(info, 1, 2, enable_ib ? "ON" : "OFF", text_color=enable_ib ? color.green : color.red)
+    table.cell(info, 0, 3, "Momentum")
+    table.cell(info, 1, 3, enable_mom ? "ON" : "OFF", text_color=enable_mom ? color.green : color.red)
+    table.cell(info, 0, 4, "Session")
+    table.cell(info, 1, 4, in_session ? "ACTIVE" : "CLOSED", text_color=in_session ? color.green : color.gray)
+    table.cell(info, 0, 5, "IB Range")
+    table.cell(info, 1, 5, ib_complete ? str.tostring(ib_range, "#.##") : "building...")
+    table.cell(info, 0, 6, "Note")
+    table.cell(info, 1, 6, "Free plan: 1 pos", text_color=color.orange)
