@@ -87,7 +87,7 @@ class DashboardExecutor(TradovateExecutor):
         await super()._execute_signal(signal, open_price)
 
         # Check if fill happened
-        record = self.strategy_orders.get(signal.strategy) if self.master_executor else None
+        record = self.master_executor.strategy_orders.get(signal.strategy) if self.master_executor else None
         if record and record.fill_price:
             self._push({
                 "type": "fill",

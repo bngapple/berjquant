@@ -57,8 +57,8 @@ export function Layout() {
           style={{ background: "var(--bg)", borderRight: "1px solid var(--border)" }}>
           <div className="flex-1 py-3 flex flex-col gap-0.5">
             {nav.map(n => (
-              <NavLink key={n.to} to={n.to} end={n.to === "/"} title={n.label}
-                className={({ isActive }) => `flex items-center h-10 gap-3 text-[13px] whitespace-nowrap ${isActive ? "text-white" : "text-zinc-500 hover:text-zinc-300"}`}
+              <NavLink key={n.to} to={n.to} end={n.to === "/"}
+                className={({ isActive }) => `relative flex items-center h-10 gap-3 text-[13px] whitespace-nowrap ${isActive ? "text-white" : "text-zinc-500 hover:text-zinc-300"}`}
                 style={({ isActive }) => ({ paddingLeft: isActive ? 13 : 16, borderLeft: isActive ? "3px solid rgba(255,255,255,0.5)" : "3px solid transparent" })}>
                 <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round" className="shrink-0">
                   <path d={n.d} />

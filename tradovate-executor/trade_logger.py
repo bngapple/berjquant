@@ -194,6 +194,35 @@ class TradeLogger:
         return trade.pnl_total
 
     def get_slippage_summary(self) -> dict:
-        """Return aggregate slippage stats for the day."""
-        # Would iterate over today's CSV — simplified here
-        return {"avg_slippage_pts": 0.0, "max_slippage_pts": 0.0, "total_trades": 0}
+        """Return aggregate slippage stats for today's trades by parsing today's CSV."""
+        now = datetime.now(ET)
+        path = self._csv_path(now)
+
+        if not os.path.exists(path):
+            return {"avg_slippage_pts": 0.0, "max_slippage_pts": 0.0, "total_trades": 0}
+
+        total_slip = 0.0
+        max_slip = 0.0
+        count = 0
+
+        try:
+            with open(path, newline="") as f:
+                reader = csv.DictReader(f)
+                for row in reader:
+                    if row.get("action") == "Entry":
+                        try:
+                            slip = float(row.get("slippage_pts", 0) or 0)
+                            total_slip += slip
+                            max_slip = max(max_slip, slip)
+                            count += 1
+                        except (ValueError, TypeError):
+                            pass
+        except (OSError, csv.Error) as e:
+            logger.warning(f"[LOG] Could not read slippage data: {e}")
+
+        avg = total_slip / count if count > 0 else 0.0
+        return {
+            "avg_slippage_pts": round(avg, 3),
+            "max_slippage_pts": round(max_slip, 3),
+            "total_trades": count,
+        }

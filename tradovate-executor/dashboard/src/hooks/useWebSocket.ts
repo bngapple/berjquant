@@ -3,7 +3,7 @@ import type { Position, PnL, Signal, Trade, EngineStatus, EquityPoint, WSData } 
 
 export function useWebSocket(): WSData {
   const wsRef = useRef<WebSocket | null>(null);
-  const reconnectRef = useRef<ReturnType<typeof setTimeout>>();
+  const reconnectRef = useRef<ReturnType<typeof setTimeout>>(undefined);
   const [connected, setConnected] = useState(false);
   const [status, setStatus] = useState<EngineStatus | null>(null);
   const [positions, setPositions] = useState<Record<string, Position | null>>({});

@@ -186,7 +186,13 @@ class AppConfig:
         return [a for a in self.accounts if not a.is_master]
 
     def save(self, path: str = "config.json"):
-        """Save config to JSON (WARNING: contains credentials)."""
+        """
+        Save non-sensitive config to JSON.
+        Credentials (password, sec) are intentionally omitted — manage
+        accounts via the dashboard server's config_store (which handles
+        Fernet encryption). This method is only used to write a sample
+        config on first run.
+        """
         data = {
             "environment": self.environment.value,
             "symbol": self.symbol,
@@ -196,12 +202,12 @@ class AppConfig:
             data["accounts"].append({
                 "name": acct.name,
                 "username": acct.username,
-                "password": acct.password,
+                "password": "",   # Never written in plaintext — use config_store
                 "device_id": acct.device_id,
                 "app_id": acct.app_id,
                 "app_version": acct.app_version,
                 "cid": acct.cid,
-                "sec": acct.sec,
+                "sec": "",        # Never written in plaintext — use config_store
                 "is_master": acct.is_master,
                 "sizing_mode": acct.sizing_mode.value,
                 "account_size": acct.account_size,

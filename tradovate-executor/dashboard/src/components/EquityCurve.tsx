@@ -12,27 +12,25 @@ export function EquityCurve({ data }: Props) {
   const cutoff = { "1W": 100, "1M": 150, "3M": 180, "ALL": 999 }[tab];
   const filtered = data.slice(-cutoff);
 
-  // Seed mock equity curve when no data
-  const displayData = filtered.length >= 2 ? filtered : (() => {
-    const seed: EquityPoint[] = [];
-    let val = 0;
-    for (let i = 0; i < 40; i++) {
-      val += (Math.random() - 0.45) * 30;
-      seed.push({ time: `${9 + Math.floor(i / 4)}:${String((i % 4) * 15).padStart(2, "0")}`, value: Math.round(val * 100) / 100 });
-    }
-    return seed;
-  })();
-  const latest = displayData[displayData.length - 1]?.value ?? 0;
+  if (filtered.length < 2) {
+    return (
+      <div className="h-full flex items-center justify-center text-xs" style={{ color: "var(--text-dim)" }}>
+        No data
+      </div>
+    );
+  }
+
+  const latest = filtered[filtered.length - 1]?.value ?? 0;
   const isPos = latest >= 0;
   const color = isPos ? "#00d4aa" : "#ef4444";
 
   return (
     <div className="h-full flex flex-col">
-      <div className="flex gap-1 mb-2">
+      <div className="flex gap-1 mb-1.5">
         {TABS.map(t => (
           <button key={t} onClick={() => setTab(t)}
-            className="px-2.5 py-0.5 text-[10px] font-medium rounded-full transition-colors"
-            style={{ background: tab === t ? "var(--accent)" : "transparent", color: tab === t ? "#0d0d0d" : "var(--text-muted)" }}>
+            className="px-2 py-0.5 text-[10px] font-medium rounded transition-colors"
+            style={{ background: tab === t ? "rgba(255,255,255,0.08)" : "transparent", color: tab === t ? "var(--text)" : "var(--text-muted)" }}>
             {t}
           </button>
         ))}
@@ -43,7 +41,7 @@ export function EquityCurve({ data }: Props) {
 
       <div className="flex-1">
         <ResponsiveContainer width="100%" height="100%">
-          <AreaChart data={displayData} margin={{ top: 4, right: 4, left: -16, bottom: 0 }}>
+          <AreaChart data={filtered} margin={{ top: 4, right: 4, left: -16, bottom: 0 }}>
             <defs>
               <linearGradient id="eqGrad" x1="0" y1="0" x2="0" y2="1">
                 <stop offset="0%" stopColor={color} stopOpacity={0.2} />
@@ -53,7 +51,7 @@ export function EquityCurve({ data }: Props) {
             <CartesianGrid strokeDasharray="3 3" stroke="rgba(255,255,255,0.03)" vertical={false} />
             <XAxis dataKey="time" axisLine={false} tickLine={false} tick={{ fill: "var(--text-dim)", fontSize: 9 }} interval="preserveStartEnd" minTickGap={60} />
             <YAxis axisLine={false} tickLine={false} tick={{ fill: "var(--text-dim)", fontSize: 9 }} tickFormatter={(v: number) => `$${v.toFixed(0)}`} orientation="right" />
-            <Tooltip contentStyle={{ background: "var(--elevated)", border: "1px solid var(--border-strong)", borderRadius: 6, fontSize: 11, color: "var(--text)" }} formatter={(v: number) => [`$${v.toFixed(2)}`, "P&L"]} labelStyle={{ color: "var(--text-muted)" }} />
+            <Tooltip contentStyle={{ background: "var(--elevated)", border: "1px solid var(--border-strong)", borderRadius: 4, fontSize: 11, color: "var(--text)" }} formatter={(v) => [`$${Number(v).toFixed(2)}`, "P&L"]} labelStyle={{ color: "var(--text-muted)" }} />
             <ReferenceLine y={0} stroke="rgba(255,255,255,0.06)" strokeDasharray="3 3" />
             <Area type="monotone" dataKey="value" stroke={color} strokeWidth={1.5} fill="url(#eqGrad)" dot={false} activeDot={{ r: 3, fill: color }} />
           </AreaChart>

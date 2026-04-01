@@ -7,6 +7,7 @@
   --border: rgba(255,255,255,0.05);
   --border-strong: rgba(255,255,255,0.1);
   --accent: #00d4aa;
+  --accent-muted: #00b894;
   --red: #ef4444;
   --amber: #f59e0b;
   --blue: #3b82f6;
@@ -51,6 +52,3 @@ button, a { transition: all 150ms ease-out; }
 
 @keyframes pulse-dot { 0%,100% { opacity: 0.7; } 50% { opacity: 1; } }
 .pulse-dot { animation: pulse-dot 2s ease-in-out infinite; }
-
-.cal-cell { transition: transform 100ms ease, box-shadow 100ms ease; }
-.cal-cell:hover { transform: scale(1.5); z-index: 10; box-shadow: 0 0 8px rgba(0,0,0,0.6); }

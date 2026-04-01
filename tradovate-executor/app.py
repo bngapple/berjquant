@@ -202,12 +202,16 @@ class TradovateExecutor:
     async def _sync_positions(self):
         """Check for existing positions from a previous session."""
         syncer = PositionSync(self.config)
+        saved_state = self.state_file.load()  # Load crash-recovery state for strategy identification
+        if saved_state:
+            active = [s for s, v in saved_state.items() if v is not None]
+            logger.info(f"[Sync] StateFile found — active strategies: {active or 'none'}")
 
         all_executors = {"master": self.master_executor}
         for name, executor in self.copy_engine.executors.items():
             all_executors[name] = executor
 
-        summaries = await syncer.sync_all(all_executors, self.signal_engine)
+        summaries = await syncer.sync_all(all_executors, self.signal_engine, saved_state)
         for s in summaries:
             if s["actions_taken"]:
                 logger.info(f"[Sync] {s['account']}: {s['actions_taken']}")

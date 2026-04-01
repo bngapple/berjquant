@@ -1,137 +1,227 @@
 import { useState, useEffect, useMemo } from "react";
 import { useLayoutData } from "../hooks/useLayoutData";
 import { api } from "../api/client";
-import type { Account, Trade } from "../types";
+import type { Account, AccountStatus } from "../types";
 
 export function Cockpit() {
-  const { status, positions, pnl, trades } = useLayoutData();
+  const { status, trades } = useLayoutData();
   const [accounts, setAccounts] = useState<Account[]>([]);
+  const [accountStatuses, setAccountStatuses] = useState<AccountStatus[]>([]);
+  const [expandedAccount, setExpandedAccount] = useState<string | null>(null);
 
-  useEffect(() => { api.getAccounts().then(setAccounts).catch(console.error); }, []);
+  useEffect(() => {
+    api.getAccounts().then(setAccounts).catch(console.error);
+    api.getAccountStatuses().then(setAccountStatuses).catch(() => {});
+  }, []);
+
+  // Refresh statuses periodically
+  useEffect(() => {
+    const interval = setInterval(() => {
+      api.getAccountStatuses().then(setAccountStatuses).catch(() => {});
+    }, 30000);
+    return () => clearInterval(interval);
+  }, []);
 
   const running = status?.running ?? false;
 
   const rows = useMemo(() => {
-    const activePos = Object.values(positions).filter(p => p !== null);
-    const netContracts = activePos.reduce((s, p) => s + (p!.contracts * (p!.side === "Buy" ? 1 : -1)), 0);
-    const openPnl = activePos.reduce((s, p) => s + p!.pnl, 0);
-    const dayPnl = pnl?.daily ?? 0;
-    const lastTrade = trades.length > 0 ? trades[trades.length - 1] : null;
-
     return accounts.map(acct => {
-      const isLeader = acct.is_master;
       const connected = status?.connected_accounts.find(a => a.name === acct.name)?.connected ?? false;
-      const scale = acct.sizing_mode === "mirror" ? 1 : acct.sizing_mode === "scaled" ? acct.account_size / 150000 : 1;
+      const acctStatus = accountStatuses.find(s => s.name === acct.name);
       return {
-        name: acct.name, isLeader, sizing: acct.sizing_mode, connected,
+        name: acct.name,
+        isLeader: acct.is_master,
+        sizing: acct.sizing_mode,
+        connected,
         fixedSizes: acct.fixed_sizes,
-        position: isLeader ? netContracts : Math.round(netContracts * scale),
-        openPnl: isLeader ? openPnl : openPnl * scale * (0.9 + Math.random() * 0.2),
-        dayPnl: isLeader ? dayPnl : dayPnl * scale * (0.9 + Math.random() * 0.2),
-        lastFill: lastTrade,
+        dayPnl: acctStatus?.daily_pnl ?? 0,
+        totalPnl: acctStatus?.pnl_total ?? 0,
+        tradesToday: acctStatus?.trades_today ?? 0,
+        status: acctStatus,
       };
     });
-  }, [accounts, status, positions, pnl, trades]);
+  }, [accounts, status, accountStatuses]);
 
   const fleet = useMemo(() => {
     const connected = rows.filter(r => r.connected).length;
-    const withPos = rows.filter(r => r.position !== 0).length;
-    const totalContracts = rows.reduce((s, r) => s + Math.abs(r.position), 0);
     const fleetDayPnl = rows.reduce((s, r) => s + r.dayPnl, 0);
-    const fleetMonthPnl = (pnl?.monthly ?? 0) * rows.length * 0.85;
-    return { connected, total: rows.length, withPos, totalContracts, fleetDayPnl, fleetMonthPnl };
-  }, [rows, pnl]);
+    const fleetTotalPnl = rows.reduce((s, r) => s + r.totalPnl, 0);
+    return { connected, total: rows.length, fleetDayPnl, fleetTotalPnl };
+  }, [rows]);
 
   const copyFeed = useMemo(() => {
-    return [...trades].reverse().slice(0, 10).map((t, i) => {
-      const target = accounts[1 + (i % Math.max(accounts.length - 1, 1))]?.name ?? "copy-1";
-      const success = Math.random() > 0.1;
-      return { ...t, target, success, id: i };
-    });
-  }, [trades, accounts]);
+    // Only show real trades from the WS feed
+    return [...trades].reverse().slice(0, 10);
+  }, [trades]);
 
   const fmt = (v: number) => `${v >= 0 ? "+" : ""}$${Math.abs(v).toFixed(2)}`;
   const clr = (v: number) => v >= 0 ? "var(--accent)" : "var(--red)";
 
   return (
-    <div className="p-5 space-y-4 max-w-[1440px] mx-auto">
+    <div className="p-5 space-y-3 max-w-[1440px] mx-auto">
       <div className="flex items-center justify-between">
-        <div className="flex items-center gap-4">
-          <span className="text-sm font-semibold" style={{ color: "var(--text)" }}>LucidFlex 150K Fleet</span>
-          <span className="text-xs" style={{ color: "var(--text-muted)" }}>{fleet.total} accounts</span>
-          <span className="text-xs" style={{ color: "var(--text-muted)" }}>{fleet.withPos} active</span>
-          <span className="text-xs font-mono tabular" style={{ color: clr(fleet.fleetDayPnl) }}>Fleet: {fmt(fleet.fleetDayPnl)}</span>
+        <span className="text-sm font-semibold" style={{ color: "var(--text)" }}>LucidFlex 150K Fleet</span>
+        <div className="flex items-center gap-4 text-xs">
+          <span style={{ color: "var(--text-muted)" }}>{running ? "Engine Running" : "Engine Stopped"}</span>
+          <span className="font-mono tabular" style={{ color: clr(fleet.fleetDayPnl) }}>Fleet: {fmt(fleet.fleetDayPnl)}</span>
         </div>
       </div>
 
       <div className="panel rounded overflow-hidden">
         <table className="w-full text-[11px]">
           <thead><tr style={{ color: "var(--text-dim)", borderBottom: "1px solid var(--border)" }}>
-            <th className="text-left font-normal px-4 py-2.5">Status</th>
-            <th className="text-left font-normal px-3 py-2.5">Account</th>
-            <th className="text-left font-normal px-3 py-2.5">Role</th>
-            <th className="text-left font-normal px-3 py-2.5">Sizing</th>
-            <th className="text-left font-normal px-3 py-2.5">Position</th>
-            <th className="text-right font-normal px-3 py-2.5">Open P&L</th>
-            <th className="text-right font-normal px-3 py-2.5">Day P&L</th>
-            <th className="text-right font-normal px-4 py-2.5">Last Fill</th>
+            <th className="text-left font-normal px-4 py-2">Status</th>
+            <th className="text-left font-normal px-3 py-2">Account</th>
+            <th className="text-left font-normal px-3 py-2">Role</th>
+            <th className="text-left font-normal px-3 py-2">Type</th>
+            <th className="text-right font-normal px-3 py-2">Day P&L</th>
+            <th className="text-right font-normal px-3 py-2">Total P&L</th>
+            <th className="text-right font-normal px-3 py-2">Trades</th>
+            <th className="text-right font-normal px-4 py-2">DD Used</th>
           </tr></thead>
           <tbody>
+            {rows.length === 0 && <tr><td colSpan={8} className="px-4 py-6 text-center text-xs" style={{ color: "var(--text-dim)" }}>No accounts configured</td></tr>}
             {rows.map(row => (
-              <tr key={row.name} style={{
-                background: row.isLeader ? "var(--elevated)" : "var(--panel)",
-                borderTop: "1px solid var(--border)",
-                borderLeft: row.isLeader ? "3px solid var(--accent)" : "3px solid transparent",
-              }}>
-                <td className="px-4 py-2.5">
-                  <span className={`w-2 h-2 rounded-full inline-block ${row.connected ? "bg-emerald-400 pulse-dot" : "bg-red-500"}`} />
-                </td>
-                <td className="px-3 py-2.5 font-medium" style={{ color: "var(--text)" }}>{row.name}</td>
-                <td className="px-3 py-2.5">
-                  <span className="px-2 py-0.5 rounded text-[9px] font-semibold"
-                    style={row.isLeader ? { background: "rgba(0,212,170,0.15)", color: "var(--accent)" } : { background: "transparent", color: "var(--text-muted)", border: "1px solid var(--border)" }}>
-                    {row.isLeader ? "Leader" : "Follower"}
-                  </span>
-                </td>
-                <td className="px-3 py-2.5" style={{ color: "var(--text-muted)" }}>
-                  {row.sizing === "mirror" ? "Mirror" : row.sizing === "fixed" ? `Fixed (${Object.values(row.fixedSizes).join("/")})` : "Scaled"}
-                </td>
-                <td className="px-3 py-2.5 font-mono tabular" style={{ color: row.position > 0 ? "var(--accent)" : row.position < 0 ? "var(--red)" : "var(--text-dim)" }}>
-                  {row.position > 0 ? `+${row.position} LONG` : row.position < 0 ? `${row.position} SHORT` : "FLAT"}
-                </td>
-                <td className="px-3 py-2.5 text-right font-mono tabular" style={{ color: clr(row.openPnl) }}>{fmt(row.openPnl)}</td>
-                <td className="px-3 py-2.5 text-right font-mono tabular" style={{ color: clr(row.dayPnl) }}>{fmt(row.dayPnl)}</td>
-                <td className="px-4 py-2.5 text-right font-mono tabular" style={{ color: "var(--text-muted)" }}>
-                  {row.lastFill ? `${row.lastFill.timestamp?.split("T")[1]?.slice(0, 8)} @${row.lastFill.fill_price?.toFixed(2) ?? row.lastFill.exit_price?.toFixed(2) ?? "\u2014"}` : "\u2014"}
-                </td>
-              </tr>
+              <>
+                <tr key={row.name}
+                  className="cursor-pointer transition-colors hover:bg-white/[0.02]"
+                  onClick={() => setExpandedAccount(expandedAccount === row.name ? null : row.name)}
+                  style={{
+                    background: row.isLeader ? "var(--elevated)" : "var(--panel)",
+                    borderTop: "1px solid var(--border)",
+                    borderLeft: row.isLeader ? "3px solid var(--accent)" : "3px solid transparent",
+                  }}>
+                  <td className="px-4 py-2">
+                    <span className={`w-2 h-2 rounded-full inline-block ${row.connected ? "bg-emerald-400 pulse-dot" : running ? "bg-red-500" : "bg-zinc-600"}`} />
+                  </td>
+                  <td className="px-3 py-2 font-medium" style={{ color: "var(--text)" }}>{row.name}</td>
+                  <td className="px-3 py-2">
+                    <span className="px-2 py-0.5 rounded text-[9px] font-semibold"
+                      style={row.isLeader ? { background: "rgba(0,212,170,0.15)", color: "#00b894" } : { background: "transparent", color: "var(--text-muted)", border: "1px solid var(--border)" }}>
+                      {row.isLeader ? "Leader" : "Follower"}
+                    </span>
+                  </td>
+                  <td className="px-3 py-2 capitalize text-[10px]" style={{ color: "var(--text-muted)" }}>{row.status?.account_type ?? "eval"}</td>
+                  <td className="px-3 py-2 text-right font-mono tabular" style={{ color: clr(row.dayPnl) }}>{fmt(row.dayPnl)}</td>
+                  <td className="px-3 py-2 text-right font-mono tabular" style={{ color: clr(row.totalPnl) }}>{fmt(row.totalPnl)}</td>
+                  <td className="px-3 py-2 text-right font-mono tabular" style={{ color: "var(--text)" }}>{row.tradesToday}</td>
+                  <td className="px-4 py-2 text-right">
+                    {row.status ? (
+                      <div className="flex items-center justify-end gap-2">
+                        <div className="w-16 h-1.5 rounded-full overflow-hidden" style={{ background: "rgba(255,255,255,0.04)" }}>
+                          <div className="h-full rounded-full" style={{
+                            width: `${Math.min(row.status.drawdown_pct_used, 100)}%`,
+                            background: row.status.drawdown_pct_used > 75 ? "var(--red)" : row.status.drawdown_pct_used > 50 ? "var(--amber)" : "var(--accent)",
+                          }} />
+                        </div>
+                        <span className="text-[10px] font-mono tabular w-8 text-right" style={{
+                          color: row.status.drawdown_pct_used > 75 ? "var(--red)" : row.status.drawdown_pct_used > 50 ? "var(--amber)" : "var(--text-muted)",
+                        }}>{row.status.drawdown_pct_used.toFixed(0)}%</span>
+                      </div>
+                    ) : <span style={{ color: "var(--text-dim)" }}>&mdash;</span>}
+                  </td>
+                </tr>
+                {/* Expanded detail panel */}
+                {expandedAccount === row.name && row.status && (
+                  <tr key={`${row.name}-detail`}>
+                    <td colSpan={8} style={{ background: "var(--elevated)", borderTop: "1px solid var(--border)" }}>
+                      <div className="px-6 py-3 flex gap-8 text-[11px]">
+                        <div>
+                          <div style={{ color: "var(--text-muted)" }}>Balance</div>
+                          <div className="font-mono font-semibold tabular" style={{ color: "var(--text)" }}>${row.status.balance.toLocaleString("en-US", { minimumFractionDigits: 2 })}</div>
+                        </div>
+                        <div>
+                          <div style={{ color: "var(--text-muted)" }}>P&L</div>
+                          <div className="font-mono font-semibold tabular" style={{ color: clr(row.status.pnl_total) }}>{fmt(row.status.pnl_total)}</div>
+                        </div>
+                        <div>
+                          <div style={{ color: "var(--text-muted)" }}>Drawdown</div>
+                          <div className="flex items-center gap-2">
+                            <span className="font-mono tabular" style={{ color: row.status.drawdown_current < 0 ? "var(--red)" : "var(--text)" }}>
+                              ${Math.abs(row.status.drawdown_current).toFixed(2)}
+                            </span>
+                            <span style={{ color: "var(--text-dim)" }}>/</span>
+                            <span className="font-mono tabular" style={{ color: "var(--text-muted)" }}>${Math.abs(row.status.drawdown_max_allowed).toFixed(0)}</span>
+                          </div>
+                          <div className="w-24 h-1.5 rounded-full overflow-hidden mt-1" style={{ background: "rgba(255,255,255,0.04)" }}>
+                            <div className="h-full rounded-full" style={{
+                              width: `${Math.min(row.status.drawdown_pct_used, 100)}%`,
+                              background: row.status.drawdown_pct_used > 75 ? "var(--red)" : row.status.drawdown_pct_used > 50 ? "var(--amber)" : "var(--accent)",
+                            }} />
+                          </div>
+                        </div>
+                        <div>
+                          <div style={{ color: "var(--text-muted)" }}>Remaining</div>
+                          <div className="font-mono tabular" style={{ color: "var(--text)" }}>${Math.abs(row.status.drawdown_remaining).toFixed(2)}</div>
+                        </div>
+                        {row.status.profit_target > 0 && (
+                          <div>
+                            <div style={{ color: "var(--text-muted)" }}>Profit Target</div>
+                            <div className="flex items-center gap-2">
+                              <span className="font-mono tabular" style={{ color: "var(--text)" }}>
+                                ${row.status.pnl_total.toFixed(0)} / ${row.status.profit_target.toFixed(0)}
+                              </span>
+                            </div>
+                            <div className="w-24 h-1.5 rounded-full overflow-hidden mt-1" style={{ background: "rgba(255,255,255,0.04)" }}>
+                              <div className="h-full rounded-full" style={{
+                                width: `${Math.min(Math.max(row.status.profit_target_progress, 0), 100)}%`,
+                                background: row.status.profit_target_progress >= 100 ? "#f59e0b" : "var(--accent)",
+                              }} />
+                            </div>
+                          </div>
+                        )}
+                        <div>
+                          <div style={{ color: "var(--text-muted)" }}>Daily P&L</div>
+                          <div className="font-mono font-semibold tabular" style={{ color: clr(row.status.daily_pnl) }}>{fmt(row.status.daily_pnl)}</div>
+                        </div>
+                        <div>
+                          <div style={{ color: "var(--text-muted)" }}>Today</div>
+                          <div style={{ color: "var(--text)" }}>{row.status.trades_today} trades</div>
+                        </div>
+                        <div>
+                          <div style={{ color: "var(--text-muted)" }}>Status</div>
+                          <span className="px-2 py-0.5 rounded text-[9px] font-semibold" style={{
+                            background: row.status.status === "active" ? "rgba(0,212,170,0.15)" : row.status.status === "eval_passed" ? "rgba(245,158,11,0.15)" : "rgba(239,68,68,0.15)",
+                            color: row.status.status === "active" ? "#00b894" : row.status.status === "eval_passed" ? "var(--amber)" : "var(--red)",
+                          }}>
+                            {row.status.status === "active" ? "Active" : row.status.status === "eval_passed" ? "Eval Passed" : row.status.status === "breached" ? "Breached" : "Daily Limit"}
+                          </span>
+                        </div>
+                      </div>
+                    </td>
+                  </tr>
+                )}
+              </>
             ))}
           </tbody>
         </table>
       </div>
 
-      <div className="flex items-center gap-6 px-4 py-2.5 text-[11px]" style={{ color: "var(--text-muted)" }}>
+      {/* Fleet strip */}
+      <div className="flex items-center gap-5 px-4 py-2 text-[11px]" style={{ color: "var(--text-muted)" }}>
         <span>Connected: <span style={{ color: "var(--text)" }}>{fleet.connected}/{fleet.total}</span></span>
-        <span>Open: <span style={{ color: "var(--text)" }}>{fleet.withPos}</span></span>
-        <span>Contracts: <span style={{ color: "var(--text)" }}>{fleet.totalContracts}</span></span>
+        <span>&middot;</span>
         <span>Day P&L: <span className="font-mono tabular" style={{ color: clr(fleet.fleetDayPnl) }}>{fmt(fleet.fleetDayPnl)}</span></span>
-        <span>Month P&L: <span className="font-mono tabular" style={{ color: clr(fleet.fleetMonthPnl) }}>{fmt(fleet.fleetMonthPnl)}</span></span>
+        <span>&middot;</span>
+        <span>Total P&L: <span className="font-mono tabular" style={{ color: clr(fleet.fleetTotalPnl) }}>{fmt(fleet.fleetTotalPnl)}</span></span>
       </div>
 
+      {/* Copy Activity */}
       <div className="panel rounded overflow-hidden">
-        <div className="px-4 py-2 text-[10px] font-normal tracking-wider" style={{ color: "var(--text-muted)", borderBottom: "1px solid var(--border)" }}>Copy Activity</div>
+        <div className="px-3 py-1.5 text-[10px] font-normal tracking-wider" style={{ color: "var(--text-muted)", borderBottom: "1px solid var(--border)" }}>Copy Activity</div>
         <div className="max-h-48 overflow-y-auto">
           {copyFeed.length === 0 ? (
             <div className="py-8 text-center text-xs" style={{ color: "var(--text-dim)" }}>No copy activity yet</div>
           ) : (
-            copyFeed.map(entry => (
-              <div key={entry.id} className="flex items-center gap-2 px-4 py-1 text-[11px]" style={{ borderBottom: "1px solid var(--border)" }}>
-                <span style={{ color: entry.success ? "var(--accent)" : "var(--red)" }}>{entry.success ? "\u2713" : "\u2717"}</span>
+            copyFeed.map((entry, i) => (
+              <div key={i} className="flex items-center gap-2 px-3 py-1 text-[11px]" style={{ borderBottom: "1px solid var(--border)" }}>
+                <span className="font-mono w-14 shrink-0 tabular" style={{ color: "var(--text-dim)" }}>{entry.timestamp?.split("T")[1]?.slice(0, 8)}</span>
                 <span style={{ color: "var(--text)" }}>
-                  {entry.action === "entry" ? `${entry.side} ${entry.contracts} MNQ @${entry.fill_price?.toFixed(2)}` : `Exit ${entry.strategy} @${entry.exit_price?.toFixed(2)}`}
+                  {entry.action === "entry" ? `${entry.side} ${entry.contracts} MNQ @${entry.fill_price?.toFixed(2) ?? "—"}` : `Exit ${entry.strategy} ${entry.exit_reason ?? ""}`}
                 </span>
-                <span style={{ color: "var(--text-dim)" }}>&rarr; {entry.target}</span>
-                {!entry.success && <span style={{ color: "var(--red)" }}>rejected</span>}
+                {entry.pnl !== undefined && entry.action === "exit" && (
+                  <span className="font-mono tabular" style={{ color: clr(entry.pnl) }}>{fmt(entry.pnl)}</span>
+                )}
               </div>
             ))
           )}

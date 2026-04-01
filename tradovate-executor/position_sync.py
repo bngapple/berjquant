@@ -32,6 +32,7 @@ class PositionSync:
         self,
         executor: OrderExecutor,
         signal_engine: Optional[SignalEngine] = None,
+        saved_state: Optional[dict] = None,
     ) -> dict:
         """
         Query positions and orders for one account, rebuild internal state.
@@ -80,7 +81,7 @@ class PositionSync:
         # 3. Reconcile state
         if position and net_pos != 0:
             await self._reconcile_with_position(
-                executor, signal_engine, position, working, summary
+                executor, signal_engine, position, working, summary, saved_state
             )
         elif not position and working:
             # No position but working orders → orphaned orders, cancel them
@@ -99,6 +100,7 @@ class PositionSync:
         position: dict,
         working_orders: list[dict],
         summary: dict,
+        saved_state: Optional[dict] = None,
     ):
         """
         We have an open position. Figure out which strategy it belongs to
@@ -169,22 +171,31 @@ class PositionSync:
 
         # Update signal engine position state if available
         if signal_engine and position and net_pos != 0:
-            # Mark that we have an active position
-            # We can't know the exact strategy, so mark a generic one
             side = Side.BUY if net_pos > 0 else Side.SELL
             if has_bracket:
-                signal_engine.mark_filled("SYNCED", side)
-                summary["actions_taken"].append("signal_engine_synced")
+                # Use saved state to identify which strategies had positions
+                recovered = [s for s, v in (saved_state or {}).items() if v is not None]
+                if recovered:
+                    for strategy in recovered:
+                        signal_engine.mark_filled(strategy, side)
+                        logger.info(f"[Sync][{account_name}] Restored strategy: {strategy}")
+                    summary["actions_taken"].append("signal_engine_synced")
+                else:
+                    logger.warning(
+                        f"[Sync][{account_name}] Open position found but no saved state — "
+                        f"signal engine will assume flat. Manual intervention may be needed."
+                    )
 
     async def sync_all(
         self,
         executors: dict[str, OrderExecutor],
         signal_engine: Optional[SignalEngine] = None,
+        saved_state: Optional[dict] = None,
     ) -> list[dict]:
         """Sync all accounts and return summaries."""
         summaries = []
         for name, executor in executors.items():
-            summary = await self.sync_account(executor, signal_engine)
+            summary = await self.sync_account(executor, signal_engine, saved_state)
             summaries.append(summary)
         return summaries
 

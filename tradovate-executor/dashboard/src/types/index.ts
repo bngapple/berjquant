@@ -9,6 +9,10 @@ export interface Account {
   sizing_mode: "mirror" | "fixed" | "scaled";
   account_size: number;
   fixed_sizes: Record<string, number>;
+  starting_balance: number;
+  profit_target: number;
+  max_drawdown: number;
+  account_type: "eval" | "funded";
 }
 
 export interface AccountCreate {
@@ -22,6 +26,10 @@ export interface AccountCreate {
   sizing_mode?: string;
   account_size?: number;
   fixed_sizes?: Record<string, number>;
+  starting_balance?: number;
+  profit_target?: number;
+  max_drawdown?: number;
+  account_type?: string;
 }
 
 export interface AuthTestResult {
@@ -43,6 +51,7 @@ export interface EngineStatus {
   positions: Record<string, Position | null>;
   pending_signals: number;
   connected_accounts: { name: string; connected: boolean }[];
+  error?: string;
 }
 
 export interface Position {
@@ -103,4 +112,44 @@ export interface WSData {
   signals: Signal[];
   trades: Trade[];
   equityHistory: EquityPoint[];
+}
+
+export interface AccountStatus {
+  name: string;
+  balance: number;
+  starting_balance: number;
+  pnl_total: number;
+  drawdown_current: number;
+  drawdown_max_allowed: number;
+  drawdown_remaining: number;
+  drawdown_pct_used: number;
+  profit_target: number;
+  profit_target_progress: number;
+  daily_pnl: number;
+  trades_today: number;
+  status: "active" | "eval_passed" | "breached" | "daily_limit_hit";
+  is_master: boolean;
+  account_type: "eval" | "funded";
+  environment: string;
+}
+
+export interface HistoryStats {
+  total_pnl: number;
+  win_rate: number | null;
+  profit_factor: number | null;
+  avg_win: number | null;
+  avg_loss: number | null;
+  total_trades: number;
+  winners: number;
+  losers: number;
+}
+
+export interface DailyPnL {
+  [date: string]: { pnl: number; trades: number; wins: number; losses: number };
+}
+
+export interface FleetAlert {
+  account: string;
+  type: "danger" | "warning" | "success";
+  message: string;
 }

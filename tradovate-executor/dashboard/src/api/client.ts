@@ -3,6 +3,10 @@ import type {
   AccountCreate,
   AuthTestResult,
   EngineStatus,
+  HistoryStats,
+  DailyPnL,
+  AccountStatus,
+  FleetAlert,
 } from "../types";
 
 const BASE = "/api";
@@ -21,6 +25,7 @@ async function request<T>(path: string, options?: RequestInit): Promise<T> {
 }
 
 export const api = {
+  // Accounts
   getAccounts: () => request<Account[]>("/accounts"),
 
   createAccount: (data: AccountCreate) =>
@@ -46,6 +51,7 @@ export const api = {
       body: JSON.stringify({ name }),
     }),
 
+  // Engine
   startEngine: () =>
     request<{ status: string }>("/engine/start", { method: "POST" }),
 
@@ -57,6 +63,7 @@ export const api = {
 
   getStatus: () => request<EngineStatus>("/engine/status"),
 
+  // Environment
   getEnvironment: () => request<{ environment: string }>("/environment"),
 
   setEnvironment: (env: string) =>
@@ -64,4 +71,26 @@ export const api = {
       method: "PUT",
       body: JSON.stringify({ environment: env }),
     }),
+
+  // History
+  getHistoryStats: () => request<HistoryStats>("/history/stats"),
+
+  getHistoryDaily: () => request<DailyPnL>("/history/daily"),
+
+  getHistoryEquity: () =>
+    request<{ date: string; value: number }[]>("/history/equity"),
+
+  getHistoryTrades: (limit = 50) =>
+    request<Record<string, unknown>[]>(`/history/trades?limit=${limit}`),
+
+  // Account status
+  getAccountStatuses: () => request<AccountStatus[]>("/accounts/status"),
+
+  getAccountStatus: (name: string) =>
+    request<AccountStatus>(`/accounts/status/${encodeURIComponent(name)}`),
+
+  getFleetAlerts: () => request<FleetAlert[]>("/accounts/alerts"),
+
+  // Health
+  getHealth: () => request<Record<string, unknown>>("/health"),
 };

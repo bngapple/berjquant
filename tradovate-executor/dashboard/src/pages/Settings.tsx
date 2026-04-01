@@ -6,14 +6,14 @@ export function Settings() {
   useEffect(() => { api.getEnvironment().then(d => setEnv(d.environment)); }, []);
 
   return (
-    <div className="p-5 max-w-[800px] mx-auto space-y-6">
+    <div className="p-5 max-w-[800px] mx-auto space-y-5">
       <Section title="Session">
         <div className="grid grid-cols-3" style={{ borderBottom: "1px solid var(--border)" }}>
           <BigStat label="Trading Session" value="9:30 – 4:45 ET" />
           <BigStat label="Daily Loss Limit" value="-$3,000" color="var(--red)" />
           <BigStat label="Monthly Loss Limit" value="-$4,500" color="var(--red)" />
         </div>
-        <div className="px-5 py-2.5 flex gap-6 text-[11px]" style={{ color: "var(--text-muted)" }}>
+        <div className="px-4 py-2 flex gap-6 text-[11px]" style={{ color: "var(--text-muted)" }}>
           <span>No new entries after 4:30 PM ET</span>
           <span>Flatten at 4:45 PM ET</span>
           <span>US/Eastern</span>
@@ -22,7 +22,7 @@ export function Settings() {
       </Section>
 
       <Section title="Contract">
-        <div className="px-5 py-3 flex items-center gap-6 text-xs">
+        <div className="px-4 py-3 flex items-center gap-6 text-xs">
           <span className="font-mono font-semibold" style={{ color: "var(--text)" }}>MNQM6</span>
           <span style={{ color: "var(--text-muted)" }}>MNQ Micro Nasdaq 100</span>
           <span className="ml-auto flex gap-4" style={{ color: "var(--text-muted)" }}>
@@ -34,18 +34,18 @@ export function Settings() {
       <Section title="Strategy Parameters">
         <table className="w-full text-[11px]">
           <thead><tr style={{ color: "var(--text-dim)", borderBottom: "1px solid var(--border)" }}>
-            <th className="text-left font-normal px-5 py-2.5 w-[35%]">Parameter</th>
-            <th className="text-center font-normal px-3 py-2.5">RSI</th>
-            <th className="text-center font-normal px-3 py-2.5">IB</th>
-            <th className="text-center font-normal px-3 py-2.5">MOM</th>
+            <th className="text-left font-normal px-4 py-2 w-[35%]">Parameter</th>
+            <th className="text-center font-normal px-3 py-2">RSI</th>
+            <th className="text-center font-normal px-3 py-2">IB</th>
+            <th className="text-center font-normal px-3 py-2">MOM</th>
           </tr></thead>
           <tbody>
             {PARAMS.map(([label, rsi, ib, mom], i) => (
               <tr key={label} style={{ background: i % 2 === 1 ? "rgba(255,255,255,0.015)" : "transparent", borderTop: "1px solid var(--border)" }}>
-                <td className="px-5 py-2" style={{ color: "var(--text-muted)" }}>{label}</td>
-                <td className="px-3 py-2 text-center font-mono tabular" style={{ color: "var(--text)" }}>{rsi}</td>
-                <td className="px-3 py-2 text-center font-mono tabular" style={{ color: "var(--text)" }}>{ib}</td>
-                <td className="px-3 py-2 text-center font-mono tabular" style={{ color: "var(--text)" }}>{mom}</td>
+                <td className="px-4 py-1.5" style={{ color: "var(--text-muted)" }}>{label}</td>
+                <td className="px-3 py-1.5 text-center font-mono tabular" style={{ color: "var(--text)" }}>{rsi}</td>
+                <td className="px-3 py-1.5 text-center font-mono tabular" style={{ color: "var(--text)" }}>{ib}</td>
+                <td className="px-3 py-1.5 text-center font-mono tabular" style={{ color: "var(--text)" }}>{mom}</td>
               </tr>
             ))}
           </tbody>
@@ -67,8 +67,8 @@ const PARAMS: [string, string, string, string][] = [
 
 function Section({ title, children }: { title: string; children: React.ReactNode }) {
   return (
-    <div className="panel rounded-lg overflow-hidden" style={{ borderTop: "2px solid var(--accent)" }}>
-      <div className="px-5 py-2.5 text-[10px] font-light uppercase tracking-widest" style={{ color: "var(--text-muted)", borderBottom: "1px solid var(--border)" }}>{title}</div>
+    <div className="panel rounded overflow-hidden" style={{ borderTop: "2px solid rgba(255,255,255,0.08)" }}>
+      <div className="px-4 py-2 text-[10px] font-normal uppercase tracking-widest" style={{ color: "var(--text-muted)", borderBottom: "1px solid var(--border)" }}>{title}</div>
       {children}
     </div>
   );
@@ -76,7 +76,7 @@ function Section({ title, children }: { title: string; children: React.ReactNode
 
 function BigStat({ label, value, color }: { label: string; value: string; color?: string }) {
   return (
-    <div className="px-5 py-4 text-center">
+    <div className="px-4 py-3 text-center">
       <div className="text-lg font-mono font-semibold tabular" style={{ color: color ?? "var(--text)" }}>{value}</div>
       <div className="text-[10px] mt-0.5 font-light" style={{ color: "var(--text-muted)" }}>{label}</div>
     </div>

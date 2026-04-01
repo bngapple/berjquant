@@ -14,7 +14,7 @@ export function DailyBarChart({ data }: Props) {
         <YAxis axisLine={false} tickLine={false} tick={{ fill: "var(--text-dim)", fontSize: 9 }} tickFormatter={(v: number) => `$${v}`} />
         <Tooltip
           contentStyle={{ background: "var(--elevated)", border: "1px solid var(--border-strong)", borderRadius: 6, fontSize: 11, color: "var(--text)" }}
-          formatter={(v: number) => [`$${v.toFixed(2)}`, "P&L"]}
+          formatter={(v) => [`$${Number(v).toFixed(2)}`, "P&L"]}
           labelStyle={{ color: "var(--text-muted)" }}
         />
         <ReferenceLine y={0} stroke="rgba(255,255,255,0.06)" />
