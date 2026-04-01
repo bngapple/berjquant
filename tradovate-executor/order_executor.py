@@ -63,6 +63,8 @@ class OrderRecord:
     signal: Optional[Signal] = None
     bracket: Optional[BracketOrders] = None
     account_name: str = ""
+    fill_confirmed: bool = False
+    _bracket_lock: asyncio.Lock = field(default_factory=asyncio.Lock)
 
     @property
     def slippage_pts(self) -> float:
@@ -166,25 +168,32 @@ class OrderExecutor:
         # Step 2: Wait for fill
         fill_price = await self._wait_for_fill(record)
 
-        if fill_price is not None:
-            record.fill_price = fill_price
-            record.fill_time = time.time()
-            record.status = OrderStatus.FILLED
-            logger.info(
-                f"[{self.session.name}][{signal.strategy}] "
-                f"FILLED @ {fill_price:.2f} | slippage: {record.slippage_pts:.2f} pts"
-            )
-            # Step 3: Bracket at real fill price
-            await self._place_bracket_at_fill(signal, contracts, fill_price, record)
-        else:
-            logger.error(
-                f"[{self.session.name}][{signal.strategy}] "
-                f"Fill not confirmed within {self.FILL_WAIT_TIMEOUT}s — "
-                f"placing bracket at signal price as fallback"
-            )
-            await self._place_bracket_at_fill(
-                signal, contracts, signal.signal_price, record
-            )
+        # Use lock to prevent WS fill callback from racing with REST poll
+        async with record._bracket_lock:
+            if record.fill_confirmed:
+                # WS fill callback already placed the bracket
+                return record
+            record.fill_confirmed = True
+
+            if fill_price is not None:
+                record.fill_price = fill_price
+                record.fill_time = time.time()
+                record.status = OrderStatus.FILLED
+                logger.info(
+                    f"[{self.session.name}][{signal.strategy}] "
+                    f"FILLED @ {fill_price:.2f} | slippage: {record.slippage_pts:.2f} pts"
+                )
+                # Step 3: Bracket at real fill price
+                await self._place_bracket_at_fill(signal, contracts, fill_price, record)
+            else:
+                logger.error(
+                    f"[{self.session.name}][{signal.strategy}] "
+                    f"Fill not confirmed within {self.FILL_WAIT_TIMEOUT}s — "
+                    f"placing bracket at signal price as fallback"
+                )
+                await self._place_bracket_at_fill(
+                    signal, contracts, signal.signal_price, record
+                )
 
         return record
 
@@ -280,6 +289,15 @@ class OrderExecutor:
             sl_resp.raise_for_status()
             bracket.stop_order_id = sl_resp.json().get("orderId")
 
+        except Exception as e:
+            logger.error(
+                f"[{self.session.name}][{signal.strategy}] "
+                f"SL placement FAILED: {e} — position UNPROTECTED, flattening"
+            )
+            await self._emergency_close(contracts, exit_action, signal.strategy)
+            return
+
+        try:
             # Place Take Profit
             tp_resp = await self._http.post(
                 f"{self._base}/order/placeorder",
@@ -298,23 +316,54 @@ class OrderExecutor:
             tp_resp.raise_for_status()
             bracket.limit_order_id = tp_resp.json().get("orderId")
 
-            bracket.is_active = True
-            record.bracket = bracket
-
-            logger.info(
+        except Exception as e:
+            # SL is placed but TP failed — position has stop loss only.
+            # This is safer than no protection, so keep the SL and log warning.
+            logger.warning(
                 f"[{self.session.name}][{signal.strategy}] "
-                f"Bracket @ fill {fill_price:.2f}: "
-                f"SL={sl_price:.2f} (id={bracket.stop_order_id}) "
-                f"TP={tp_price:.2f} (id={bracket.limit_order_id})"
+                f"TP placement FAILED: {e} — SL is active, no TP. "
+                f"Position protected by SL only."
             )
 
-            # Link as OCO
+        bracket.is_active = True
+        record.bracket = bracket
+
+        logger.info(
+            f"[{self.session.name}][{signal.strategy}] "
+            f"Bracket @ fill {fill_price:.2f}: "
+            f"SL={sl_price:.2f} (id={bracket.stop_order_id}) "
+            f"TP={tp_price:.2f} (id={bracket.limit_order_id})"
+        )
+
+        # Link as OCO (only if both legs exist)
+        if bracket.stop_order_id and bracket.limit_order_id:
             await self._link_oco(bracket)
 
+    async def _emergency_close(self, contracts: int, action: str, strategy: str):
+        """Emergency: close position with a market order when bracket fails."""
+        try:
+            resp = await self._http.post(
+                f"{self._base}/order/placeorder",
+                json={
+                    "accountSpec": self.session.account_config.username,
+                    "accountId": self.session.tradovate_account_id,
+                    "action": action,
+                    "symbol": self.config.symbol,
+                    "orderQty": contracts,
+                    "orderType": "Market",
+                    "isAutomated": True,
+                },
+                headers=self._headers,
+            )
+            resp.raise_for_status()
+            logger.warning(
+                f"[{self.session.name}][{strategy}] "
+                f"Emergency close: {action} {contracts} @ Market"
+            )
         except Exception as e:
-            logger.error(
-                f"[{self.session.name}][{signal.strategy}] "
-                f"Bracket FAILED: {e} — MANUAL INTERVENTION NEEDED"
+            logger.critical(
+                f"[{self.session.name}][{strategy}] "
+                f"EMERGENCY CLOSE FAILED: {e} — MANUAL INTERVENTION REQUIRED"
             )
 
     async def _link_oco(self, bracket: BracketOrders):
@@ -358,6 +407,11 @@ class OrderExecutor:
         # Check if it's an entry fill
         record = self.orders.get(order_id)
         if record:
+            async with record._bracket_lock:
+                if record.fill_confirmed:
+                    # REST poll already handled this fill
+                    return None
+                record.fill_confirmed = True
             record.fill_price = fill_price
             record.fill_time = time.time()
             record.status = OrderStatus.FILLED
@@ -416,15 +470,60 @@ class OrderExecutor:
         return success
 
     # ------------------------------------------------------------------
-    # Flatten / Liquidate
+    # Per-Strategy Close (reducing market order)
     # ------------------------------------------------------------------
-    async def flatten_position(self, strategy: str = "") -> bool:
-        """Cancel brackets, then liquidate position."""
-        if strategy:
-            await self.cancel_bracket(strategy)
-        else:
-            for strat in list(self.strategy_orders.keys()):
-                await self.cancel_bracket(strat)
+    async def close_strategy_position(self, strategy: str) -> bool:
+        """
+        Close one strategy's position using a reducing market order.
+        This only closes the exact qty for that strategy, not the whole symbol.
+        Use this when multiple strategies may be open simultaneously.
+        """
+        record = self.strategy_orders.get(strategy)
+        if not record:
+            logger.debug(f"[{self.session.name}] No record for {strategy} — nothing to close")
+            return True
+
+        await self.cancel_bracket(strategy)
+
+        # Determine exit side (opposite of entry)
+        exit_action = "Sell" if record.side == "Buy" else "Buy"
+        qty = record.qty
+
+        if qty <= 0:
+            logger.debug(f"[{self.session.name}] {strategy} qty=0 — nothing to close")
+            return True
+
+        try:
+            resp = await self._http.post(
+                f"{self._base}/order/placeorder",
+                json={
+                    "accountSpec": self.session.account_config.username,
+                    "accountId": self.session.tradovate_account_id,
+                    "action": exit_action,
+                    "symbol": self.config.symbol,
+                    "orderQty": qty,
+                    "orderType": "Market",
+                    "isAutomated": True,
+                },
+                headers=self._headers,
+            )
+            resp.raise_for_status()
+            logger.info(
+                f"[{self.session.name}][{strategy}] "
+                f"Closed: {exit_action} {qty} @ Market"
+            )
+            return True
+        except Exception as e:
+            logger.error(f"[{self.session.name}][{strategy}] Close FAILED: {e}")
+            return False
+
+    # ------------------------------------------------------------------
+    # Flatten / Liquidate (all positions — EOD/emergency only)
+    # ------------------------------------------------------------------
+    async def liquidate_all(self) -> bool:
+        """Cancel all brackets, then liquidate entire symbol position. EOD/emergency only."""
+        for strat in list(self.strategy_orders.keys()):
+            await self.cancel_bracket(strat)
         try:
             resp = await self._http.post(
                 f"{self._base}/order/liquidateposition",
@@ -436,11 +535,17 @@ class OrderExecutor:
                 headers=self._headers,
             )
             resp.raise_for_status()
-            logger.info(f"[{self.session.name}] Flattened" + (f" ({strategy})" if strategy else ""))
+            logger.info(f"[{self.session.name}] Liquidated all")
             return True
         except Exception as e:
-            logger.error(f"[{self.session.name}] Flatten FAILED: {e}")
+            logger.error(f"[{self.session.name}] Liquidate FAILED: {e}")
             return False
+
+    async def flatten_position(self, strategy: str = "") -> bool:
+        """Close position — per-strategy if specified, liquidate all if not."""
+        if strategy:
+            return await self.close_strategy_position(strategy)
+        return await self.liquidate_all()
 
     async def cancel_all_orders(self) -> bool:
         """Cancel all working orders."""

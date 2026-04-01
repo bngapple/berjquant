@@ -133,10 +133,10 @@ class TradovateExecutor:
         # 3. Position sync (recover from restart)
         await self._sync_positions()
 
-        # 4. Connect market data WebSocket
+        # 4. Connect market data WebSocket (uses separate md token)
         self.ws_market = TradovateWebSocket(
             url=self.config.ws_market_url,
-            access_token=master_session.access_token,
+            access_token=master_session.md_access_token or master_session.access_token,
             name="md",
             on_message=self._on_market_message,
         )
@@ -231,7 +231,7 @@ class TradovateExecutor:
             await self.market_data.on_tick(float(price), int(volume), ts)
             return
 
-        # --- Chart/bar data (historical seeding + live) ---
+        # --- Chart/bar data (historical seeding) ---
         bars = data.get("bars", [])
         for bar_data in bars:
             ts = self._parse_timestamp(bar_data.get("timestamp"))
@@ -241,10 +241,15 @@ class TradovateExecutor:
             c = bar_data.get("close", 0)
             v = bar_data.get("upVolume", 0) + bar_data.get("downVolume", 0)
 
-            # Feed as ticks to build bars (open, high, low, close)
-            for p in [o, h, l, c]:
-                if p > 0:
-                    await self.market_data.on_tick(float(p), int(v // 4), ts)
+            if o > 0 and h > 0 and l > 0 and c > 0:
+                await self.market_data.ingest_historical_bar(
+                    timestamp=ts,
+                    open_=float(o),
+                    high=float(h),
+                    low=float(l),
+                    close=float(c),
+                    volume=int(v),
+                )
 
     def _parse_timestamp(self, ts_str) -> datetime:
         """Parse Tradovate timestamp or fall back to now."""
@@ -464,13 +469,13 @@ class TradovateExecutor:
 
         if self.master_executor:
             await self.master_executor.cancel_all_orders()
-            await self.master_executor.flatten_position()
+            await self.master_executor.liquidate_all()
 
         if self.copy_engine:
             await self.copy_engine.cancel_all_on_copies()
             await self.copy_engine.copy_flatten()
 
-        for strategy in ["RSI", "IB", "MOM", "SYNCED"]:
+        for strategy in list(self.signal_engine.positions.keys()):
             self.signal_engine.mark_flat(strategy)
 
         self._pending_signals.clear()
@@ -548,7 +553,7 @@ def main():
 
     def handle_sig(sig, frame):
         logger.warning(f"Signal {sig} received — shutting down...")
-        loop.create_task(app.shutdown())
+        loop.call_soon_threadsafe(lambda: asyncio.ensure_future(app.shutdown()))
 
     signal.signal(signal.SIGINT, handle_sig)
     signal.signal(signal.SIGTERM, handle_sig)

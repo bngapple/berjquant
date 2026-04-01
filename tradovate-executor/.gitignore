@@ -1,4 +1,5 @@
 .secret_key
+config.json
 venv/
 __pycache__/
 *.pyc
@@ -7,3 +8,5 @@ test_secret_key
 logs/
 dashboard/node_modules/
 dashboard/dist/
+build/
+dist/

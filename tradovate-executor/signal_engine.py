@@ -214,7 +214,6 @@ class SignalEngine:
         if side is None:
             return None
 
-        self._ib_traded_today = True
         logger.info(f"[IB] Signal: {side.value} — {reason}")
         return Signal(
             strategy="IB",
@@ -315,7 +314,12 @@ class SignalEngine:
     def mark_filled(self, strategy: str, side: Side):
         """Called by executor when an entry is confirmed filled."""
         self.positions[strategy].enter(side, self._bar_count)
+        if strategy == "IB":
+            self._ib_traded_today = True
 
     def mark_flat(self, strategy: str):
         """Called when a position is closed (SL, TP, max hold, EOD)."""
-        self.positions[strategy].flatten()
+        if strategy in self.positions:
+            self.positions[strategy].flatten()
+        else:
+            logger.warning(f"mark_flat called with unknown strategy: {strategy}")

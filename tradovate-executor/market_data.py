@@ -223,6 +223,91 @@ class MarketDataEngine:
             if len(self.state.ib_history) > 50:
                 self.state.ib_history = self.state.ib_history[-50:]
 
+    async def ingest_historical_bar(
+        self,
+        timestamp: datetime,
+        open_: float,
+        high: float,
+        low: float,
+        close: float,
+        volume: int,
+    ):
+        """
+        Ingest a pre-formed historical bar directly, bypassing tick aggregation.
+
+        This is used for chart data returned by md/getChart so that completed
+        bars seed the indicator warmup period without being mangled by the
+        tick-to-bar aggregation logic.
+        """
+        # Convert to ET if needed
+        if timestamp.tzinfo is None:
+            timestamp = timestamp.replace(tzinfo=ET)
+        else:
+            timestamp = timestamp.astimezone(ET)
+
+        bar_start = self._bar_start_time(timestamp)
+
+        bar = Bar(
+            timestamp=bar_start,
+            open=open_,
+            high=high,
+            low=low,
+            close=close,
+            volume=volume,
+            is_complete=True,
+        )
+
+        # Check for new day -> reset IB
+        today = timestamp.date()
+        if self._today != today:
+            self._finalize_ib_day()
+            self._today = today
+            self.state.today_ib = IBRange(date=timestamp)
+            self.state.ib_complete = False
+            logger.info(f"New trading day (historical): {today}")
+
+        # Update IB tracking from the bar's high/low
+        if self._is_ib_time(timestamp) and self.state.today_ib:
+            self.state.today_ib.high = max(self.state.today_ib.high, high)
+            self.state.today_ib.low = min(self.state.today_ib.low, low)
+
+        # Mark IB complete once past window
+        if self._is_past_ib(timestamp) and not self.state.ib_complete:
+            self.state.ib_complete = True
+            if self.state.today_ib and self.state.today_ib.is_valid:
+                logger.info(
+                    f"IB complete (historical) — H: {self.state.today_ib.high:.2f} "
+                    f"L: {self.state.today_ib.low:.2f} "
+                    f"Range: {self.state.today_ib.range:.2f}"
+                )
+
+        # Append to history (same as _complete_bar but without firing callback)
+        self.state.last_bar = bar
+        self.state.closes.append(bar.close)
+        self.state.highs.append(bar.high)
+        self.state.lows.append(bar.low)
+        self.state.volumes.append(bar.volume)
+
+        # Trim history
+        if len(self.state.closes) > self.MAX_HISTORY:
+            trim = len(self.state.closes) - self.MAX_HISTORY
+            self.state.closes = self.state.closes[trim:]
+            self.state.highs = self.state.highs[trim:]
+            self.state.lows = self.state.lows[trim:]
+            self.state.volumes = self.state.volumes[trim:]
+
+        # Recalculate indicators so warmup state is current
+        self._update_indicators()
+
+        # Reset current_bar so live ticks start a fresh bar
+        self.state.current_bar = None
+
+        logger.debug(
+            f"Historical bar ingested: {bar.timestamp.strftime('%Y-%m-%d %H:%M')} "
+            f"O={bar.open:.2f} H={bar.high:.2f} L={bar.low:.2f} C={bar.close:.2f} "
+            f"V={bar.volume}"
+        )
+
     def get_last_bar_range(self) -> Optional[float]:
         """Range of the most recently completed bar."""
         if self.state.last_bar:

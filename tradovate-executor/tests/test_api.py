@@ -117,6 +117,9 @@ class TestConfigStore:
         assert masked["password"] == "********"
         assert masked["sec"] == "********"
         assert masked["username"] == "u"
+        assert masked["starting_balance"] == 150000.0
+        assert masked["profit_target"] == 9000.0
+        assert masked["max_drawdown"] == -4500.0
 
     def test_environment_get_set(self):
         assert config_store.get_environment() == "demo"
@@ -140,18 +143,21 @@ class TestConfigStore:
         assert acct["sec"] == "plain_sec"
 
 
+from unittest.mock import AsyncMock, patch
 from fastapi.testclient import TestClient
-from server.api import app, _engine_state
+from server.api import app
+from server.schemas import AuthTestResponse
+from server.engine_bridge import bridge
 
 client = TestClient(app)
 
-
-@pytest.fixture(autouse=True)
-def reset_engine_state():
-    """Reset engine state before each test to avoid cross-test pollution."""
-    _engine_state["running"] = False
-    yield
-    _engine_state["running"] = False
+# Mock credential validation for all account tests — we don't hit real Tradovate in tests
+_mock_auth = patch(
+    "server.api._validate_credentials",
+    new_callable=AsyncMock,
+    return_value=AuthTestResponse(success=True, account_id=12345, user_id=67890),
+)
+_mock_auth.start()
 
 
 class TestAccountEndpoints:
@@ -174,6 +180,8 @@ class TestAccountEndpoints:
         assert data["password"] == "********"
         assert data["sec"] == "********"
         assert data["sizing_mode"] == "mirror"
+        assert data["starting_balance"] == 150000.0
+        assert data["profit_target"] == 9000.0
 
     def test_create_duplicate_returns_409(self):
         client.post("/api/accounts", json={
@@ -241,28 +249,61 @@ class TestEngineEndpoints:
         data = resp.json()
         assert data["running"] is False
 
-    def test_start_engine(self):
+    def test_start_without_accounts_returns_400(self):
         resp = client.post("/api/engine/start")
-        assert resp.status_code == 200
-        assert resp.json()["status"] == "started"
-        # Stop it for other tests
-        client.post("/api/engine/stop")
+        assert resp.status_code == 400
 
-    def test_start_already_running_returns_409(self):
-        client.post("/api/engine/start")
+    def test_start_without_master_returns_400(self):
+        client.post("/api/accounts", json={
+            "name": "copy-only",
+            "username": "u",
+            "password": "p",
+            "is_master": False,
+        })
         resp = client.post("/api/engine/start")
-        assert resp.status_code == 409
-        client.post("/api/engine/stop")
+        assert resp.status_code == 400
 
     def test_stop_not_running_returns_409(self):
         resp = client.post("/api/engine/stop")
         assert resp.status_code == 409
 
-    def test_flatten(self):
-        client.post("/api/engine/start")
+    def test_flatten_when_stopped(self):
         resp = client.post("/api/engine/flatten")
         assert resp.status_code == 200
-        assert resp.json()["status"] == "flattened"
+        assert resp.json()["status"] == "no_engine"
+
+
+class TestHistoryEndpoints:
+    def test_history_stats_empty(self):
+        resp = client.get("/api/history/stats")
+        assert resp.status_code == 200
+        data = resp.json()
+        assert data["total_trades"] == 0
+        assert data["total_pnl"] == 0.0
+
+    def test_history_daily_empty(self):
+        resp = client.get("/api/history/daily")
+        assert resp.status_code == 200
+        assert resp.json() == {}
+
+    def test_history_equity_empty(self):
+        resp = client.get("/api/history/equity")
+        assert resp.status_code == 200
+        assert resp.json() == []
+
+    def test_history_trades_empty(self):
+        resp = client.get("/api/history/trades")
+        assert resp.status_code == 200
+        assert resp.json() == []
+
+
+class TestHealthEndpoint:
+    def test_health(self):
+        resp = client.get("/api/health")
+        assert resp.status_code == 200
+        data = resp.json()
+        assert "engine_running" in data
+        assert data["engine_running"] is False
 
 
 class TestEnvironmentEndpoints:

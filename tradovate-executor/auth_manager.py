@@ -21,6 +21,7 @@ class AuthSession:
     """Live auth state for one Tradovate account."""
     account_config: AccountConfig
     access_token: Optional[str] = None
+    md_access_token: Optional[str] = None    # Separate token for market data WS
     expiry_ts: float = 0.0                  # Unix timestamp
     tradovate_account_id: Optional[int] = None  # Numeric account ID for orders
     user_id: Optional[int] = None
@@ -84,6 +85,7 @@ class AuthManager:
             raise RuntimeError(f"Auth error: {data['errorText']}")
 
         session.access_token = data["accessToken"]
+        session.md_access_token = data.get("mdAccessToken", data["accessToken"])
         session.expiry_ts = time.time() + self.TOKEN_LIFETIME
         session.user_id = data.get("userId")
         session.is_authenticated = True
@@ -144,6 +146,7 @@ class AuthManager:
             raise RuntimeError(data["errorText"])
 
         session.access_token = data["accessToken"]
+        session.md_access_token = data.get("mdAccessToken", data["accessToken"])
         session.expiry_ts = time.time() + self.TOKEN_LIFETIME
 
     def get_session(self, account_name: str) -> Optional[AuthSession]:

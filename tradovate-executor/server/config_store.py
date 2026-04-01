@@ -20,9 +20,13 @@ def _get_fernet() -> Fernet:
     if os.path.exists(KEY_FILE):
         with open(KEY_FILE, "rb") as f:
             key = f.read().strip()
+        # Fix permissions if they're too open
+        if os.stat(KEY_FILE).st_mode & 0o077:
+            os.chmod(KEY_FILE, 0o600)
     else:
         key = Fernet.generate_key()
-        with open(KEY_FILE, "wb") as f:
+        fd = os.open(KEY_FILE, os.O_WRONLY | os.O_CREAT | os.O_TRUNC, 0o600)
+        with os.fdopen(fd, "wb") as f:
             f.write(key)
     return Fernet(key)
 
@@ -108,6 +112,11 @@ def mask_account(acct: dict) -> dict:
     masked["password"] = "********"
     if masked.get("sec"):
         masked["sec"] = "********"
+    # Ensure new fields have defaults
+    masked.setdefault("starting_balance", 150000.0)
+    masked.setdefault("profit_target", 9000.0)
+    masked.setdefault("max_drawdown", -4500.0)
+    masked.setdefault("account_type", "eval")
     return masked
 
 

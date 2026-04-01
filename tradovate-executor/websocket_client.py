@@ -164,10 +164,24 @@ class TradovateWebSocket:
         logger.debug(f"[{self.name}] Unknown frame: {raw[:100]}")
 
     async def _dispatch(self, data: Any):
-        """Forward parsed message to callback."""
+        """Forward parsed message to callback.
+        Tradovate sends two kinds of messages with a "d" key:
+        1. Subscription response confirmations: {"s": status, "i": requestId, "d": payload}
+           → Unwrap to just data["d"] so handlers get the actual data.
+        2. Event push frames: {"e": "fill", "d": {...fill_data...}}
+           → Pass the FULL dict so handlers can read data["e"] for the event type.
+        """
         if self.on_message:
             try:
-                await self.on_message(data)
+                if isinstance(data, dict) and "d" in data:
+                    if "e" in data:
+                        # Event push frame — pass full dict so callback can read "e"
+                        await self.on_message(data)
+                    else:
+                        # Subscription response — unwrap the "d" payload
+                        await self.on_message(data["d"])
+                else:
+                    await self.on_message(data)
             except Exception as e:
                 logger.error(f"[{self.name}] Message handler error: {e}", exc_info=True)
 

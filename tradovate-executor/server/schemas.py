@@ -13,6 +13,10 @@ class AccountCreate(BaseModel):
     sizing_mode: str = "mirror"
     account_size: float = 150000.0
     fixed_sizes: dict[str, int] = {"RSI": 3, "IB": 3, "MOM": 3}
+    starting_balance: float = 150000.0
+    profit_target: float = 9000.0
+    max_drawdown: float = -4500.0
+    account_type: str = "eval"
 
 
 class AccountUpdate(BaseModel):
@@ -25,6 +29,10 @@ class AccountUpdate(BaseModel):
     sizing_mode: Optional[str] = None
     account_size: Optional[float] = None
     fixed_sizes: Optional[dict[str, int]] = None
+    starting_balance: Optional[float] = None
+    profit_target: Optional[float] = None
+    max_drawdown: Optional[float] = None
+    account_type: Optional[str] = None
 
 
 class AccountResponse(BaseModel):
@@ -38,6 +46,10 @@ class AccountResponse(BaseModel):
     sizing_mode: str
     account_size: float
     fixed_sizes: dict[str, int]
+    starting_balance: float = 150000.0
+    profit_target: float = 9000.0
+    max_drawdown: float = -4500.0
+    account_type: str = "eval"
 
 
 class AuthTestRequest(BaseModel):
@@ -66,4 +78,23 @@ class EngineStatus(BaseModel):
 
 
 class EnvironmentUpdate(BaseModel):
+    environment: str
+
+
+class AccountStatusResponse(BaseModel):
+    name: str
+    balance: float
+    starting_balance: float
+    pnl_total: float
+    drawdown_current: float
+    drawdown_max_allowed: float
+    drawdown_remaining: float
+    drawdown_pct_used: float
+    profit_target: float
+    profit_target_progress: float
+    daily_pnl: float
+    trades_today: int
+    status: str
+    is_master: bool
+    account_type: str
     environment: str
