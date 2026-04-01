@@ -11,8 +11,8 @@ export default function App() {
   return (
     <Routes>
       <Route element={<Layout />}>
-        <Route path="/" element={<Dashboard />} />
-        <Route path="/terminal" element={<Terminal />} />
+        <Route path="/" element={<Terminal />} />
+        <Route path="/dashboard" element={<Dashboard />} />
         <Route path="/calendar" element={<Calendar />} />
         <Route path="/cockpit" element={<Cockpit />} />
         <Route path="/setup" element={<Setup />} />

@@ -5,8 +5,8 @@ import { FlattenModal } from "./FlattenModal";
 import { api } from "../api/client";
 
 const nav = [
-  { to: "/", label: "Dashboard", d: "M3 3h7v9H3zm11-0h7v5h-7zm0 9h7v9h-7zM3 16h7v5H3z" },
-  { to: "/terminal", label: "Terminal", d: "M3 3h18v3H3zM3 9h12v3H3zm0 6h9v3H3zm14-3l4 4-4 4" },
+  { to: "/", label: "Terminal", d: "M3 3h18v3H3zM3 9h12v3H3zm0 6h9v3H3zm14-3l4 4-4 4" },
+  { to: "/dashboard", label: "Dashboard", d: "M3 3h7v9H3zm11-0h7v5h-7zm0 9h7v9h-7zM3 16h7v5H3z" },
   { to: "/calendar", label: "Calendar", d: "M8 7V3m8 4V3m-9 4h10a2 2 0 012 2v11a2 2 0 01-2 2H7a2 2 0 01-2-2V9a2 2 0 012-2zm-2 4h14" },
   { to: "/cockpit", label: "Cockpit", d: "M4 6h6v6H4zm10 0h6v6h-6zM7 14v4m10-4v4M7 18h10" },
   { to: "/setup", label: "Setup", d: "M12 12a4 4 0 100-8 4 4 0 000 8zm0 2c-4 0-8 2-8 4v2h16v-2c0-2-4-4-8-4z" },
