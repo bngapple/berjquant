@@ -1,5 +1,5 @@
 import { useEffect, useRef, useState, useCallback } from "react";
-import type { Position, PnL, Signal, Trade, EngineStatus, EquityPoint, WSData } from "../types";
+import type { Position, PnL, Signal, Trade, EngineStatus, EquityPoint, WSData, Bar } from "../types";
 
 export function useWebSocket(): WSData {
   const wsRef = useRef<WebSocket | null>(null);
@@ -11,6 +11,7 @@ export function useWebSocket(): WSData {
   const [signals, setSignals] = useState<Signal[]>([]);
   const [trades, setTrades] = useState<Trade[]>([]);
   const [equityHistory, setEquityHistory] = useState<EquityPoint[]>([]);
+  const [bars, setBars] = useState<Bar[]>([]);
 
   const connect = useCallback(() => {
     const protocol = window.location.protocol === "https:" ? "wss:" : "ws:";
@@ -36,11 +37,20 @@ export function useWebSocket(): WSData {
           setTrades(p => [...p.slice(-49), { ...(msg.data as Trade), timestamp: msg.timestamp, action: "exit" as const }]);
           setPositions(p => ({ ...p, [(msg.data as { strategy: string }).strategy]: null }));
           break;
+        case "bar":
+          setBars(p => {
+            const b = msg.data as Bar;
+            // Replace existing bar with same timestamp or append
+            const idx = p.findIndex(x => x.timestamp === b.timestamp);
+            if (idx >= 0) { const next = [...p]; next[idx] = b; return next; }
+            return [...p.slice(-199), b];
+          });
+          break;
       }
     };
   }, []);
 
   useEffect(() => { connect(); return () => { clearTimeout(reconnectRef.current); wsRef.current?.close(); }; }, [connect]);
 
-  return { connected, status, positions, pnl, signals, trades, equityHistory };
+  return { connected, status, positions, pnl, signals, trades, equityHistory, bars };
 }

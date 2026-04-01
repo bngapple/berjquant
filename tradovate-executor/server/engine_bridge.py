@@ -34,6 +34,7 @@ class DashboardExecutor(TradovateExecutor):
     def __init__(self, config: AppConfig, event_queue: asyncio.Queue):
         super().__init__(config)
         self._event_queue = event_queue
+        self._bars_buffer: list[dict] = []  # Ring buffer of last 200 15m bars for chart history
 
     def _push(self, event: dict):
         """Non-blocking push to event queue."""
@@ -43,24 +44,53 @@ class DashboardExecutor(TradovateExecutor):
         except asyncio.QueueFull:
             pass  # Drop oldest if queue is full
 
+    async def _on_market_message(self, data: dict):
+        """Override: buffer historical OHLCV bars for chart REST endpoint, then run parent."""
+        bars = data.get("bars", [])
+        for bar_data in bars:
+            o = bar_data.get("open", 0)
+            h = bar_data.get("high", 0)
+            l = bar_data.get("low", 0)
+            c = bar_data.get("close", 0)
+            if o > 0 and h > 0 and l > 0 and c > 0:
+                ts = self._parse_timestamp(bar_data.get("timestamp"))
+                v = bar_data.get("upVolume", 0) + bar_data.get("downVolume", 0)
+                self._bars_buffer.append({
+                    "timestamp": ts.isoformat(),
+                    "open": float(o), "high": float(h),
+                    "low": float(l), "close": float(c),
+                    "volume": int(v),
+                    "rsi": None, "atr": None, "ema": None,
+                })
+        if len(self._bars_buffer) > 200:
+            self._bars_buffer = self._bars_buffer[-200:]
+        await super()._on_market_message(data)
+
     async def _on_bar_complete(self, state: MarketState):
-        """Override: push bar event, then run parent logic (which generates signals)."""
+        """Override: push bar event, buffer it, then run parent logic (which generates signals)."""
         bar = state.last_bar
         if bar:
-            self._push({
-                "type": "bar",
-                "data": {
-                    "timestamp": bar.timestamp.isoformat() if bar.timestamp else "",
-                    "open": bar.open,
-                    "high": bar.high,
-                    "low": bar.low,
-                    "close": bar.close,
-                    "volume": bar.volume,
-                    "rsi": round(state.rsi_5, 2) if state.rsi_5 is not None else None,
-                    "atr": round(state.atr_14, 2) if state.atr_14 is not None else None,
-                    "ema": round(state.ema_21, 2) if state.ema_21 is not None else None,
-                },
-            })
+            bar_dict = {
+                "timestamp": bar.timestamp.isoformat() if bar.timestamp else "",
+                "open": bar.open,
+                "high": bar.high,
+                "low": bar.low,
+                "close": bar.close,
+                "volume": bar.volume,
+                "rsi": round(state.rsi_5, 2) if state.rsi_5 is not None else None,
+                "atr": round(state.atr_14, 2) if state.atr_14 is not None else None,
+                "ema": round(state.ema_21, 2) if state.ema_21 is not None else None,
+            }
+            self._push({"type": "bar", "data": bar_dict})
+            # Update buffer: replace same-timestamp bar or append
+            idx = next((i for i, b in enumerate(self._bars_buffer)
+                        if b["timestamp"] == bar_dict["timestamp"]), -1)
+            if idx >= 0:
+                self._bars_buffer[idx] = bar_dict
+            else:
+                self._bars_buffer.append(bar_dict)
+                if len(self._bars_buffer) > 200:
+                    self._bars_buffer = self._bars_buffer[-200:]
 
         # Run parent — this evaluates signals and executes pending ones
         await super()._on_bar_complete(state)
@@ -376,6 +406,12 @@ class EngineBridge:
             "pending_signals": len(ex._pending_signals),
             "connected_accounts": connected_accounts,
         }
+
+    def get_bars(self) -> list[dict]:
+        """Return buffered OHLCV bar history for the chart."""
+        if self.executor:
+            return list(self.executor._bars_buffer)
+        return []
 
     def get_health(self) -> dict:
         """Health check endpoint data."""

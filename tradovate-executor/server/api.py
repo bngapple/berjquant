@@ -308,6 +308,12 @@ def history_trades(limit: int = 50):
     return history.get_recent_trades(trades, limit)
 
 
+@app.get("/api/history/bars")
+def history_bars():
+    """Return buffered OHLCV bars from the running engine for charting."""
+    return bridge.get_bars()
+
+
 # -- Account Status -----------------------------------------------------------
 
 

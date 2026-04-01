@@ -7,6 +7,7 @@ import type {
   DailyPnL,
   AccountStatus,
   FleetAlert,
+  Bar,
 } from "../types";
 
 const BASE = "/api";
@@ -93,4 +94,7 @@ export const api = {
 
   // Health
   getHealth: () => request<Record<string, unknown>>("/health"),
+
+  // Chart bars (historical, from engine buffer)
+  getBars: () => request<Bar[]>("/history/bars"),
 };

@@ -112,6 +112,7 @@ export interface WSData {
   signals: Signal[];
   trades: Trade[];
   equityHistory: EquityPoint[];
+  bars: Bar[];
 }
 
 export interface AccountStatus {
@@ -152,4 +153,16 @@ export interface FleetAlert {
   account: string;
   type: "danger" | "warning" | "success";
   message: string;
+}
+
+export interface Bar {
+  timestamp: string;
+  open: number;
+  high: number;
+  low: number;
+  close: number;
+  volume: number;
+  rsi?: number | null;
+  atr?: number | null;
+  ema?: number | null;
 }
