@@ -1,0 +1,98 @@
+name: Build Releases
+
+on:
+  workflow_dispatch:       # Manual trigger from GitHub UI
+  push:
+    tags: ['v*']           # Auto-trigger on version tags (e.g. v1.0.0)
+
+jobs:
+  # ── macOS → .app + .dmg ─────────────────────────────────────────────────
+  build-macos:
+    runs-on: macos-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: "20"
+
+      - name: Install Python dependencies
+        run: pip install -r requirements.txt pywebview pyinstaller
+
+      - name: Build dashboard
+        run: cd dashboard && npm ci && npm run build
+
+      - name: Build .app bundle
+        run: pyinstaller HTFExecutor.spec --clean --noconfirm
+
+      - name: Package as DMG
+        run: |
+          hdiutil create -volname "HTFExecutor" \
+            -srcfolder "dist/HTFExecutor.app" \
+            -ov -format UDZO \
+            "dist/HTFExecutor-macOS.dmg"
+
+      - name: Upload macOS artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: HTFExecutor-macOS
+          path: dist/HTFExecutor-macOS.dmg
+
+  # ── Windows → single .exe ───────────────────────────────────────────────
+  build-windows:
+    runs-on: windows-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: "20"
+
+      - name: Install Python dependencies
+        run: pip install -r requirements.txt pywebview pyinstaller
+
+      - name: Build dashboard
+        run: cd dashboard && npm ci && npm run build
+
+      - name: Build .exe
+        run: pyinstaller HTFExecutorWin.spec --clean --noconfirm
+
+      - name: Upload Windows artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: HTFExecutor-Windows
+          path: dist/HTFExecutor.exe
+
+  # ── Create GitHub Release with both files ────────────────────────────────
+  release:
+    needs: [build-macos, build-windows]
+    runs-on: ubuntu-latest
+    if: startsWith(github.ref, 'refs/tags/')   # Only on version tags
+    permissions:
+      contents: write
+    steps:
+      - name: Download macOS artifact
+        uses: actions/download-artifact@v4
+        with:
+          name: HTFExecutor-macOS
+
+      - name: Download Windows artifact
+        uses: actions/download-artifact@v4
+        with:
+          name: HTFExecutor-Windows
+
+      - name: Create Release
+        uses: softprops/action-gh-release@v2
+        with:
+          files: |
+            HTFExecutor-macOS.dmg
+            HTFExecutor.exe
+          generate_release_notes: true
