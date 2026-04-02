@@ -1,0 +1,74 @@
+name: Build Releases
+
+on:
+  workflow_dispatch:
+  push:
+    tags: ['v*']
+
+defaults:
+  run:
+    working-directory: tradovate-executor
+
+jobs:
+  build-windows:
+    runs-on: windows-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: "20"
+
+      - name: Install Python dependencies
+        run: pip install -r requirements.txt pywebview pyinstaller
+
+      - name: Build dashboard
+        run: cd dashboard && npm ci && npm run build
+
+      - name: Build .exe
+        run: pyinstaller HTFExecutorWin.spec --clean --noconfirm
+
+      - name: Upload Windows artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: HTFExecutor-Windows
+          path: tradovate-executor/dist/HTFExecutor.exe
+
+  build-macos:
+    runs-on: macos-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: "20"
+
+      - name: Install Python dependencies
+        run: pip install -r requirements.txt pywebview pyinstaller
+
+      - name: Build dashboard
+        run: cd dashboard && npm ci && npm run build
+
+      - name: Build .app bundle
+        run: pyinstaller HTFExecutor.spec --clean --noconfirm
+
+      - name: Package as DMG
+        run: |
+          hdiutil create -volname "HTFExecutor" \
+            -srcfolder "dist/HTFExecutor.app" \
+            -ov -format UDZO \
+            "dist/HTFExecutor-macOS.dmg"
+
+      - name: Upload macOS artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: HTFExecutor-macOS
+          path: tradovate-executor/dist/HTFExecutor-macOS.dmg
