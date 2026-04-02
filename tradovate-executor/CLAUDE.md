@@ -47,8 +47,8 @@ Ticks → MarketDataEngine → SignalEngine → OrderExecutor (master) → CopyE
 - Max 1 position per strategy simultaneously
 - No new entries after 4:30 PM ET
 - Flatten ALL positions at 4:45 PM ET
-- Daily loss limit: -$3,000 → stop trading for the day
-- Monthly loss limit: -$4,500 → stop trading for the month
+- Max drawdown limit: -$4,500 (LucidFlex trailing drawdown) → stop trading for the month
+- No daily loss limit — LucidFlex uses trailing max drawdown only
 - Ctrl+C → flatten everything → exit
 
 ## Tradovate API
@@ -83,11 +83,17 @@ The app mirrors master account fills to N linked Tradovate accounts. Each copy a
 
 Failed copies are logged and skipped (no retry). All accounts are Tradovate/CQG.
 
-## LucidFlex 150K Prop Firm
+## LucidFlex Prop Firm Tiers
+
+| Tier  | Profit Target | Max Drawdown |
+|-------|--------------|--------------|
+| 25K   | $1,250       | -$1,000      |
+| 50K   | $3,000       | -$2,000      |
+| 100K  | $6,000       | -$3,000      |
+| 150K  | $9,000       | -$4,500      |
 
 - Session: 9:30 AM – 4:45 PM ET
-- Max loss: -$4,500 (monthly)
-- Daily loss: -$3,000 (self-imposed)
+- **No daily loss limit** — trailing max drawdown only
 - 90% payout
 
 ## Current State / What Needs Work
@@ -102,7 +108,7 @@ The core architecture is built and compiles clean. Key areas that need testing a
 
 4. **Per-strategy position tracking with copy accounts** — currently `flatten_position` liquidates the entire position on the symbol. With 3 strategies potentially open (9 contracts total), flattening one strategy means closing only 3 of 9. This needs partial-close logic via `placeorder` with reducing qty instead of `liquidateposition`.
 
-5. **Mac desktop UI** — not started. Currently terminal-only via `python app.py`.
+5. **Desktop UI** — complete. PyWebview + React dashboard. Run `python3 app_launcher.py`. Distributable via `bash build_app.sh` (macOS .dmg + Windows .exe via GitHub Actions).
 
 ## Commands
 

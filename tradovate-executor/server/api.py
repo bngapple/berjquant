@@ -5,6 +5,7 @@ Serves the built React frontend as static files in production.
 """
 
 import asyncio
+from dataclasses import asdict
 import logging
 import os
 import time
@@ -23,6 +24,8 @@ from server.schemas import (
     AuthTestRequest,
     AuthTestResponse,
     EnvironmentUpdate,
+    NTOnlySetupUpdate,
+    RuntimeConfigResponse,
 )
 from server.engine_bridge import bridge
 from server import history
@@ -31,6 +34,34 @@ from server import account_tracker
 logger = logging.getLogger(__name__)
 
 _start_time = time.time()
+
+
+def _runtime_config_payload() -> dict:
+    cfg = bridge._build_config()
+    return {
+        "environment": cfg.environment.value,
+        "symbol": cfg.symbol,
+        "nt_enabled": bool(cfg.nt),
+        "nt_only": bool(cfg.nt and not cfg.accounts),
+        "nt_accounts": [
+            {"name": name, "host": acct.host, "port": acct.port}
+            for name, acct in (cfg.nt.accounts.items() if cfg.nt else [])
+        ],
+        "session": asdict(cfg.session),
+        "rsi": asdict(cfg.rsi),
+        "ib": asdict(cfg.ib),
+        "mom": asdict(cfg.mom),
+    }
+
+
+def _default_nt_config(existing: dict | None = None) -> dict:
+    existing = dict(existing or {})
+    existing.setdefault("default_atm_template", "MNQ_2R")
+    existing.setdefault("order_timeout_seconds", 10)
+    existing.setdefault("status_timeout_seconds", 15)
+    existing.setdefault("reconnect_max_backoff_seconds", 30)
+    existing.setdefault("symbol", "MNQU6")
+    return existing
 
 
 @asynccontextmanager
@@ -161,6 +192,8 @@ async def create_account(req: AccountCreate):
         "profit_target": req.profit_target,
         "max_drawdown": req.max_drawdown,
         "account_type": req.account_type,
+        "monthly_loss_limit": req.monthly_loss_limit,
+        "min_contracts": req.min_contracts,
     }
     try:
         config_store.add_account(acct)
@@ -176,6 +209,10 @@ async def update_account(name: str, req: AccountUpdate):
         raise HTTPException(404, f"Account '{name}' not found")
 
     updates = req.model_dump(exclude_none=True)
+    # UI sends blank string for password/sec when user doesn't change them — drop those
+    for _key in ("password", "sec"):
+        if updates.get(_key) == "":
+            updates.pop(_key)
 
     # If credentials changed, re-validate against Tradovate
     creds_changed = any(k in updates for k in ("username", "password", "cid", "sec"))
@@ -235,14 +272,6 @@ async def test_auth(req: AuthTestRequest):
 async def start_engine():
     if bridge.running:
         raise HTTPException(409, "Engine already running")
-
-    accounts = config_store.get_accounts()
-    if not accounts:
-        raise HTTPException(400, "No accounts configured")
-
-    master = [a for a in accounts if a.get("is_master")]
-    if not master:
-        raise HTTPException(400, "No master account configured")
 
     result = await bridge.start()
     if "error" in result:
@@ -351,6 +380,39 @@ def set_environment(req: EnvironmentUpdate):
     return {"environment": req.environment}
 
 
+@app.get("/api/runtime-config", response_model=RuntimeConfigResponse)
+def get_runtime_config():
+    return _runtime_config_payload()
+
+
+@app.put("/api/runtime-config/nt-only", response_model=RuntimeConfigResponse)
+def save_nt_only_runtime_config(req: NTOnlySetupUpdate):
+    raw = config_store.load_config()
+
+    nt_raw = _default_nt_config(raw.get("ninjatrader") or raw.get("nt"))
+    nt_raw["accounts"] = {
+        req.account_name: {
+            "host": req.host,
+            "port": req.port,
+        }
+    }
+    nt_raw["symbol"] = req.symbol
+
+    raw["accounts"] = []
+    raw["symbol"] = req.symbol
+    raw["ninjatrader"] = nt_raw
+    raw["session"] = {
+        **raw.get("session", {}),
+        "monthly_loss_limit": req.monthly_loss_limit,
+    }
+    raw["rsi"] = {**raw.get("rsi", {}), "contracts": req.contracts}
+    raw["ib"] = {**raw.get("ib", {}), "contracts": req.contracts}
+    raw["mom"] = {**raw.get("mom", {}), "contracts": req.contracts}
+
+    config_store.save_config(raw)
+    return _runtime_config_payload()
+
+
 # -- WebSocket ----------------------------------------------------------------
 
 _ws_connections: list[WebSocket] = []
@@ -397,7 +459,9 @@ async def websocket_live(ws: WebSocket):
 # 3. dashboard/dist relative to cwd — development via app_launcher
 # 4. dist/ relative to cwd — py2app bundle (Resources/dist/)
 _DIST_DIR = None
+_meipass = getattr(__import__("sys"), "_MEIPASS", "")
 for _candidate in [
+    os.path.join(_meipass, "dashboard", "dist") if _meipass else "",
     os.path.join(os.path.dirname(os.path.dirname(os.path.abspath(__file__))), "dashboard", "dist"),
     os.path.join(os.path.dirname(os.path.dirname(os.path.abspath(__file__))), "dist"),
     os.path.join(os.getcwd(), "dashboard", "dist"),

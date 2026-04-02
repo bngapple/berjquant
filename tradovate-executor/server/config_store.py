@@ -117,6 +117,8 @@ def mask_account(acct: dict) -> dict:
     masked.setdefault("profit_target", 9000.0)
     masked.setdefault("max_drawdown", -4500.0)
     masked.setdefault("account_type", "eval")
+    masked.setdefault("monthly_loss_limit", -4500.0)
+    masked.setdefault("min_contracts", 1)
     return masked
 
 

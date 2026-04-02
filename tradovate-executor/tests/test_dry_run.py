@@ -546,8 +546,16 @@ class TestRiskManager:
     def risk(self):
         from risk_manager import RiskManager
         from config import SessionConfig
-        # No flatten callback to avoid async issues in tests
-        return RiskManager(session_config=SessionConfig(), on_flatten_all=None)
+        from unittest.mock import patch
+        # Patch _load_state so test starts with clean state (no stale disk data).
+        # daily_loss_limit=-3000.0 mirrors the threshold checked by test_daily_limit_halt.
+        with patch.object(RiskManager, '_load_state'):
+            rm = RiskManager(
+                session_config=SessionConfig(daily_loss_limit=-3000.0),
+                on_flatten_all=None,
+            )
+        rm._save_state = lambda: None  # prevent disk writes during tests
+        return rm
 
     @pytest.mark.asyncio
     async def test_daily_limit_halt(self, risk):
@@ -814,10 +822,10 @@ class TestCopyEngine:
         assert acct.get_contracts("RSI", 6) == 3  # 75k/150k * 6 = 3
 
     def test_contract_sizing_scaled_zero(self):
-        """Scaled sizing with tiny account should return 0."""
+        """Scaled sizing with tiny account returns 0 when min_contracts=0."""
         from config import AccountConfig, SizingMode
         acct = AccountConfig(
             name="tiny", username="u", password="p", device_id="d",
-            sizing_mode=SizingMode.SCALED, account_size=25000,
+            sizing_mode=SizingMode.SCALED, account_size=25000, min_contracts=0,
         )
         assert acct.get_contracts("RSI", 3) == 0  # 25k/150k * 3 = 0.5 → floor = 0

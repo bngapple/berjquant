@@ -1,17 +1,19 @@
 import { useState, useEffect, useMemo } from "react";
 import { useLayoutData } from "../hooks/useLayoutData";
 import { api } from "../api/client";
-import type { Account, AccountStatus } from "../types";
+import type { Account, AccountStatus, RuntimeConfig } from "../types";
 
 export function Cockpit() {
   const { status, trades } = useLayoutData();
   const [accounts, setAccounts] = useState<Account[]>([]);
   const [accountStatuses, setAccountStatuses] = useState<AccountStatus[]>([]);
+  const [runtime, setRuntime] = useState<RuntimeConfig | null>(null);
   const [expandedAccount, setExpandedAccount] = useState<string | null>(null);
 
   useEffect(() => {
     api.getAccounts().then(setAccounts).catch(console.error);
     api.getAccountStatuses().then(setAccountStatuses).catch(() => {});
+    api.getRuntimeConfig().then(setRuntime).catch(() => {});
   }, []);
 
   // Refresh statuses periodically
@@ -60,7 +62,7 @@ export function Cockpit() {
   return (
     <div className="p-5 space-y-3 max-w-[1440px] mx-auto">
       <div className="flex items-center justify-between">
-        <span className="text-sm font-semibold" style={{ color: "var(--text)" }}>LucidFlex 150K Fleet</span>
+        <span className="text-sm font-semibold tracking-wide" style={{ color: "var(--text)", letterSpacing: "0.04em" }}>Fleet Monitor</span>
         <div className="flex items-center gap-4 text-xs">
           <span style={{ color: "var(--text-muted)" }}>{running ? "Engine Running" : "Engine Stopped"}</span>
           <span className="font-mono tabular" style={{ color: clr(fleet.fleetDayPnl) }}>Fleet: {fmt(fleet.fleetDayPnl)}</span>
@@ -80,7 +82,15 @@ export function Cockpit() {
             <th className="text-right font-normal px-4 py-2">DD Used</th>
           </tr></thead>
           <tbody>
-            {rows.length === 0 && <tr><td colSpan={8} className="px-4 py-6 text-center text-xs" style={{ color: "var(--text-dim)" }}>No accounts configured</td></tr>}
+            {rows.length === 0 && (
+              <tr>
+                <td colSpan={8} className="px-4 py-6 text-center text-xs" style={{ color: "var(--text-dim)" }}>
+                  {runtime?.nt_only
+                    ? "NT-only mode active — fleet monitoring appears when copy-account tracking is configured."
+                    : "No accounts configured"}
+                </td>
+              </tr>
+            )}
             {rows.map(row => (
               <>
                 <tr key={row.name}
@@ -147,6 +157,7 @@ export function Cockpit() {
                             <div className="h-full rounded-full" style={{
                               width: `${Math.min(row.status.drawdown_pct_used, 100)}%`,
                               background: row.status.drawdown_pct_used > 75 ? "var(--red)" : row.status.drawdown_pct_used > 50 ? "var(--amber)" : "var(--accent)",
+                              boxShadow: `0 0 6px ${row.status.drawdown_pct_used > 75 ? "rgba(240,74,74,0.5)" : "rgba(0,212,170,0.4)"}`,
                             }} />
                           </div>
                         </div>

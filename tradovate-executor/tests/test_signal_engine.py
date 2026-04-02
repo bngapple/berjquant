@@ -70,6 +70,15 @@ def make_engine() -> SignalEngine:
     )
 
 
+def make_engine_with_session(session: SessionConfig) -> SignalEngine:
+    return SignalEngine(
+        rsi_params=default_rsi_params(),
+        ib_params=default_ib_params(),
+        mom_params=default_mom_params(),
+        session=session,
+    )
+
+
 def make_bar(
     hour: int = 10,
     minute: int = 0,
@@ -298,6 +307,14 @@ class TestRSIStrategy:
         signals = engine.evaluate(state)
         rsi_signals = [s for s in signals if s.strategy == "RSI"]
         assert len(rsi_signals) == 1
+
+    def test_cutoff_uses_session_config(self):
+        engine = make_engine_with_session(SessionConfig(no_new_entries_after="15:00"))
+        bar = make_bar(hour=15, minute=0)
+        state = make_state(bar=bar, rsi_5=20.0)
+        signals = engine.evaluate(state)
+        rsi_signals = [s for s in signals if s.strategy == "RSI"]
+        assert rsi_signals == []
 
     def test_reason_contains_rsi_value_and_threshold(self):
         engine = make_engine()

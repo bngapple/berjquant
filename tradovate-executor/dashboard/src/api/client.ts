@@ -8,6 +8,8 @@ import type {
   AccountStatus,
   FleetAlert,
   Bar,
+  RuntimeConfig,
+  NTOnlySetupUpdate,
 } from "../types";
 
 const BASE = "/api";
@@ -71,6 +73,14 @@ export const api = {
     request<{ environment: string }>("/environment", {
       method: "PUT",
       body: JSON.stringify({ environment: env }),
+    }),
+
+  getRuntimeConfig: () => request<RuntimeConfig>("/runtime-config"),
+
+  saveNTOnlySetup: (data: NTOnlySetupUpdate) =>
+    request<RuntimeConfig>("/runtime-config/nt-only", {
+      method: "PUT",
+      body: JSON.stringify(data),
     }),
 
   // History

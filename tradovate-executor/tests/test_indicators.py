@@ -129,14 +129,15 @@ class TestEMA:
         assert_close(result, 8.0, rel_tol=1e-5)
 
     def test_ema_lags_sma_on_uptrend(self):
-        # EMA gives more weight to recent prices so it will be higher than SMA
-        # when prices are trending up
-        data = [float(i) for i in range(1, 22)]  # 1..21
-        ema_val = ema(data, period=21)
-        sma_val = sma(data, period=21)
+        # EMA gives more weight to recent prices, so it's higher than SMA when
+        # prices are *accelerating* upward (not just linearly trending — for a
+        # perfect linear trend EMA == SMA in steady state).
+        data = [1.0, 2.0, 4.0, 8.0, 16.0, 32.0, 64.0, 128.0]  # exponential
+        ema_val = ema(data, period=5)
+        sma_val = sma(data, period=5)
         assert ema_val is not None
         assert sma_val is not None
-        # EMA > SMA for ascending series
+        # EMA > SMA for accelerating (exponential) uptrend
         assert ema_val > sma_val
 
     def test_all_same_values_equals_that_value(self):
@@ -293,18 +294,18 @@ class TestRSI:
         assert_close(result, expected, rel_tol=1e-9)
 
     def test_flat_prices_after_initial_rsi(self):
-        # After the initial avg, flat prices (0 changes) drive RSI toward 50
-        # via Wilder smoothing pulling avg_gain and avg_loss toward 0 together
+        # When avg_loss = 0 (pure gains), RSI = 100.0 by Wilder's definition.
+        # Flat bars produce 0 changes, so avg_loss stays 0 and avg_gain decays —
+        # but RS = avg_gain / 0 is still infinity, so RSI stays at 100.0.
         closes = [100.0, 102.0, 104.0, 106.0, 108.0, 110.0]  # pure gains first
         result_up = rsi(closes, period=5)
-        assert result_up == 100.0  # all gains
+        assert result_up == 100.0  # all gains → avg_loss = 0
 
-        # Extend with flat bars
+        # Extend with flat bars — avg_loss stays 0, RS stays ∞, RSI stays 100
         flat = [110.0] * 10
         result_flat = rsi(closes + flat, period=5)
-        # Flat bars should pull RSI down from 100 (gains decay, no new losses)
         assert result_flat is not None
-        assert result_flat < 100.0
+        assert result_flat == 100.0  # avg_loss=0 → RSI=100 (Wilder's convention)
 
     def test_period_3_minimal(self):
         # period=3 needs at least 4 closes

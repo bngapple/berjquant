@@ -6,24 +6,43 @@ Starts the FastAPI backend in a background thread and opens a native WebKit wind
 
 import os
 import sys
-import signal
 import socket
 import threading
 import time
 import logging
+import shutil
 
-# Resolve paths relative to the app bundle or script location
-if getattr(sys, "frozen", False):
-    # Running inside py2app bundle
+# ---------------------------------------------------------------------------
+# Path resolution — dev vs PyInstaller bundle
+# ---------------------------------------------------------------------------
+
+if getattr(sys, "frozen", False) and hasattr(sys, "_MEIPASS"):
+    # PyInstaller bundle — store config/logs in a user-writable location
+    import pathlib, platform
+    _plat = platform.system()
+    if _plat == "Windows":
+        DATA_DIR = str(pathlib.Path.home() / "AppData" / "Roaming" / "HTFExecutor")
+    elif _plat == "Darwin":
+        DATA_DIR = str(pathlib.Path.home() / "Library" / "Application Support" / "HTFExecutor")
+    else:
+        DATA_DIR = str(pathlib.Path.home() / ".htfexecutor")
+    os.makedirs(DATA_DIR, exist_ok=True)
+    bundled_config = os.path.join(sys._MEIPASS, "config.json")
+    data_config = os.path.join(DATA_DIR, "config.json")
+    if os.path.exists(bundled_config) and not os.path.exists(data_config):
+        shutil.copy2(bundled_config, data_config)
+    os.chdir(DATA_DIR)
+    sys.path.insert(0, sys._MEIPASS)
+elif getattr(sys, "frozen", False):
+    # py2app bundle (legacy fallback)
     APP_DIR = os.path.dirname(os.path.dirname(os.path.dirname(os.path.abspath(sys.executable))))
     RESOURCE_DIR = os.path.join(APP_DIR, "Contents", "Resources")
     os.chdir(RESOURCE_DIR)
+    sys.path.insert(0, os.getcwd())
 else:
-    APP_DIR = os.path.dirname(os.path.abspath(__file__))
-    os.chdir(APP_DIR)
-
-# Add project root to Python path
-sys.path.insert(0, os.getcwd())
+    # Development — run from project root
+    os.chdir(os.path.dirname(os.path.abspath(__file__)))
+    sys.path.insert(0, os.getcwd())
 
 logging.basicConfig(
     level=logging.INFO,
@@ -38,16 +57,16 @@ URL = f"http://{HOST}:{PORT}"
 
 
 def port_in_use(port: int) -> bool:
-    """Check if a port is already bound."""
     with socket.socket(socket.AF_INET, socket.SOCK_STREAM) as s:
         return s.connect_ex((HOST, port)) == 0
 
 
 def start_server():
-    """Run uvicorn in the current thread (called from a daemon thread)."""
+    """Run uvicorn — use object import so PyInstaller can trace the dependency."""
     import uvicorn
+    from server.api import app as fastapi_app
     uvicorn.run(
-        "server.api:app",
+        fastapi_app,
         host=HOST,
         port=PORT,
         log_level="info",
@@ -56,7 +75,6 @@ def start_server():
 
 
 def wait_for_server(timeout: float = 30.0) -> bool:
-    """Poll until the server responds or timeout."""
     import urllib.request
     start = time.time()
     while time.time() - start < timeout:
@@ -69,9 +87,7 @@ def wait_for_server(timeout: float = 30.0) -> bool:
 
 
 def stop_engine_gracefully():
-    """Try to stop the trading engine before exit."""
     import urllib.request
-    import json
     try:
         req = urllib.request.Request(
             f"{URL}/api/engine/stop",
@@ -81,54 +97,44 @@ def stop_engine_gracefully():
         urllib.request.urlopen(req, timeout=5)
         logger.info("Engine stopped gracefully")
     except Exception:
-        pass  # Engine wasn't running or already stopped
+        pass
 
 
 def on_closing():
-    """Called when the native window is closed."""
     logger.info("Window closing — shutting down...")
     stop_engine_gracefully()
 
 
 def main():
-    # Check if port is already in use
     if port_in_use(PORT):
         logger.error(f"Port {PORT} is already in use. Is another instance running?")
         try:
             import webview
             webview.create_window(
                 "HTF Executor — Error",
-                html=f"""
-                <html>
-                <body style="background:#0d0d0d;color:#e8e8e8;font-family:system-ui;display:flex;align-items:center;justify-content:center;height:100vh;margin:0;">
+                html=f"""<html><body style="background:#0d0d0d;color:#e8e8e8;font-family:system-ui;
+                display:flex;align-items:center;justify-content:center;height:100vh;margin:0;">
                 <div style="text-align:center;">
-                    <h2 style="color:#ef4444;">Port {PORT} Already In Use</h2>
-                    <p style="color:#6b7280;">Another instance may be running. Close it and try again.</p>
-                </div>
-                </body>
-                </html>
-                """,
-                width=500,
-                height=300,
+                <h2 style="color:#ef4444;">Port {PORT} Already In Use</h2>
+                <p style="color:#6b7280;">Close the other instance and try again.</p>
+                </div></body></html>""",
+                width=500, height=300,
             )
             webview.start()
         except Exception:
             pass
         sys.exit(1)
 
-    # Start FastAPI server in a background thread
     logger.info(f"Starting server on {URL}...")
     server_thread = threading.Thread(target=start_server, daemon=True)
     server_thread.start()
 
-    # Wait for server to be ready
     if not wait_for_server():
         logger.error("Server failed to start within 30 seconds")
         sys.exit(1)
 
     logger.info("Server ready — opening window")
 
-    # Open native macOS window
     import webview
     window = webview.create_window(
         "HTF Executor",
@@ -140,12 +146,7 @@ def main():
         text_select=True,
     )
     window.events.closing += on_closing
-
-    webview.start(
-        debug=not getattr(sys, "frozen", False),  # Debug mode in development only
-    )
-
-    # After window closes, exit
+    webview.start(debug=not getattr(sys, "frozen", False))
     logger.info("Exited")
 
 

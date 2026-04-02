@@ -7,7 +7,7 @@ import asyncio
 import time
 import logging
 from dataclasses import dataclass
-from typing import Optional
+from typing import Callable, Optional
 
 import httpx
 
@@ -50,6 +50,9 @@ class AuthManager:
         self.sessions: dict[str, AuthSession] = {}  # keyed by account name
         self._http = httpx.AsyncClient(timeout=15.0)
         self._renew_tasks: dict[str, asyncio.Task] = {}
+        # Optional callback: called after every successful token renewal or re-auth.
+        # Signature: on_token_renewed(session: AuthSession) -> None (sync or async)
+        self.on_token_renewed: Optional[Callable] = None
 
     async def authenticate_all(self):
         """Authenticate every configured account in parallel."""
@@ -65,7 +68,7 @@ class AuthManager:
             else:
                 logger.info(f"[{acct.name}] Authenticated — account ID: {self.sessions[acct.name].tradovate_account_id}")
 
-    async def _authenticate(self, session: AuthSession):
+    async def _authenticate(self, session: AuthSession, start_renewal: bool = True):
         """POST /auth/accesstokenrequest for one account."""
         url = f"{self.config.rest_url}/auth/accesstokenrequest"
         payload = {
@@ -93,8 +96,10 @@ class AuthManager:
         # Fetch account ID (needed for order placement)
         await self._fetch_account_id(session)
 
-        # Start auto-renewal loop
-        self._start_renewal(session)
+        # Start auto-renewal loop (skipped when called from within the renewal loop
+        # to avoid self-cancellation of the currently running task)
+        if start_renewal:
+            self._start_renewal(session)
 
     async def _fetch_account_id(self, session: AuthSession):
         """GET /account/list to find the numeric account ID."""
@@ -125,14 +130,24 @@ class AuthManager:
             try:
                 await self._renew_token(session)
                 logger.info(f"[{session.name}] Token renewed")
+                self._fire_token_renewed(session)
             except Exception as e:
                 logger.error(f"[{session.name}] Token renewal failed: {e}")
-                # Try full re-auth
+                # Re-auth without starting a new renewal task — this loop continues
                 try:
-                    await self._authenticate(session)
+                    await self._authenticate(session, start_renewal=False)
                     logger.info(f"[{session.name}] Re-authenticated after renewal failure")
+                    self._fire_token_renewed(session)
                 except Exception as e2:
                     logger.critical(f"[{session.name}] Re-auth also failed: {e2}")
+
+    def _fire_token_renewed(self, session: AuthSession):
+        """Invoke the on_token_renewed callback if set."""
+        if not self.on_token_renewed:
+            return
+        result = self.on_token_renewed(session)
+        if asyncio.iscoroutine(result):
+            asyncio.create_task(result)
 
     async def _renew_token(self, session: AuthSession):
         """POST /auth/renewaccesstoken."""

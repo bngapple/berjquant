@@ -95,26 +95,26 @@ export function Dashboard() {
 
       {/* ── Stat Strip ──────────────────────────────────── */}
       <div className="flex gap-3">
-        <div className="panel rounded flex-[2.5] px-6 py-5">
-          <div className="text-[10px] font-normal uppercase tracking-wider mb-2" style={{ color: "var(--text-muted)" }}>Total P&L</div>
-          <span className="text-[32px] font-bold font-mono tabular leading-none" style={{ color: clr(stats.totalPnl) }}>{fmt(stats.totalPnl)}</span>
+        <div className={`panel rounded flex-[2.5] px-6 py-5 ${stats.totalPnl >= 0 ? "card-accent" : "card-red"}`}>
+          <div className="text-[10px] font-medium uppercase tracking-wider mb-2" style={{ color: "var(--text-muted)", letterSpacing: "0.12em" }}>Total P&L</div>
+          <span className={`text-[36px] font-bold font-mono tabular leading-none ${stats.totalPnl >= 0 ? "glow-accent" : "glow-red"}`} style={{ color: clr(stats.totalPnl) }}>{fmt(stats.totalPnl)}</span>
         </div>
-        <div className="panel rounded flex-1 px-4 py-4">
-          <div className="text-[10px] font-normal uppercase tracking-wider mb-1.5" style={{ color: "var(--text-muted)" }}>Win Rate</div>
+        <div className="panel rounded flex-1 px-4 py-4 card-accent">
+          <div className="text-[10px] font-medium uppercase tracking-wider mb-1.5" style={{ color: "var(--text-muted)", letterSpacing: "0.12em" }}>Win Rate</div>
           <div className="flex items-center gap-2">
             <DonutRing value={stats.winRate} size={28} />
             <span className="text-[15px] font-semibold tabular" style={{ color: "var(--text)" }}>{hasData ? `${stats.winRate.toFixed(0)}%` : "--"}</span>
           </div>
         </div>
-        <div className="panel rounded flex-1 px-4 py-4">
-          <div className="text-[10px] font-normal uppercase tracking-wider mb-1.5" style={{ color: "var(--text-muted)" }}>Profit Factor</div>
+        <div className="panel rounded flex-1 px-4 py-4 card-accent">
+          <div className="text-[10px] font-medium uppercase tracking-wider mb-1.5" style={{ color: "var(--text-muted)", letterSpacing: "0.12em" }}>Profit Factor</div>
           <div className="flex items-center gap-2">
             <DonutRing value={stats.profitFactor > 0 ? Math.min((stats.profitFactor / (stats.profitFactor + 1)) * 100, 100) : 0} size={28} />
             <span className="text-[15px] font-semibold tabular" style={{ color: "var(--text)" }}>{hasData ? stats.profitFactor.toFixed(2) : "--"}</span>
           </div>
         </div>
-        <div className="panel rounded flex-[1.2] px-4 py-4">
-          <div className="text-[10px] font-normal uppercase tracking-wider mb-1.5" style={{ color: "var(--text-muted)" }}>Avg Win / Loss</div>
+        <div className="panel rounded flex-[1.2] px-4 py-4 card-accent">
+          <div className="text-[10px] font-medium uppercase tracking-wider mb-1.5" style={{ color: "var(--text-muted)", letterSpacing: "0.12em" }}>Avg Win / Loss</div>
           <div className="space-y-1">
             <div className="text-[13px] font-mono tabular" style={{ color: "var(--accent)" }}>Avg Win: {hasData ? `$${stats.avgWin.toFixed(0)}` : "--"}</div>
             <div className="flex h-[3px] rounded overflow-hidden" style={{ background: "rgba(255,255,255,0.04)" }}>
@@ -124,8 +124,8 @@ export function Dashboard() {
             <div className="text-[13px] font-mono tabular" style={{ color: "var(--red)" }}>Avg Loss: {hasData ? `$${stats.avgLoss.toFixed(0)}` : "--"}</div>
           </div>
         </div>
-        <div className="panel rounded flex-[0.6] px-4 py-4">
-          <div className="text-[10px] font-normal uppercase tracking-wider mb-1.5" style={{ color: "var(--text-muted)" }}>Trades</div>
+        <div className="panel rounded flex-[0.6] px-4 py-4 card-accent">
+          <div className="text-[10px] font-medium uppercase tracking-wider mb-1.5" style={{ color: "var(--text-muted)", letterSpacing: "0.12em" }}>Trades</div>
           <span className="text-[15px] font-semibold tabular" style={{ color: "var(--text)" }}>{stats.totalTrades}</span>
         </div>
       </div>
@@ -168,8 +168,7 @@ export function Dashboard() {
           </table>
         </div>
         <div className="panel rounded px-3 py-2.5 space-y-2">
-          <LimitBar label="Daily" value={pnl?.daily ?? 0} limit={-3000} />
-          <LimitBar label="Monthly" value={pnl?.monthly ?? 0} limit={-4500} />
+          <LimitBar label="Drawdown" value={pnl?.monthly ?? 0} limit={pnl?.monthly_limit ?? -4500} />
         </div>
       </div>
 
@@ -178,7 +177,7 @@ export function Dashboard() {
         <div className="flex px-3 pt-1.5 gap-4" style={{ borderBottom: "1px solid var(--border)" }}>
           {(["signals", "trades"] as const).map(t => (
             <button key={t} onClick={() => setLogTab(t)} className="pb-1.5 text-[11px] font-medium capitalize transition-colors"
-              style={{ color: logTab === t ? "var(--text)" : "var(--text-muted)", borderBottom: logTab === t ? "2px solid white" : "2px solid transparent" }}>
+              style={{ color: logTab === t ? "var(--accent)" : "var(--text-muted)", borderBottom: logTab === t ? "2px solid var(--accent)" : "2px solid transparent" }}>
               {t === "signals" ? "Signal Log" : "Trade Log"}
             </button>
           ))}
@@ -218,15 +217,18 @@ export function Dashboard() {
 
 function LimitBar({ label, value, limit }: { label: string; value: number; limit: number }) {
   const pct = value <= 0 ? Math.min((Math.abs(value) / Math.abs(limit)) * 100, 100) : 0;
-  const color = value >= 0 ? "var(--accent)" : pct > 80 ? "var(--red)" : pct > 50 ? "var(--amber)" : "var(--accent)";
+  const danger = pct > 75;
+  const warn = pct > 50;
+  const color = danger ? "var(--red)" : warn ? "var(--amber)" : "var(--accent)";
+  const glowColor = danger ? "rgba(240,74,74,0.35)" : warn ? "rgba(245,158,11,0.35)" : "rgba(0,212,170,0.35)";
   return (
     <div className="flex items-center gap-3">
-      <span className="text-[10px] w-14 shrink-0 font-light" style={{ color: "var(--text-muted)" }}>{label}</span>
-      <div className="flex-1 h-2 rounded-full overflow-hidden" style={{ background: "rgba(255,255,255,0.04)" }}>
-        <div className="h-full rounded-full transition-all duration-500" style={{ width: `${value >= 0 ? 0 : pct}%`, background: color }} />
+      <span className="text-[10px] w-20 shrink-0 font-medium uppercase tracking-wider" style={{ color: "var(--text-muted)", letterSpacing: "0.1em" }}>{label}</span>
+      <div className="flex-1 h-1.5 rounded-full overflow-hidden" style={{ background: "rgba(255,255,255,0.04)" }}>
+        <div className="h-full rounded-full transition-all duration-700" style={{ width: `${value >= 0 ? 0 : pct}%`, background: color, boxShadow: pct > 10 ? `0 0 6px ${glowColor}` : "none" }} />
       </div>
-      <span className="text-[10px] font-mono w-24 text-right tabular" style={{ color: value >= 0 ? "var(--accent)" : "var(--red)" }}>
-        {value >= 0 ? "+" : ""}${value.toFixed(0)} / ${limit.toFixed(0)}
+      <span className="text-[11px] font-mono w-28 text-right tabular font-medium" style={{ color: value >= 0 ? "var(--accent)" : color }}>
+        {value >= 0 ? "+" : ""}${Math.abs(value).toFixed(0)} / ${Math.abs(limit).toFixed(0)}
       </span>
     </div>
   );

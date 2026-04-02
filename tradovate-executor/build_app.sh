@@ -1,30 +1,48 @@
 #!/bin/bash
+# build_app.sh — Builds HTF Executor as a distributable macOS .app + .dmg
 set -e
 
 cd "$(dirname "$0")"
 
-echo "=== HTF Executor — Build macOS App ==="
+echo "═══════════════════════════════════════"
+echo "  HTF Executor — App Bundle Builder"
+echo "═══════════════════════════════════════"
+
+# 1. Build the React dashboard
 echo ""
-
-# 1. Activate venv
-source venv/bin/activate
-
-# 2. Build frontend
-echo "[1/3] Building frontend..."
+echo "→ [1/3] Building dashboard..."
 cd dashboard && npm run build && cd ..
-echo "      Frontend built → dashboard/dist/"
+echo "   ✓ Dashboard built"
 
-# 3. Clean previous build
-echo "[2/3] Cleaning previous build..."
-rm -rf build dist
+# 2. Activate venv and run PyInstaller
+echo ""
+echo "→ [2/3] Bundling with PyInstaller..."
+source venv/bin/activate
+pip install pyinstaller --quiet
 
-# 4. Build .app bundle
-echo "[3/3] Building macOS app bundle..."
-python setup_app.py py2app 2>&1 | tail -5
+# Clean old build artifacts
+rm -rf build dist/HTFExecutor dist/HTFExecutor.app
+
+pyinstaller HTFExecutor.spec --clean --noconfirm
+echo "   ✓ App bundle created: dist/HTFExecutor.app"
+
+# 3. Package as DMG
+echo ""
+echo "→ [3/3] Packaging as DMG..."
+rm -f "dist/HTFExecutor.dmg"
+
+hdiutil create -volname "HTFExecutor" \
+    -srcfolder "dist/HTFExecutor.app" \
+    -ov -format UDZO \
+    "dist/HTFExecutor.dmg"
+echo "   ✓ DMG created: dist/HTFExecutor.dmg"
 
 echo ""
-echo "=== Done ==="
-echo "App: dist/HTF Executor.app"
+echo "═══════════════════════════════════════"
+echo "  Done!"
+echo "  App:  dist/HTFExecutor.app"
+echo "  DMG:  dist/HTFExecutor.dmg"
 echo ""
-echo "To install: drag to /Applications"
-echo "To run: double-click the app"
+echo "  Share dist/HTFExecutor.dmg"
+echo "  Config/logs: ~/Library/Application Support/HTFExecutor/"
+echo "═══════════════════════════════════════"
