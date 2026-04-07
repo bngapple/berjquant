@@ -42,6 +42,7 @@ namespace NinjaTrader.NinjaScript.Strategies
         private const double DefaultPointValueUsd = 2.0;
         private const int MaxHistoryBars = 500;
         private const string RiskStateFileName = "HTFSwingV3HybridV2.risk";
+        private const int RegularTradingHoursEnd = 160000;
 
         private class ClosedBar
         {
@@ -353,7 +354,7 @@ namespace NinjaTrader.NinjaScript.Strategies
                 RealtimeErrorHandling        = RealtimeErrorHandling.StopCancelClose;
 
                 SessionStart                 = 93000;
-                NoNewEntriesAfter            = 163000;
+                NoNewEntriesAfter            = 160000;
                 EodFlattenTime               = 164500;
                 OnePositionAtATime           = false;
                 PersistRiskState             = true;
@@ -550,9 +551,15 @@ namespace NinjaTrader.NinjaScript.Strategies
                 Volume = Convert.ToInt64(Volume[1], CultureInfo.InvariantCulture),
             };
 
+            if (!IsRegularTradingHoursBar(closedBarTime))
+                return;
+
             IngestClosedBar(bar);
 
             if (State == State.Historical)
+                return;
+
+            if (closedBarTime.Date != openBarTime.Date)
                 return;
 
             AdvanceHeldBars();
@@ -600,6 +607,12 @@ namespace NinjaTrader.NinjaScript.Strategies
             TrimSeries(_volumes);
 
             UpdateIndicators();
+        }
+
+        private bool IsRegularTradingHoursBar(DateTime barTime)
+        {
+            int timeValue = ToTime(barTime);
+            return timeValue >= SessionStart && timeValue < RegularTradingHoursEnd;
         }
 
         private void UpdateIbState(ClosedBar bar)
@@ -768,7 +781,7 @@ namespace NinjaTrader.NinjaScript.Strategies
             int contracts = GetEffectiveContractsPerStrategy();
             PendingSignal signal = null;
 
-            if (bar.Close > _todayIb.High)
+            if (bar.High > _todayIb.High)
             {
                 signal = BuildSignal(
                     "IB",
@@ -777,11 +790,11 @@ namespace NinjaTrader.NinjaScript.Strategies
                     IbStopLossPts,
                     IbTakeProfitPts,
                     IbMaxHoldBars,
-                    string.Format(CultureInfo.InvariantCulture, "IB Breakout UP — close {0:F2} > IB high {1:F2}", bar.Close, _todayIb.High),
+                    string.Format(CultureInfo.InvariantCulture, "IB Breakout UP — high {0:F2} > IB high {1:F2}", bar.High, _todayIb.High),
                     bar
                 );
             }
-            else if (bar.Close < _todayIb.Low)
+            else if (bar.Low < _todayIb.Low)
             {
                 signal = BuildSignal(
                     "IB",
@@ -790,7 +803,7 @@ namespace NinjaTrader.NinjaScript.Strategies
                     IbStopLossPts,
                     IbTakeProfitPts,
                     IbMaxHoldBars,
-                    string.Format(CultureInfo.InvariantCulture, "IB Breakout DOWN — close {0:F2} < IB low {1:F2}", bar.Close, _todayIb.Low),
+                    string.Format(CultureInfo.InvariantCulture, "IB Breakout DOWN — low {0:F2} < IB low {1:F2}", bar.Low, _todayIb.Low),
                     bar
                 );
             }
