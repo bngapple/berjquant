@@ -94,11 +94,37 @@ namespace NinjaTrader.NinjaScript.Strategies
 
             public void Enter(MarketPosition side, double entryPrice, int quantity)
             {
-                IsFlat = false;
-                Side = side;
-                EntryPrice = entryPrice;
-                Quantity = quantity;
-                BarsHeld = 0;
+                if (quantity <= 0)
+                    return;
+
+                if (IsFlat || Side != side || Quantity <= 0)
+                {
+                    IsFlat = false;
+                    Side = side;
+                    EntryPrice = entryPrice;
+                    Quantity = quantity;
+                    BarsHeld = 0;
+                    return;
+                }
+
+                double weightedCost = (EntryPrice * Quantity) + (entryPrice * quantity);
+                Quantity += quantity;
+                EntryPrice = weightedCost / Quantity;
+            }
+
+            public bool Reduce(int quantity)
+            {
+                if (IsFlat || quantity <= 0)
+                    return true;
+
+                Quantity = Math.Max(0, Quantity - quantity);
+                if (Quantity == 0)
+                {
+                    Reset();
+                    return true;
+                }
+
+                return false;
             }
 
             public void Reset()
@@ -151,9 +177,10 @@ namespace NinjaTrader.NinjaScript.Strategies
         private double? _volumeSmaValue;
 
         private double _dailyPnl;
-        private double _monthlyPnl;
+        private double _realizedPnl;
+        private double _peakRealizedPnl;
         private bool _dailyLimitHit;
-        private bool _monthlyLimitHit;
+        private bool _maxDrawdownHit;
         private bool _tradingHalted;
         private bool _eodFlattened;
 
@@ -247,31 +274,35 @@ namespace NinjaTrader.NinjaScript.Strategies
         public int IbEndTime { get; set; }
 
         [NinjaScriptProperty]
-        [Display(Name = "Stop Loss Pts", GroupName = "IB", Order = 32)]
+        [Display(Name = "IB Last Entry (HHMMSS)", GroupName = "IB", Order = 32)]
+        public int IbLastEntryTime { get; set; }
+
+        [NinjaScriptProperty]
+        [Display(Name = "Stop Loss Pts", GroupName = "IB", Order = 33)]
         public double IbStopLossPts { get; set; }
 
         [NinjaScriptProperty]
-        [Display(Name = "Take Profit Pts", GroupName = "IB", Order = 33)]
+        [Display(Name = "Take Profit Pts", GroupName = "IB", Order = 34)]
         public double IbTakeProfitPts { get; set; }
 
         [NinjaScriptProperty]
-        [Display(Name = "Max Hold Bars", GroupName = "IB", Order = 34)]
+        [Display(Name = "Max Hold Bars", GroupName = "IB", Order = 35)]
         public int IbMaxHoldBars { get; set; }
 
         [NinjaScriptProperty]
-        [Display(Name = "Min IB Range Pts", GroupName = "IB", Order = 35)]
+        [Display(Name = "Min IB Range Pts", GroupName = "IB", Order = 36)]
         public double IbMinRangePts { get; set; }
 
         [NinjaScriptProperty]
-        [Display(Name = "IB Range Lookback Days", GroupName = "IB", Order = 36)]
+        [Display(Name = "IB Range Lookback Days", GroupName = "IB", Order = 37)]
         public int IbRangeLookbackDays { get; set; }
 
         [NinjaScriptProperty]
-        [Display(Name = "Range Percentile Low", GroupName = "IB", Order = 37)]
+        [Display(Name = "Range Percentile Low", GroupName = "IB", Order = 38)]
         public double IbRangePercentileLow { get; set; }
 
         [NinjaScriptProperty]
-        [Display(Name = "Range Percentile High", GroupName = "IB", Order = 38)]
+        [Display(Name = "Range Percentile High", GroupName = "IB", Order = 39)]
         public double IbRangePercentileHigh { get; set; }
 
         // ----------------------------------------------------------------
@@ -342,6 +373,7 @@ namespace NinjaTrader.NinjaScript.Strategies
 
                 IbStartTime                  = 93000;
                 IbEndTime                    = 100000;
+                IbLastEntryTime              = 153000;
                 IbStopLossPts                = 10.0;
                 IbTakeProfitPts              = 120.0;
                 IbMaxHoldBars                = 15;
@@ -377,7 +409,7 @@ namespace NinjaTrader.NinjaScript.Strategies
                 int effectiveContracts = GetEffectiveContractsPerStrategy();
                 double effectiveMonthlyLimit = GetEffectiveMonthlyLossLimitUsd();
                 Print(string.Format(
-                    "[HTF] Realtime ready on {0}. OnePositionAtATime={1}, contracts={2}, monthly limit=${3:F2}, tier={4}k",
+                    "[HTF] Realtime ready on {0}. OnePositionAtATime={1}, contracts={2}, max drawdown=${3:F2}, tier={4}k",
                     Instrument != null ? Instrument.FullName : "chart",
                     OnePositionAtATime,
                     effectiveContracts,
@@ -437,11 +469,13 @@ namespace NinjaTrader.NinjaScript.Strategies
 
                 pos.Enter(side, price, quantity);
                 Print(string.Format(
-                    "[HTF] Entry fill: {0} {1} {2} @ {3:F2}",
+                    "[HTF] Entry fill: {0} {1} {2} @ {3:F2} | total_qty={4} avg_entry={5:F2}",
                     orderName,
                     side == MarketPosition.Long ? "Long" : "Short",
                     quantity,
-                    price
+                    price,
+                    pos.Quantity,
+                    pos.EntryPrice
                 ));
                 return;
             }
@@ -453,24 +487,34 @@ namespace NinjaTrader.NinjaScript.Strategies
             if (strategyPos.IsFlat)
                 return;
 
+            int exitQuantity = Math.Min(quantity, strategyPos.Quantity);
+            if (exitQuantity <= 0)
+                return;
+
             string exitType = ResolveExitType(order);
             double pnl = 0.0;
 
             if (strategyPos.Side == MarketPosition.Long)
-                pnl = (price - strategyPos.EntryPrice) * GetPointValueUsd() * quantity;
+                pnl = (price - strategyPos.EntryPrice) * GetPointValueUsd() * exitQuantity;
             else if (strategyPos.Side == MarketPosition.Short)
-                pnl = (strategyPos.EntryPrice - price) * GetPointValueUsd() * quantity;
+                pnl = (strategyPos.EntryPrice - price) * GetPointValueUsd() * exitQuantity;
 
             Print(string.Format(
                 "[HTF] Exit: {0} {1} {2} @ {3:F2} | pnl={4:+0.00;-0.00;0.00}",
                 fromEntrySignal,
                 exitType,
-                quantity,
+                exitQuantity,
                 price,
                 pnl
             ));
 
-            strategyPos.Reset();
+            bool flatAfterExit = strategyPos.Reduce(exitQuantity);
+            Print(string.Format(
+                "[HTF] Position update: {0} remaining_qty={1} flat={2}",
+                fromEntrySignal,
+                strategyPos.Quantity,
+                flatAfterExit
+            ));
             RecordTradePnl(pnl, fromEntrySignal);
         }
 
@@ -708,6 +752,10 @@ namespace NinjaTrader.NinjaScript.Strategies
             if (!pos.IsFlat || _ibTradedToday || _todayIb == null || !_ibComplete || !_todayIb.IsValid)
                 return null;
 
+            int barTime = ToTime(bar.Time);
+            if (barTime < IbEndTime || barTime >= IbLastEntryTime)
+                return null;
+
             if (_todayIb.Range < IbMinRangePts)
                 return null;
 
@@ -720,7 +768,7 @@ namespace NinjaTrader.NinjaScript.Strategies
             int contracts = GetEffectiveContractsPerStrategy();
             PendingSignal signal = null;
 
-            if (bar.High > _todayIb.High)
+            if (bar.Close > _todayIb.High)
             {
                 signal = BuildSignal(
                     "IB",
@@ -729,11 +777,11 @@ namespace NinjaTrader.NinjaScript.Strategies
                     IbStopLossPts,
                     IbTakeProfitPts,
                     IbMaxHoldBars,
-                    string.Format(CultureInfo.InvariantCulture, "IB Breakout UP — high {0:F2} > IB high {1:F2}", bar.High, _todayIb.High),
+                    string.Format(CultureInfo.InvariantCulture, "IB Breakout UP — close {0:F2} > IB high {1:F2}", bar.Close, _todayIb.High),
                     bar
                 );
             }
-            else if (bar.Low < _todayIb.Low)
+            else if (bar.Close < _todayIb.Low)
             {
                 signal = BuildSignal(
                     "IB",
@@ -742,7 +790,7 @@ namespace NinjaTrader.NinjaScript.Strategies
                     IbStopLossPts,
                     IbTakeProfitPts,
                     IbMaxHoldBars,
-                    string.Format(CultureInfo.InvariantCulture, "IB Breakout DOWN — low {0:F2} < IB low {1:F2}", bar.Low, _todayIb.Low),
+                    string.Format(CultureInfo.InvariantCulture, "IB Breakout DOWN — close {0:F2} < IB low {1:F2}", bar.Close, _todayIb.Low),
                     bar
                 );
             }
@@ -961,9 +1009,6 @@ namespace NinjaTrader.NinjaScript.Strategies
             if (_currentRiskDate == DateTime.MinValue)
                 _currentRiskDate = openBarTime.Date;
 
-            if (_currentRiskMonth != openBarTime.Month)
-                ResetMonthly(openBarTime.Month);
-
             if (_currentRiskDate.Date != openBarTime.Date)
                 ResetDaily(openBarTime.Date);
         }
@@ -974,33 +1019,26 @@ namespace NinjaTrader.NinjaScript.Strategies
             _dailyPnl = 0.0;
             _dailyLimitHit = false;
             _eodFlattened = false;
-            if (!_monthlyLimitHit)
+            if (!_maxDrawdownHit)
                 _tradingHalted = false;
             SaveRiskState();
             Print(string.Format("[HTF] Daily reset — {0:yyyy-MM-dd}", date));
         }
 
-        private void ResetMonthly(int month)
-        {
-            _currentRiskMonth = month;
-            _monthlyPnl = 0.0;
-            _monthlyLimitHit = false;
-            _tradingHalted = false;
-            SaveRiskState();
-            Print(string.Format("[HTF] Monthly reset — month {0}", month));
-        }
-
         private void RecordTradePnl(double pnl, string strategy)
         {
             _dailyPnl += pnl;
-            _monthlyPnl += pnl;
+            _realizedPnl += pnl;
+            if (_realizedPnl > _peakRealizedPnl)
+                _peakRealizedPnl = _realizedPnl;
 
             Print(string.Format(
-                "[HTF] Trade P&L: {0:+0.00;-0.00;0.00} ({1}) | daily={2:+0.00;-0.00;0.00} | monthly={3:+0.00;-0.00;0.00}",
+                "[HTF] Trade P&L: {0:+0.00;-0.00;0.00} ({1}) | daily={2:+0.00;-0.00;0.00} | realized={3:+0.00;-0.00;0.00} | dd={4:+0.00;-0.00;0.00}",
                 pnl,
                 strategy,
                 _dailyPnl,
-                _monthlyPnl
+                _realizedPnl,
+                _realizedPnl - _peakRealizedPnl
             ));
 
             if (DailyLossLimitUsd > 0.0 && !_dailyLimitHit && _dailyPnl <= -Math.Abs(DailyLossLimitUsd))
@@ -1012,11 +1050,17 @@ namespace NinjaTrader.NinjaScript.Strategies
             }
 
             double effectiveMonthlyLimit = GetEffectiveMonthlyLossLimitUsd();
-            if (!_monthlyLimitHit && _monthlyPnl <= -Math.Abs(effectiveMonthlyLimit))
+            double currentDrawdown = _realizedPnl - _peakRealizedPnl;
+            if (!_maxDrawdownHit && currentDrawdown <= -Math.Abs(effectiveMonthlyLimit))
             {
-                _monthlyLimitHit = true;
+                _maxDrawdownHit = true;
                 _tradingHalted = true;
-                Print(string.Format("[HTF] MONTHLY LOSS LIMIT HIT: {0:F2}", _monthlyPnl));
+                Print(string.Format(
+                    "[HTF] MAX DRAWDOWN HIT: drawdown={0:F2} | realized={1:F2} | peak={2:F2}",
+                    currentDrawdown,
+                    _realizedPnl,
+                    _peakRealizedPnl
+                ));
                 FlattenAllStrategies("Risk");
             }
 
@@ -1062,25 +1106,25 @@ namespace NinjaTrader.NinjaScript.Strategies
                 }
 
                 DateTime now = DateTime.Now;
-                int savedMonth;
                 DateTime savedDate;
-                bool savedMonthlyLimitHit;
+                bool savedMaxDrawdownHit;
                 bool savedDailyLimitHit;
 
-                if (TryGetInt(map, "current_month", out savedMonth) && savedMonth == now.Month)
+                _currentRiskMonth = now.Month;
+                _realizedPnl = GetDouble(map, "realized_pnl");
+                _peakRealizedPnl = GetDouble(map, "peak_realized_pnl");
+                if (_peakRealizedPnl < _realizedPnl)
+                    _peakRealizedPnl = _realizedPnl;
+                savedMaxDrawdownHit = GetBool(map, "max_drawdown_hit");
+                _maxDrawdownHit = savedMaxDrawdownHit;
+                if (_maxDrawdownHit)
                 {
-                    _currentRiskMonth = savedMonth;
-                    _monthlyPnl = GetDouble(map, "monthly_pnl");
-                    savedMonthlyLimitHit = GetBool(map, "monthly_limit_hit");
-                    _monthlyLimitHit = savedMonthlyLimitHit;
-                    if (_monthlyLimitHit)
-                    {
-                        _tradingHalted = true;
-                        Print(string.Format(
-                            "[HTF] Monthly loss limit was hit in a previous session ({0:F2}). Trading halted.",
-                            _monthlyPnl
-                        ));
-                    }
+                    _tradingHalted = true;
+                    Print(string.Format(
+                        "[HTF] Max drawdown was hit in a previous session. realized={0:F2} peak={1:F2}",
+                        _realizedPnl,
+                        _peakRealizedPnl
+                    ));
                 }
 
                 if (TryGetDate(map, "current_date", out savedDate) && savedDate.Date == now.Date)
@@ -1092,9 +1136,10 @@ namespace NinjaTrader.NinjaScript.Strategies
                 }
 
                 Print(string.Format(
-                    "[HTF] Risk state loaded — daily={0:+0.00;-0.00;0.00}, monthly={1:+0.00;-0.00;0.00}, halted={2}",
+                    "[HTF] Risk state loaded — daily={0:+0.00;-0.00;0.00}, realized={1:+0.00;-0.00;0.00}, peak={2:+0.00;-0.00;0.00}, halted={3}",
                     _dailyPnl,
-                    _monthlyPnl,
+                    _realizedPnl,
+                    _peakRealizedPnl,
                     _tradingHalted
                 ));
             }
@@ -1117,8 +1162,9 @@ namespace NinjaTrader.NinjaScript.Strategies
 
                 string[] lines =
                 {
-                    "monthly_pnl=" + _monthlyPnl.ToString(CultureInfo.InvariantCulture),
-                    "monthly_limit_hit=" + _monthlyLimitHit.ToString(),
+                    "realized_pnl=" + _realizedPnl.ToString(CultureInfo.InvariantCulture),
+                    "peak_realized_pnl=" + _peakRealizedPnl.ToString(CultureInfo.InvariantCulture),
+                    "max_drawdown_hit=" + _maxDrawdownHit.ToString(),
                     "current_month=" + (_currentRiskMonth == 0 ? DateTime.Now.Month : _currentRiskMonth).ToString(CultureInfo.InvariantCulture),
                     "current_date=" + (_currentRiskDate == DateTime.MinValue ? DateTime.Now.Date : _currentRiskDate.Date).ToString("yyyy-MM-dd", CultureInfo.InvariantCulture),
                     "daily_pnl=" + _dailyPnl.ToString(CultureInfo.InvariantCulture),
@@ -1384,9 +1430,10 @@ namespace NinjaTrader.NinjaScript.Strategies
             _currentRiskDate = DateTime.MinValue;
             _currentRiskMonth = 0;
             _dailyPnl = 0.0;
-            _monthlyPnl = 0.0;
+            _realizedPnl = 0.0;
+            _peakRealizedPnl = 0.0;
             _dailyLimitHit = false;
-            _monthlyLimitHit = false;
+            _maxDrawdownHit = false;
             _tradingHalted = false;
             _eodFlattened = false;
         }
