@@ -8,8 +8,11 @@ Risk Manager — enforces all risk limits and session rules.
 """
 
 import asyncio
+import json
 import logging
+import os
 from datetime import datetime, time as dt_time, date
+from pathlib import Path
 from typing import Optional, Callable
 from zoneinfo import ZoneInfo
 
@@ -18,6 +21,8 @@ from config import SessionConfig, POINT_VALUE
 logger = logging.getLogger(__name__)
 
 ET = ZoneInfo("US/Eastern")
+
+_STATE_FILE = "state/risk_state.json"
 
 
 class RiskManager:
@@ -49,9 +54,75 @@ class RiskManager:
         # EOD flatten task
         self._eod_task: Optional[asyncio.Task] = None
 
+        # Load persisted state so monthly P&L survives restarts
+        self._load_state()
+
+    # ------------------------------------------------------------------
+    # State Persistence (monthly P&L survives restarts)
+    # ------------------------------------------------------------------
+
+    def _load_state(self):
+        """Load persisted monthly/daily state from disk."""
+        try:
+            p = Path(_STATE_FILE)
+            if not p.exists():
+                return
+            data = json.loads(p.read_text())
+            now = datetime.now(ET)
+            today = now.date()
+            saved_month = data.get("current_month")
+            saved_date = data.get("current_date")
+
+            # Restore monthly state only if same calendar month
+            if saved_month == now.month:
+                self.monthly_pnl = float(data.get("monthly_pnl", 0.0))
+                self.current_month = saved_month
+                self.monthly_limit_hit = bool(data.get("monthly_limit_hit", False))
+                if self.monthly_limit_hit:
+                    self.trading_halted = True
+                    logger.warning(
+                        f"Monthly loss limit was hit in previous session "
+                        f"(${self.monthly_pnl:,.2f}). Trading halted."
+                    )
+
+            # Restore daily P&L only if same calendar date
+            if saved_date == str(today):
+                self.daily_pnl = float(data.get("daily_pnl", 0.0))
+                self.current_date = today
+
+            logger.info(
+                f"Risk state loaded — monthly: ${self.monthly_pnl:+,.2f}, "
+                f"daily: ${self.daily_pnl:+,.2f}, halted: {self.trading_halted}"
+            )
+        except Exception as e:
+            logger.warning(f"Could not load risk state: {e}")
+
+    def _save_state(self):
+        """Persist monthly/daily state to disk."""
+        try:
+            Path(_STATE_FILE).parent.mkdir(exist_ok=True)
+            Path(_STATE_FILE).write_text(json.dumps({
+                "monthly_pnl": self.monthly_pnl,
+                "monthly_limit_hit": self.monthly_limit_hit,
+                "current_month": self.current_month or datetime.now(ET).month,
+                "current_date": str(self.current_date or datetime.now(ET).date()),
+                "daily_pnl": self.daily_pnl,
+            }))
+        except Exception as e:
+            logger.warning(f"Could not save risk state: {e}")
+
     def start_eod_timer(self):
-        """Launch background task that flattens at 4:45 PM ET."""
+        """Launch background task that flattens at the configured EOD time."""
         self._eod_task = asyncio.create_task(self._eod_loop())
+
+    def _session_start_time(self) -> dt_time:
+        return dt_time.fromisoformat(self.cfg.session_start)
+
+    def _entry_cutoff_time(self) -> dt_time:
+        return dt_time.fromisoformat(self.cfg.no_new_entries_after)
+
+    def _flatten_time(self) -> dt_time:
+        return dt_time.fromisoformat(self.cfg.flatten_time)
 
     async def _eod_loop(self):
         """Check every 5 seconds if it's time to flatten."""
@@ -61,7 +132,10 @@ class RiskManager:
                 now = datetime.now(ET)
 
                 # Reset daily state at session start
-                if now.time() >= dt_time(9, 30) and now.time() < dt_time(9, 31):
+                session_start = self._session_start_time()
+                now_minutes = now.hour * 60 + now.minute
+                session_start_minutes = session_start.hour * 60 + session_start.minute
+                if session_start_minutes <= now_minutes < session_start_minutes + 1:
                     if self.current_date != now.date():
                         self._reset_daily(now.date())
 
@@ -69,12 +143,17 @@ class RiskManager:
                 if self.current_month != now.month:
                     self._reset_monthly(now.month)
 
-                # Flatten at 4:45 PM ET
-                flatten_time = dt_time(16, 45)
+                # Flatten at the configured EOD time.
+                flatten_time = self._flatten_time()
                 if now.time() >= flatten_time and not self.eod_flattened:
-                    logger.warning("EOD FLATTEN — 4:45 PM ET reached")
+                    logger.warning(
+                        "EOD FLATTEN — %s ET reached",
+                        flatten_time.strftime("%H:%M"),
+                    )
                     self.eod_flattened = True
-                    await self._execute_flatten("EOD 4:45 PM ET")
+                    await self._execute_flatten(
+                        f"EOD {flatten_time.strftime('%H:%M')} ET"
+                    )
 
             except asyncio.CancelledError:
                 break
@@ -89,7 +168,7 @@ class RiskManager:
         self.daily_pnl = 0.0
         self.daily_limit_hit = False
         self.eod_flattened = False
-        # Don't reset trading_halted if monthly limit is hit
+        # Don't resume trading if monthly/drawdown limit was hit — that persists until monthly reset
         if not self.monthly_limit_hit:
             self.trading_halted = False
         logger.info(f"Daily reset — {today}")
@@ -118,11 +197,13 @@ class RiskManager:
         logger.info(
             f"Trade P&L: ${pnl:+,.2f} ({strategy}) | "
             f"Daily: ${self.daily_pnl:+,.2f} | "
-            f"Monthly: ${self.monthly_pnl:+,.2f}"
+            f"Drawdown: ${self.monthly_pnl:+,.2f}"
         )
 
-        # Check limits
-        if self.daily_pnl <= self.cfg.daily_loss_limit and not self.daily_limit_hit:
+        # Daily loss limit (optional — None means disabled, e.g. LucidFlex)
+        if (self.cfg.daily_loss_limit is not None
+                and self.daily_pnl <= self.cfg.daily_loss_limit
+                and not self.daily_limit_hit):
             self.daily_limit_hit = True
             self.trading_halted = True
             logger.critical(
@@ -131,6 +212,7 @@ class RiskManager:
             )
             asyncio.create_task(self._execute_flatten("Daily loss limit"))
 
+        # Monthly / max drawdown limit
         if self.monthly_pnl <= self.cfg.monthly_loss_limit and not self.monthly_limit_hit:
             self.monthly_limit_hit = True
             self.trading_halted = True
@@ -140,6 +222,8 @@ class RiskManager:
             )
             asyncio.create_task(self._execute_flatten("Monthly loss limit"))
 
+        self._save_state()
+
     def can_trade(self) -> bool:
         """Check if new entries are allowed right now."""
         if self.trading_halted:
@@ -147,12 +231,12 @@ class RiskManager:
 
         now = datetime.now(ET)
 
-        # No new entries after 4:30 PM ET
-        if now.time() >= dt_time(16, 30):
+        # No new entries after the configured cutoff.
+        if now.time() >= self._entry_cutoff_time():
             return False
 
-        # Before session start
-        if now.time() < dt_time(9, 30):
+        # Before the configured session start.
+        if now.time() < self._session_start_time():
             return False
 
         return True

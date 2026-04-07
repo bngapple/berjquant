@@ -263,6 +263,28 @@ class TestEngineEndpoints:
         resp = client.post("/api/engine/start")
         assert resp.status_code == 400
 
+    def test_start_nt_only_without_accounts_allowed(self, monkeypatch):
+        with open("test_config.json", "w") as f:
+            json.dump({
+                "environment": "live",
+                "symbol": "MNQU6",
+                "accounts": [],
+                "ninjatrader": {
+                    "accounts": {
+                        "LTT07T22GBH": {"host": "172.16.47.129", "port": 6000}
+                    }
+                },
+            }, f)
+
+        fake_start = AsyncMock(return_value={"status": "started"})
+        monkeypatch.setattr("server.api.bridge.start", fake_start)
+
+        resp = client.post("/api/engine/start")
+
+        assert resp.status_code == 200
+        assert resp.json()["status"] == "started"
+        fake_start.assert_awaited_once()
+
     def test_stop_not_running_returns_409(self):
         resp = client.post("/api/engine/stop")
         assert resp.status_code == 409
@@ -322,3 +344,59 @@ class TestEnvironmentEndpoints:
     def test_set_invalid_environment(self):
         resp = client.put("/api/environment", json={"environment": "staging"})
         assert resp.status_code == 400
+
+
+class TestRuntimeConfigEndpoint:
+    def test_get_runtime_config(self):
+        with open("test_config.json", "w") as f:
+            json.dump({
+                "environment": "live",
+                "symbol": "MNQU6",
+                "session": {"monthly_loss_limit": -1000.0},
+                "rsi": {"contracts": 1},
+                "ib": {"contracts": 1},
+                "mom": {"contracts": 1},
+                "accounts": [],
+                "ninjatrader": {
+                    "accounts": {
+                        "LTT07T22GBH": {"host": "172.16.47.129", "port": 6000}
+                    }
+                },
+            }, f)
+
+        resp = client.get("/api/runtime-config")
+
+        assert resp.status_code == 200
+        data = resp.json()
+        assert data["environment"] == "live"
+        assert data["symbol"] == "MNQU6"
+        assert data["nt_only"] is True
+        assert data["rsi"]["contracts"] == 1
+        assert data["session"]["monthly_loss_limit"] == -1000.0
+        assert data["nt_accounts"][0]["name"] == "LTT07T22GBH"
+
+    def test_save_nt_only_runtime_config(self):
+        resp = client.put("/api/runtime-config/nt-only", json={
+            "account_name": "LTT07T22GBH",
+            "host": "172.16.47.129",
+            "port": 6000,
+            "symbol": "MNQU6",
+            "contracts": 1,
+            "monthly_loss_limit": -1000.0,
+        })
+
+        assert resp.status_code == 200
+        data = resp.json()
+        assert data["nt_only"] is True
+        assert data["symbol"] == "MNQU6"
+        assert data["session"]["monthly_loss_limit"] == -1000.0
+        assert data["rsi"]["contracts"] == 1
+        assert data["ib"]["contracts"] == 1
+        assert data["mom"]["contracts"] == 1
+        assert data["nt_accounts"][0]["name"] == "LTT07T22GBH"
+
+        with open("test_config.json") as f:
+            raw = json.load(f)
+        assert raw["accounts"] == []
+        assert raw["symbol"] == "MNQU6"
+        assert raw["ninjatrader"]["accounts"]["LTT07T22GBH"]["host"] == "172.16.47.129"

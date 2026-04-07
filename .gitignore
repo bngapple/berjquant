@@ -47,3 +47,14 @@ Thumbs.db
 
 # Jupyter
 .ipynb_checkpoints/
+
+# Local workspace / embedded repos
+.claude/
+claw-code/
+everything-claude-code/
+ruflo/
+
+# Backups / archives / local state
+*.bak
+*.zip
+live/forward_state.json

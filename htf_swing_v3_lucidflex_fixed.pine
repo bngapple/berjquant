@@ -31,18 +31,18 @@ enable_rsi     = input.bool(true, "Enable RSI Strategy", group="General")
 enable_ib      = input.bool(true, "Enable IB Breakout", group="General")
 enable_mom     = input.bool(true, "Enable Momentum", group="General")
 
-// RSI — Python: sig_rsi_extreme(d, 7, 70, 30), sl=60t, tp=400t, hold=5
-rsi_period     = input.int(7, "RSI Period", minval=2, maxval=50, group="RSI Strategy")
-rsi_oversold   = input.int(30, "RSI Oversold", minval=5, maxval=45, group="RSI Strategy")
-rsi_overbought = input.int(70, "RSI Overbought", minval=55, maxval=95, group="RSI Strategy")
-rsi_sl_pts     = input.float(15.0, "RSI Stop Loss (points)", group="RSI Strategy")
+// RSI — Hybrid v2: sig_rsi_extreme(d, 5, 65, 35), sl=40t, tp=400t, hold=5
+rsi_period     = input.int(5, "RSI Period", minval=2, maxval=50, group="RSI Strategy")
+rsi_oversold   = input.int(35, "RSI Oversold", minval=5, maxval=45, group="RSI Strategy")
+rsi_overbought = input.int(65, "RSI Overbought", minval=55, maxval=95, group="RSI Strategy")
+rsi_sl_pts     = input.float(10.0, "RSI Stop Loss (points)", group="RSI Strategy")
 rsi_tp_pts     = input.float(100.0, "RSI Take Profit (points)", group="RSI Strategy")
 rsi_max_hold   = input.int(5, "RSI Max Hold (bars)", minval=1, maxval=50, group="RSI Strategy")
 
-// IB — Python: sig_ib_breakout(d), sl=80t, tp=480t, hold=10
-ib_sl_pts      = input.float(20.0, "IB Stop Loss (points)", group="IB Strategy")
+// IB — Hybrid v2: sl=40t, tp=480t, hold=15
+ib_sl_pts      = input.float(10.0, "IB Stop Loss (points)", group="IB Strategy")
 ib_tp_pts      = input.float(120.0, "IB Take Profit (points)", group="IB Strategy")
-ib_max_hold    = input.int(10, "IB Max Hold (bars)", minval=1, maxval=50, group="IB Strategy")
+ib_max_hold    = input.int(15, "IB Max Hold (bars)", minval=1, maxval=50, group="IB Strategy")
 ib_min_range   = input.float(2.0, "IB Min Range (points)", group="IB Strategy")
 ib_use_filter  = input.bool(true, "IB Percentile Filter (25th-75th)", group="IB Strategy")
 

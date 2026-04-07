@@ -1,25 +1,26 @@
 @import "tailwindcss";
 
 :root {
-  --bg: #0d0d0d;
-  --panel: #161616;
-  --elevated: #1e1e1e;
-  --border: rgba(255,255,255,0.05);
-  --border-strong: rgba(255,255,255,0.1);
+  --bg: #07100e;
+  --panel: #0d1512;
+  --elevated: #131e1b;
+  --border: rgba(255,255,255,0.06);
+  --border-strong: rgba(255,255,255,0.12);
   --accent: #00d4aa;
-  --accent-muted: #00b894;
-  --red: #ef4444;
+  --accent-dim: rgba(0,212,170,0.08);
+  --accent-mid: rgba(0,212,170,0.18);
+  --red: #f04a4a;
   --amber: #f59e0b;
-  --blue: #3b82f6;
-  --text: #e8e8e8;
-  --text-muted: #6b7280;
-  --text-dim: #3f3f46;
+  --blue: #4f8ef7;
+  --text: #dce8e4;
+  --text-muted: #4d6660;
+  --text-dim: #253330;
 }
 
 @theme {
-  --color-bg: #0d0d0d;
-  --color-panel: #161616;
-  --color-elevated: #1e1e1e;
+  --color-bg: #07100e;
+  --color-panel: #0d1512;
+  --color-elevated: #131e1b;
 }
 
 body {
@@ -38,17 +39,91 @@ body {
 
 button, a { transition: all 150ms ease-out; }
 
+/* Thin scrollbars */
 * { scrollbar-width: thin; scrollbar-color: transparent transparent; }
-*:hover { scrollbar-color: rgba(255,255,255,0.08) transparent; }
-::-webkit-scrollbar { width: 4px; height: 4px; }
+*:hover { scrollbar-color: rgba(255,255,255,0.07) transparent; }
+::-webkit-scrollbar { width: 3px; height: 3px; }
 ::-webkit-scrollbar-track { background: transparent; }
 ::-webkit-scrollbar-thumb { background: transparent; border-radius: 2px; }
-*:hover::-webkit-scrollbar-thumb { background: rgba(255,255,255,0.08); }
+*:hover::-webkit-scrollbar-thumb { background: rgba(255,255,255,0.07); }
 
-.panel { background: var(--panel); border: 1px solid var(--border); }
+/* Base panel — dark surface + very subtle inner top highlight */
+.panel {
+  background: var(--panel);
+  border: 1px solid var(--border);
+  position: relative;
+}
+.panel::after {
+  content: '';
+  position: absolute;
+  inset: 0;
+  border-radius: inherit;
+  pointer-events: none;
+  box-shadow: inset 0 1px 0 rgba(255,255,255,0.04);
+}
 
-@keyframes load-bar { 0% { transform: translateX(-100%); } 100% { transform: translateX(200%); } }
-.loading-bar { animation: load-bar 1.2s ease-in-out infinite; }
+/* Accent-glowing active dot */
+@keyframes pulse-dot {
+  0%, 100% { opacity: 0.8; box-shadow: 0 0 0 0 rgba(52,211,153,0.5); }
+  50%       { opacity: 1;   box-shadow: 0 0 0 3px rgba(52,211,153,0); }
+}
+.pulse-dot { animation: pulse-dot 2.4s ease-in-out infinite; }
 
-@keyframes pulse-dot { 0%,100% { opacity: 0.7; } 50% { opacity: 1; } }
-.pulse-dot { animation: pulse-dot 2s ease-in-out infinite; }
+/* Loading bar */
+@keyframes load-bar { 0% { transform: translateX(-100%); } 100% { transform: translateX(250%); } }
+.loading-bar { animation: load-bar 1.4s ease-in-out infinite; }
+
+/* Accent card top-line — apply to .panel for accent-coloured top border */
+.card-accent { border-top: 1px solid var(--accent) !important; }
+.card-red    { border-top: 1px solid var(--red)    !important; }
+.card-amber  { border-top: 1px solid var(--amber)  !important; }
+
+/* Glow text utilities */
+.glow-accent { text-shadow: 0 0 12px rgba(0,212,170,0.45); }
+.glow-red    { text-shadow: 0 0 12px rgba(240,74,74,0.45); }
+
+/* LucidFlex tier slider */
+.lucid-slider {
+  -webkit-appearance: none;
+  appearance: none;
+  width: 100%;
+  height: 2px;
+  border-radius: 1px;
+  outline: none;
+  cursor: pointer;
+  display: block;
+}
+.lucid-slider::-webkit-slider-runnable-track {
+  background: transparent;
+  height: 2px;
+  border-radius: 1px;
+}
+.lucid-slider::-webkit-slider-thumb {
+  -webkit-appearance: none;
+  width: 20px;
+  height: 20px;
+  border-radius: 50%;
+  background: var(--accent);
+  cursor: grab;
+  margin-top: -9px;
+  border: 2px solid var(--accent);
+  box-shadow: 0 0 14px rgba(0,212,170,0.55);
+  transition: box-shadow 0.15s;
+}
+.lucid-slider:active::-webkit-slider-thumb {
+  cursor: grabbing;
+  box-shadow: 0 0 22px rgba(0,212,170,0.9);
+}
+.lucid-slider::-moz-range-track {
+  background: transparent;
+  height: 2px;
+}
+.lucid-slider::-moz-range-thumb {
+  width: 20px;
+  height: 20px;
+  border-radius: 50%;
+  background: var(--accent);
+  cursor: grab;
+  border: 2px solid var(--accent);
+  box-shadow: 0 0 14px rgba(0,212,170,0.55);
+}

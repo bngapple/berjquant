@@ -15,9 +15,22 @@ from zoneinfo import ZoneInfo
 # Add project root to path so we can import engine modules
 sys.path.insert(0, os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
 
-from config import AppConfig, Environment, AccountConfig, SizingMode, POINT_VALUE
+from config import (
+    AppConfig,
+    Environment,
+    AccountConfig,
+    SizingMode,
+    SessionConfig,
+    NTConfig,
+    NTAccountConfig,
+    POINT_VALUE,
+    RSIParams,
+    IBParams,
+    MOMParams,
+)
 from app import TradovateExecutor, setup_logging
 from market_data import MarketState
+from order_executor import OrderRecord
 from signal_engine import Signal, Side
 from server import config_store
 
@@ -35,6 +48,7 @@ class DashboardExecutor(TradovateExecutor):
         super().__init__(config)
         self._event_queue = event_queue
         self._bars_buffer: list[dict] = []  # Ring buffer of last 200 15m bars for chart history
+        self._last_price: float = 0.0       # Latest tick price for live unrealized P&L
 
     def _push(self, event: dict):
         """Non-blocking push to event queue."""
@@ -45,7 +59,18 @@ class DashboardExecutor(TradovateExecutor):
             pass  # Drop oldest if queue is full
 
     async def _on_market_message(self, data: dict):
-        """Override: buffer historical OHLCV bars for chart REST endpoint, then run parent."""
+        """Override: track latest price for live P&L, buffer bars, then run parent."""
+        # Track latest tick price for unrealized P&L calculation
+        entries = data.get("entries", {})
+        tick_price = entries.get("Trade", {}).get("price")
+        if tick_price is not None:
+            self._last_price = float(tick_price)
+            # Push live position P&L on every tick if positions are open
+            if self.master_executor and any(
+                not p.is_flat for p in self.signal_engine.positions.values()
+            ):
+                self._push_positions()
+
         bars = data.get("bars", [])
         for bar_data in bars:
             o = bar_data.get("open", 0)
@@ -137,9 +162,13 @@ class DashboardExecutor(TradovateExecutor):
 
     async def _handle_fill(self, fill_data: dict):
         """Override: run parent, push exit event if SL/TP."""
+        order_id = fill_data.get("orderId")
+        fill_price = fill_data.get("price", 0)
+        if not order_id or not fill_price:
+            return
         result = await self.master_executor.on_fill_event(
-            fill_data.get("orderId", 0),
-            float(fill_data.get("price", 0)),
+            int(order_id),
+            float(fill_price),
             int(fill_data.get("qty", 0)),
         ) if self.master_executor else None
 
@@ -200,19 +229,61 @@ class DashboardExecutor(TradovateExecutor):
         self._push_positions()
 
     async def _handle_flatten_signal(self, signal: Signal):
-        """Override: push exit event for max-hold flatten."""
+        """Override: push exit event for max-hold flatten with actual P&L."""
+        strategy = signal.strategy
+        rec = self.master_executor.strategy_orders.get(strategy) if self.master_executor else None
+        pos = self.signal_engine.positions.get(strategy)
+        exit_price = self._last_price or (rec.fill_price if rec else 0)
+
+        pnl = 0.0
+        if rec and rec.fill_price and exit_price:
+            if rec.side == "Buy":
+                pnl = (exit_price - rec.fill_price) * POINT_VALUE * rec.qty
+            else:
+                pnl = (rec.fill_price - exit_price) * POINT_VALUE * rec.qty
+
         self._push({
             "type": "exit",
             "data": {
-                "strategy": signal.strategy,
+                "strategy": strategy,
                 "side": signal.side.value,
+                "entry_price": rec.fill_price if rec else 0,
+                "exit_price": exit_price,
                 "exit_reason": "MaxHold",
-                "pnl": 0,
-                "bars_held": 0,
-                "contracts": 0,
+                "pnl": round(pnl, 2),
+                "bars_held": pos.bars_held if pos else 0,
+                "contracts": rec.qty if rec else 0,
             },
         })
         await super()._handle_flatten_signal(signal)
+        self._push_pnl()
+        self._push_positions()
+
+    async def _on_nt_exit(self, record: OrderRecord, exit_type: str, fill_price: float):
+        """Override: push exit event to dashboard before running parent handler."""
+        entry_price = record.fill_price or 0.0
+        if record.side == "Buy":
+            pnl = (fill_price - entry_price) * POINT_VALUE * record.qty
+        else:
+            pnl = (entry_price - fill_price) * POINT_VALUE * record.qty
+
+        self._push({
+            "type": "exit",
+            "data": {
+                "strategy": record.strategy,
+                "side": record.side,
+                "entry_price": entry_price,
+                "exit_price": fill_price,
+                "pnl": round(pnl, 2),
+                "exit_reason": exit_type,
+                "bars_held": self.signal_engine.positions.get(
+                    record.strategy, type("", (), {"bars_held": 0})()
+                ).bars_held,
+                "contracts": record.qty,
+            },
+        })
+
+        await super()._on_nt_exit(record, exit_type, fill_price)
         self._push_pnl()
         self._push_positions()
 
@@ -223,7 +294,6 @@ class DashboardExecutor(TradovateExecutor):
             "data": {
                 "daily": round(self.risk_manager.daily_pnl, 2),
                 "monthly": round(self.risk_manager.monthly_pnl, 2),
-                "daily_limit": self.risk_manager.cfg.daily_loss_limit,
                 "monthly_limit": self.risk_manager.cfg.monthly_loss_limit,
             },
         })
@@ -236,15 +306,22 @@ class DashboardExecutor(TradovateExecutor):
             pos = self.signal_engine.positions.get(strategy)
             rec = self.master_executor.strategy_orders.get(strategy) if self.master_executor else None
             if pos and not pos.is_flat and rec and rec.fill_price:
+                # Use latest tick price for unrealized P&L; fall back to entry price
+                current_px = self._last_price if self._last_price > 0 else rec.fill_price
+                side = pos.side.value if pos.side else "Buy"
+                if side == "Buy":
+                    unrealized = (current_px - rec.fill_price) * POINT_VALUE * rec.qty
+                else:
+                    unrealized = (rec.fill_price - current_px) * POINT_VALUE * rec.qty
                 self._push({
                     "type": "position",
                     "data": {
                         "strategy": strategy,
-                        "side": pos.side.value if pos.side else "Buy",
+                        "side": side,
                         "entry_price": rec.fill_price,
-                        "current_price": rec.fill_price,  # Updated by market data
+                        "current_price": current_px,
                         "contracts": rec.qty,
-                        "pnl": 0.0,  # Calculated from current price
+                        "pnl": round(unrealized, 2),
                         "bars_held": pos.bars_held,
                         "sl": rec.bracket.stop_price if rec.bracket else 0,
                         "tp": rec.bracket.limit_price if rec.bracket else 0,
@@ -278,7 +355,11 @@ class EngineBridge:
         self._error = None
         config = self._build_config()
 
-        if not config.master_account:
+        nt_only = bool(config.nt and not config.accounts)
+        if not config.accounts and not nt_only:
+            return {"error": "No accounts configured"}
+
+        if config.accounts and not config.master_account:
             return {"error": "No master account configured"}
 
         self.executor = DashboardExecutor(config, self.event_queue)
@@ -343,21 +424,29 @@ class EngineBridge:
     def get_status(self) -> dict:
         """Return current engine status."""
         if not self.executor or not self.running:
+            cfg = self._build_config()
             accounts = config_store.get_accounts()
+            connected_accounts = [
+                {"name": a["name"], "connected": False} for a in accounts
+            ] if accounts else []
+            if cfg.nt:
+                connected_accounts.extend(
+                    {
+                        "name": f"NinjaTrader ({acct.host}:{acct.port})",
+                        "connected": False,
+                    }
+                    for acct in cfg.nt.accounts.values()
+                )
             return {
                 "running": False,
                 "can_trade": False,
                 "daily_pnl": 0.0,
                 "monthly_pnl": 0.0,
-                "daily_limit": -3000.0,
-                "monthly_limit": -4500.0,
-                "daily_limit_hit": False,
+                "monthly_limit": cfg.session.monthly_loss_limit,
                 "monthly_limit_hit": False,
                 "positions": {"RSI": None, "IB": None, "MOM": None},
                 "pending_signals": 0,
-                "connected_accounts": [
-                    {"name": a["name"], "connected": False} for a in accounts
-                ] if accounts else [],
+                "connected_accounts": connected_accounts,
                 "error": self._error,
             }
 
@@ -370,13 +459,19 @@ class EngineBridge:
             pos = ex.signal_engine.positions.get(strategy)
             rec = ex.master_executor.strategy_orders.get(strategy) if ex.master_executor else None
             if pos and not pos.is_flat and rec and rec.fill_price:
+                current_px = ex._last_price if ex._last_price > 0 else rec.fill_price
+                side = pos.side.value if pos.side else "Buy"
+                if side == "Buy":
+                    unrealized = (current_px - rec.fill_price) * POINT_VALUE * rec.qty
+                else:
+                    unrealized = (rec.fill_price - current_px) * POINT_VALUE * rec.qty
                 positions[strategy] = {
                     "strategy": strategy,
-                    "side": pos.side.value if pos.side else "Buy",
+                    "side": side,
                     "entry_price": rec.fill_price,
-                    "current_price": rec.fill_price,
+                    "current_price": current_px,
                     "contracts": rec.qty,
-                    "pnl": 0.0,
+                    "pnl": round(unrealized, 2),
                     "bars_held": pos.bars_held,
                     "sl": rec.bracket.stop_price if rec.bracket else 0,
                     "tp": rec.bracket.limit_price if rec.bracket else 0,
@@ -384,9 +479,17 @@ class EngineBridge:
             else:
                 positions[strategy] = None
 
-        # Account connections
+        # Account connections — include NT bridge status when in NT mode
         connected_accounts = []
-        if ex.auth:
+        if ex.config.nt and ex.master_executor:
+            from ninjatrader_bridge import NinjaTraderBridge
+            nt = ex.master_executor
+            if isinstance(nt, NinjaTraderBridge):
+                connected_accounts.append({
+                    "name": f"NinjaTrader ({nt._nt_host}:{nt._nt_port})",
+                    "connected": nt.connected,
+                })
+        elif ex.auth:
             for session in ex.auth.sessions.values():
                 connected_accounts.append({
                     "name": session.name,
@@ -398,9 +501,7 @@ class EngineBridge:
             "can_trade": risk["can_trade"],
             "daily_pnl": round(risk["daily_pnl"], 2),
             "monthly_pnl": round(risk["monthly_pnl"], 2),
-            "daily_limit": ex.risk_manager.cfg.daily_loss_limit,
             "monthly_limit": ex.risk_manager.cfg.monthly_loss_limit,
-            "daily_limit_hit": risk["daily_limit_hit"],
             "monthly_limit_hit": risk["monthly_limit_hit"],
             "positions": positions,
             "pending_signals": len(ex._pending_signals),
@@ -437,19 +538,52 @@ class EngineBridge:
                 device_id=a.get("device_id", f"device-{a['name']}"),
                 app_id=a.get("app_id", "HTFSwing"),
                 app_version=a.get("app_version", "1.0.0"),
-                cid=a.get("cid", 0),
-                sec=a.get("sec", ""),
+                cid=a.get("cid", 8),
+                sec=a.get("sec", "9c4e7db2-0e37-4169-915c-2a8fc0571dc2"),
                 is_master=a.get("is_master", False),
-                sizing_mode=SizingMode(a.get("sizing_mode", "mirror")),
+                sizing_mode=SizingMode(a.get("sizing_mode", "scaled")),
                 account_size=a.get("account_size", 150000.0),
                 fixed_sizes=a.get("fixed_sizes", {"RSI": 3, "IB": 3, "MOM": 3}),
+                min_contracts=a.get("min_contracts", 1),
+                monthly_loss_limit=a.get("monthly_loss_limit", -4500.0),
             ))
 
         config = AppConfig(
             environment=env,
             symbol=raw.get("symbol", "MNQM6"),
+            session=SessionConfig(**raw.get("session", {})),
+            rsi=RSIParams(**raw.get("rsi", {})),
+            ib=IBParams(**raw.get("ib", {})),
+            mom=MOMParams(**raw.get("mom", {})),
             accounts=accounts,
         )
+        nt_raw = raw.get("ninjatrader") or raw.get("nt")
+        if nt_raw:
+            if "accounts" in nt_raw:
+                accounts_dict = {}
+                for name, acct_data in nt_raw["accounts"].items():
+                    if name.startswith("_"):
+                        continue
+                    accounts_dict[name] = NTAccountConfig(
+                        host=acct_data.get("host", "127.0.0.1"),
+                        port=acct_data.get("port", 6000),
+                    )
+                config.nt = NTConfig(
+                    accounts=accounts_dict,
+                    default_atm_template=nt_raw.get("default_atm_template", "MNQ_2R"),
+                    order_timeout_seconds=nt_raw.get("order_timeout_seconds", 10),
+                    status_timeout_seconds=nt_raw.get("status_timeout_seconds", 5),
+                    reconnect_max_backoff_seconds=nt_raw.get("reconnect_max_backoff_seconds", 30),
+                    symbol=nt_raw.get("symbol", "MNQU6"),
+                )
+            else:
+                # Old single-host "nt" key (backward compat)
+                config.nt = NTConfig(
+                    accounts={"default": NTAccountConfig(
+                        host=nt_raw.get("host", "127.0.0.1"),
+                        port=nt_raw.get("port", 6000),
+                    )},
+                )
         return config
 
 

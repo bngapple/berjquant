@@ -13,6 +13,8 @@ export interface Account {
   profit_target: number;
   max_drawdown: number;
   account_type: "eval" | "funded";
+  monthly_loss_limit?: number;
+  min_contracts?: number;
 }
 
 export interface AccountCreate {
@@ -30,6 +32,8 @@ export interface AccountCreate {
   profit_target?: number;
   max_drawdown?: number;
   account_type?: string;
+  monthly_loss_limit?: number;
+  min_contracts?: number;
 }
 
 export interface AuthTestResult {
@@ -44,9 +48,7 @@ export interface EngineStatus {
   can_trade: boolean;
   daily_pnl: number;
   monthly_pnl: number;
-  daily_limit: number;
   monthly_limit: number;
-  daily_limit_hit: boolean;
   monthly_limit_hit: boolean;
   positions: Record<string, Position | null>;
   pending_signals: number;
@@ -95,7 +97,6 @@ export interface Trade {
 export interface PnL {
   daily: number;
   monthly: number;
-  daily_limit: number;
   monthly_limit: number;
 }
 
@@ -128,7 +129,7 @@ export interface AccountStatus {
   profit_target_progress: number;
   daily_pnl: number;
   trades_today: number;
-  status: "active" | "eval_passed" | "breached" | "daily_limit_hit";
+  status: "active" | "eval_passed" | "breached";
   is_master: boolean;
   account_type: "eval" | "funded";
   environment: string;
@@ -165,4 +166,58 @@ export interface Bar {
   rsi?: number | null;
   atr?: number | null;
   ema?: number | null;
+}
+
+export interface StrategyConfig {
+  contracts: number;
+  stop_loss_pts: number;
+  take_profit_pts: number;
+  max_hold_bars: number;
+  period?: number;
+  oversold?: number;
+  overbought?: number;
+  ib_start?: string;
+  ib_end?: string;
+  ib_range_lookback?: number;
+  ib_range_pct_low?: number;
+  ib_range_pct_high?: number;
+  atr_period?: number;
+  ema_period?: number;
+  vol_sma_period?: number;
+}
+
+export interface SessionSettings {
+  session_start: string;
+  no_new_entries_after: string;
+  flatten_time: string;
+  monthly_loss_limit: number;
+  daily_loss_limit?: number | null;
+  timezone: string;
+}
+
+export interface NTConnection {
+  name: string;
+  host: string;
+  port: number;
+}
+
+export interface RuntimeConfig {
+  environment: string;
+  symbol: string;
+  nt_enabled: boolean;
+  nt_only: boolean;
+  nt_accounts: NTConnection[];
+  session: SessionSettings;
+  rsi: StrategyConfig;
+  ib: StrategyConfig;
+  mom: StrategyConfig;
+}
+
+export interface NTOnlySetupUpdate {
+  account_name: string;
+  host: string;
+  port: number;
+  symbol: string;
+  contracts: number;
+  monthly_loss_limit: number;
 }

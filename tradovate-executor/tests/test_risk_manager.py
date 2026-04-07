@@ -11,6 +11,7 @@ the real system clock.
 import sys
 import os
 import asyncio
+from contextlib import contextmanager
 import pytest
 from datetime import datetime, date, time as dt_time
 from unittest.mock import AsyncMock, MagicMock, patch, call
@@ -35,11 +36,15 @@ def default_session() -> SessionConfig:
     )
 
 
-def make_rm(flatten_callback=None) -> RiskManager:
-    return RiskManager(
-        session_config=default_session(),
-        on_flatten_all=flatten_callback,
-    )
+def make_rm(flatten_callback=None, session_config: SessionConfig | None = None) -> RiskManager:
+    # Patch _load_state so tests start with clean state (no stale disk data)
+    with patch.object(RiskManager, '_load_state'):
+        rm = RiskManager(
+            session_config=session_config or default_session(),
+            on_flatten_all=flatten_callback,
+        )
+    rm._save_state = lambda: None  # prevent disk writes from polluting state
+    return rm
 
 
 def et_datetime(hour: int, minute: int, day: int = 15, month: int = 1, year: int = 2026):
@@ -52,6 +57,17 @@ def et_datetime(hour: int, minute: int, day: int = 15, month: int = 1, year: int
 
 def run_async(coro):
     return asyncio.get_event_loop().run_until_complete(coro)
+
+
+@contextmanager
+def patch_create_task():
+    """Patch create_task and close submitted coroutines to avoid test warnings."""
+    def close_coro(coro):
+        coro.close()
+        return MagicMock()
+
+    with patch("risk_manager.asyncio.create_task", side_effect=close_coro) as mock_task:
+        yield mock_task
 
 
 # ===========================================================================
@@ -91,7 +107,7 @@ class TestDailyLossLimit:
         flatten_mock = AsyncMock()
         rm = make_rm(flatten_callback=flatten_mock)
 
-        with patch("risk_manager.asyncio.create_task") as mock_task:
+        with patch_create_task():
             rm.record_trade_pnl(-3000.0)
 
         assert rm.daily_limit_hit is True
@@ -102,7 +118,7 @@ class TestDailyLossLimit:
         flatten_mock = AsyncMock()
         rm = make_rm(flatten_callback=flatten_mock)
 
-        with patch("risk_manager.asyncio.create_task"):
+        with patch_create_task():
             rm.record_trade_pnl(-2999.99)
 
         assert rm.daily_limit_hit is False
@@ -113,7 +129,7 @@ class TestDailyLossLimit:
         flatten_mock = AsyncMock()
         rm = make_rm(flatten_callback=flatten_mock)
 
-        with patch("risk_manager.asyncio.create_task") as mock_task:
+        with patch_create_task():
             rm.record_trade_pnl(-1500.0)
             assert rm.daily_limit_hit is False
             rm.record_trade_pnl(-1500.0)
@@ -146,7 +162,7 @@ class TestDailyLossLimit:
 
     def test_daily_pnl_accumulates_correctly(self):
         rm = make_rm()
-        with patch("risk_manager.asyncio.create_task"):
+        with patch_create_task():
             rm.record_trade_pnl(-500.0)
             rm.record_trade_pnl(-200.0)
             rm.record_trade_pnl(300.0)
@@ -169,7 +185,7 @@ class TestMonthlyLossLimit:
         flatten_mock = AsyncMock()
         rm = make_rm(flatten_callback=flatten_mock)
 
-        with patch("risk_manager.asyncio.create_task"):
+        with patch_create_task():
             rm.record_trade_pnl(-4500.0)
 
         assert rm.monthly_limit_hit is True
@@ -178,7 +194,7 @@ class TestMonthlyLossLimit:
     @pytest.mark.asyncio
     async def test_monthly_limit_not_triggered_above_threshold(self):
         rm = make_rm()
-        with patch("risk_manager.asyncio.create_task"):
+        with patch_create_task():
             rm.record_trade_pnl(-4499.99)
         assert rm.monthly_limit_hit is False
 
@@ -189,14 +205,14 @@ class TestMonthlyLossLimit:
         (e.g. losses accumulated over multiple daily resets).
         """
         rm = make_rm()
-        with patch("risk_manager.asyncio.create_task"):
+        with patch_create_task():
             rm.record_trade_pnl(-4500.0)  # monthly hits, daily hits too in this case
 
         assert rm.monthly_limit_hit is True
 
     def test_monthly_pnl_accumulates_correctly(self):
         rm = make_rm()
-        with patch("risk_manager.asyncio.create_task"):
+        with patch_create_task():
             rm.record_trade_pnl(-1000.0)
             rm.record_trade_pnl(-1000.0)
             rm.record_trade_pnl(-1000.0)
@@ -286,6 +302,22 @@ class TestCanTrade:
             mock_dt.now.return_value = et_datetime(12, 0)
             assert rm.can_trade() is True
 
+    def test_can_trade_uses_configured_session_times(self):
+        rm = make_rm(session_config=SessionConfig(
+            session_start="10:00",
+            no_new_entries_after="15:00",
+            flatten_time="15:15",
+            daily_loss_limit=-3000.0,
+            monthly_loss_limit=-4500.0,
+        ))
+        with patch("risk_manager.datetime") as mock_dt:
+            mock_dt.now.return_value = et_datetime(9, 45)
+            assert rm.can_trade() is False
+            mock_dt.now.return_value = et_datetime(10, 0)
+            assert rm.can_trade() is True
+            mock_dt.now.return_value = et_datetime(15, 0)
+            assert rm.can_trade() is False
+
 
 # ===========================================================================
 # Daily Reset
@@ -294,7 +326,7 @@ class TestCanTrade:
 class TestDailyReset:
     def test_daily_reset_clears_daily_pnl(self):
         rm = make_rm()
-        with patch("risk_manager.asyncio.create_task"):
+        with patch_create_task():
             rm.record_trade_pnl(-1000.0)
         assert rm.daily_pnl == -1000.0
 
@@ -303,7 +335,7 @@ class TestDailyReset:
 
     def test_daily_reset_clears_daily_limit_hit(self):
         rm = make_rm()
-        with patch("risk_manager.asyncio.create_task"):
+        with patch_create_task():
             rm.record_trade_pnl(-3000.0)
         assert rm.daily_limit_hit is True
 
@@ -312,7 +344,7 @@ class TestDailyReset:
 
     def test_daily_reset_does_not_clear_monthly_pnl(self):
         rm = make_rm()
-        with patch("risk_manager.asyncio.create_task"):
+        with patch_create_task():
             rm.record_trade_pnl(-2000.0)
         assert rm.monthly_pnl == -2000.0
 
@@ -321,7 +353,7 @@ class TestDailyReset:
 
     def test_daily_reset_does_not_clear_monthly_limit_hit(self):
         rm = make_rm()
-        with patch("risk_manager.asyncio.create_task"):
+        with patch_create_task():
             rm.record_trade_pnl(-4500.0)
         assert rm.monthly_limit_hit is True
 
@@ -330,7 +362,7 @@ class TestDailyReset:
 
     def test_daily_reset_does_not_resume_trading_when_monthly_limit_hit(self):
         rm = make_rm()
-        with patch("risk_manager.asyncio.create_task"):
+        with patch_create_task():
             rm.record_trade_pnl(-4500.0)
         assert rm.trading_halted is True
 
@@ -340,7 +372,7 @@ class TestDailyReset:
 
     def test_daily_reset_resumes_trading_when_only_daily_limit_hit(self):
         rm = make_rm()
-        with patch("risk_manager.asyncio.create_task"):
+        with patch_create_task():
             rm.record_trade_pnl(-3000.0)  # only daily, not monthly
         assert rm.trading_halted is True
         assert rm.monthly_limit_hit is False
@@ -368,7 +400,7 @@ class TestDailyReset:
 class TestMonthlyReset:
     def test_monthly_reset_clears_monthly_pnl(self):
         rm = make_rm()
-        with patch("risk_manager.asyncio.create_task"):
+        with patch_create_task():
             rm.record_trade_pnl(-4000.0)
         assert rm.monthly_pnl == -4000.0
 
@@ -377,7 +409,7 @@ class TestMonthlyReset:
 
     def test_monthly_reset_clears_monthly_limit_hit(self):
         rm = make_rm()
-        with patch("risk_manager.asyncio.create_task"):
+        with patch_create_task():
             rm.record_trade_pnl(-4500.0)
         assert rm.monthly_limit_hit is True
 
@@ -386,7 +418,7 @@ class TestMonthlyReset:
 
     def test_monthly_reset_resumes_trading(self):
         rm = make_rm()
-        with patch("risk_manager.asyncio.create_task"):
+        with patch_create_task():
             rm.record_trade_pnl(-4500.0)
         assert rm.trading_halted is True
 
@@ -401,7 +433,7 @@ class TestMonthlyReset:
     def test_monthly_reset_clears_daily_pnl(self):
         """Monthly reset also resets daily to prevent stale carryover."""
         rm = make_rm()
-        with patch("risk_manager.asyncio.create_task"):
+        with patch_create_task():
             rm.record_trade_pnl(-1000.0)
         rm._reset_monthly(2)
         assert rm.monthly_pnl == 0.0
@@ -428,7 +460,7 @@ class TestGetStatus:
 
     def test_status_reflects_current_pnl(self):
         rm = make_rm()
-        with patch("risk_manager.asyncio.create_task"):
+        with patch_create_task():
             rm.record_trade_pnl(-500.0)
         with patch("risk_manager.datetime") as mock_dt:
             mock_dt.now.return_value = et_datetime(10, 30)
@@ -498,7 +530,7 @@ class TestFlattenCallback:
     async def test_flatten_not_called_below_threshold(self):
         flatten_mock = AsyncMock()
         rm = make_rm(flatten_callback=flatten_mock)
-        with patch("risk_manager.asyncio.create_task"):
+        with patch_create_task():
             rm.record_trade_pnl(-1000.0)
         flatten_mock.assert_not_called()
 
@@ -548,26 +580,26 @@ class TestPnLEdgeCases:
     def test_daily_and_monthly_both_triggered_by_single_trade(self):
         """A single -$4500 loss hits both daily ($3k) and monthly ($4.5k)."""
         rm = make_rm()
-        with patch("risk_manager.asyncio.create_task"):
+        with patch_create_task():
             rm.record_trade_pnl(-4500.0)
         assert rm.daily_limit_hit is True
         assert rm.monthly_limit_hit is True
 
     def test_pnl_exactly_one_cent_above_daily_limit(self):
         rm = make_rm()
-        with patch("risk_manager.asyncio.create_task"):
+        with patch_create_task():
             rm.record_trade_pnl(-2999.99)
         assert rm.daily_limit_hit is False
 
     def test_pnl_exactly_at_daily_limit(self):
         rm = make_rm()
-        with patch("risk_manager.asyncio.create_task"):
+        with patch_create_task():
             rm.record_trade_pnl(-3000.0)
         assert rm.daily_limit_hit is True
 
     def test_can_trade_false_immediately_after_daily_limit(self):
         rm = make_rm()
-        with patch("risk_manager.asyncio.create_task"):
+        with patch_create_task():
             rm.record_trade_pnl(-3000.0)
         with patch("risk_manager.datetime") as mock_dt:
             mock_dt.now.return_value = et_datetime(10, 30)

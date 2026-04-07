@@ -42,11 +42,13 @@ class TradovateWebSocket:
         access_token: str,
         name: str = "ws",
         on_message: Optional[Callable] = None,
+        on_reconnect: Optional[Callable] = None,
     ):
         self.url = url
         self.access_token = access_token
         self.name = name
-        self.on_message = on_message  # async callback(data: dict)
+        self.on_message = on_message    # async callback(data: dict)
+        self.on_reconnect = on_reconnect  # async callback(), fired on every reconnect (not first connect)
 
         self._ws: Optional[websockets.WebSocketClientProtocol] = None
         self._running = False
@@ -54,6 +56,7 @@ class TradovateWebSocket:
         self._reconnect_count = 0
         self._last_heartbeat = 0.0
         self._tasks: list[asyncio.Task] = []
+        self._ever_connected = False    # Distinguishes reconnects from first connect
 
     @property
     def connected(self) -> bool:
@@ -85,9 +88,15 @@ class TradovateWebSocket:
                     # Authenticate
                     await self._authorize()
 
+                    is_reconnect = self._ever_connected
                     self._connected = True
+                    self._ever_connected = True
                     self._reconnect_count = 0
                     self._last_heartbeat = time.time()
+
+                    # Fire reconnect callback (skip on first connect — caller handles initial subscriptions)
+                    if is_reconnect and self.on_reconnect:
+                        asyncio.create_task(self.on_reconnect())
 
                     # Start heartbeat sender
                     hb_task = asyncio.create_task(self._heartbeat_loop())
@@ -123,13 +132,21 @@ class TradovateWebSocket:
         logger.debug(f"[{self.name}] Auth sent")
 
     async def _heartbeat_loop(self):
-        """Send periodic heartbeats to keep connection alive."""
+        """Send periodic heartbeats and enforce timeout on stalled connections."""
         while self._running and self._connected:
             try:
                 await asyncio.sleep(self.HEARTBEAT_INTERVAL)
                 if self._ws and self._connected:
+                    # Check if server heartbeats have stopped (stalled connection)
+                    since_last = time.time() - self._last_heartbeat
+                    if self._last_heartbeat > 0 and since_last > self.HEARTBEAT_TIMEOUT:
+                        logger.warning(
+                            f"[{self.name}] No heartbeat for {since_last:.1f}s "
+                            f"— forcing reconnect"
+                        )
+                        await self._ws.close()
+                        break
                     await self._ws.send("[]")
-                    self._last_heartbeat = time.time()
             except Exception:
                 break
 

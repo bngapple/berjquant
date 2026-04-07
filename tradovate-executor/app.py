@@ -29,12 +29,13 @@ from datetime import datetime
 from typing import Optional
 from zoneinfo import ZoneInfo
 
-from config import AppConfig, Environment, POINT_VALUE
-from auth_manager import AuthManager
+from config import AppConfig, AccountConfig, Environment, POINT_VALUE
+from auth_manager import AuthManager, AuthSession
 from websocket_client import TradovateWebSocket
 from market_data import MarketDataEngine, MarketState
 from signal_engine import SignalEngine, Signal, Side
-from order_executor import OrderExecutor
+from order_executor import OrderExecutor, OrderRecord
+from ninjatrader_bridge import NinjaTraderBridge
 from copy_engine import CopyEngine
 from risk_manager import RiskManager
 from trade_logger import TradeLogger, TradeEntry
@@ -101,6 +102,7 @@ class TradovateExecutor:
         # Signals generated on bar N, executed on bar N+1 open
         self._pending_signals: list[Signal] = []
         self._shutdown_event = asyncio.Event()
+        self._master_session: Optional[AuthSession] = None
 
     # ==================================================================
     # STARTUP
@@ -113,73 +115,124 @@ class TradovateExecutor:
         logger.info(f"Accounts: {len(self.config.accounts)} configured")
         logger.info("=" * 60)
 
-        # 1. Authenticate
-        logger.info("Authenticating all accounts...")
-        await self.auth.authenticate_all()
+        # 1. Authenticate, or synthesize a local session for NT-only mode.
+        if self._is_nt_only_mode():
+            logger.info("NT-only mode detected — skipping Tradovate authentication")
+            master_session = self._build_nt_only_master_session()
+            if not master_session:
+                logger.critical("NT-only startup FAILED — could not build master session")
+                return
+        else:
+            logger.info("Authenticating all accounts...")
+            await self.auth.authenticate_all()
 
-        master_session = self.auth.get_master_session()
-        if not master_session or not master_session.is_authenticated:
-            logger.critical("Master account auth FAILED — cannot start")
-            return
+            master_session = self.auth.get_master_session()
+            if not master_session or not master_session.is_authenticated:
+                logger.critical("Master account auth FAILED — cannot start")
+                return
 
-        # 2. Initialize executors
-        self.master_executor = OrderExecutor(self.config, master_session)
-        self.copy_engine = CopyEngine(self.config, self.auth)
-        await self.copy_engine.initialize()
+        self._master_session = master_session
 
-        copy_count = len(self.auth.get_copy_sessions())
+        # 2. Initialize executors (NT bridge or Tradovate REST, depending on config)
+        if self.config.nt:
+            nt_acct = self._resolve_nt_account(master_session.name)
+            if not nt_acct:
+                return
+
+            if not self._validate_nt_account(master_session.name, nt_acct):
+                return
+
+            logger.info(
+                f"NT mode: routing execution through NinjaTrader at "
+                f"{nt_acct.host}:{nt_acct.port} for account '{master_session.name}'"
+            )
+            self.master_executor = NinjaTraderBridge(
+                self.config,
+                master_session,
+                nt_host=nt_acct.host,
+                nt_port=nt_acct.port,
+            )
+            self.master_executor.set_exit_callback(self._on_nt_exit)
+            self.master_executor.set_market_callback(self._on_nt_market_message)
+            await self.master_executor.connect()
+
+            nt_timeout = max(5.0, float(self.config.nt.status_timeout_seconds))
+            if not await self._wait_nt_connected(timeout=nt_timeout):
+                await self.master_executor.shutdown()
+                self.master_executor = None
+                return
+
+            self.copy_engine = None
+            copy_count = 0
+        else:
+            self.master_executor = OrderExecutor(self.config, master_session)
+            self.copy_engine = CopyEngine(self.config, self.auth)
+            await self.copy_engine.initialize()
+            copy_count = len(self.auth.get_copy_sessions())
+
         logger.info(f"Master: {master_session.name} | Copies: {copy_count}")
 
         # 3. Position sync (recover from restart)
         await self._sync_positions()
 
-        # 4. Connect market data WebSocket (uses separate md token)
-        self.ws_market = TradovateWebSocket(
-            url=self.config.ws_market_url,
-            access_token=master_session.md_access_token or master_session.access_token,
-            name="md",
-            on_message=self._on_market_message,
-        )
-        await self.ws_market.connect()
-        await self._wait_connected(self.ws_market, "Market data")
+        # 4. Connect market data (Tradovate WS or NT TCP, depending on mode)
+        if not self._is_nt_only_mode():
+            self.ws_market = TradovateWebSocket(
+                url=self.config.ws_market_url,
+                access_token=master_session.md_access_token or master_session.access_token,
+                name="md",
+                on_message=self._on_market_message,
+                on_reconnect=self._on_md_reconnect,
+            )
+            await self.ws_market.connect()
+            await self._wait_connected(self.ws_market, "Market data")
 
-        # Subscribe to quotes
-        await self.ws_market.subscribe(
-            "md/subscribeQuote",
-            {"symbol": self.config.symbol},
-        )
-        # Also subscribe to chart for historical bar seeding
-        await self.ws_market.subscribe(
-            "md/getChart",
-            {
-                "symbol": self.config.symbol,
-                "chartDescription": {
-                    "underlyingType": "MinuteBar",
-                    "elementSize": 15,
-                    "elementSizeUnit": "UnderlyingUnits",
-                    "withHistogram": False,
+            # Subscribe to quotes
+            await self.ws_market.subscribe(
+                "md/subscribeQuote",
+                {"symbol": self.config.symbol},
+            )
+            # Also subscribe to chart for historical bar seeding
+            await self.ws_market.subscribe(
+                "md/getChart",
+                {
+                    "symbol": self.config.symbol,
+                    "chartDescription": {
+                        "underlyingType": "MinuteBar",
+                        "elementSize": 15,
+                        "elementSizeUnit": "UnderlyingUnits",
+                        "withHistogram": False,
+                    },
+                    "timeRange": {
+                        "asFarAsTimestamp": datetime.now(ET).strftime("%Y-%m-%dT00:00:00"),
+                    },
                 },
-                "timeRange": {
-                    "asFarAsTimestamp": datetime.now(ET).strftime("%Y-%m-%dT00:00:00"),
-                },
-            },
-        )
-        logger.info(f"Subscribed to: {self.config.symbol}")
+            )
+            logger.info(f"Subscribed to: {self.config.symbol}")
+        else:
+            logger.info(
+                f"Waiting for market data from NinjaTrader on {self.config.symbol} "
+                f"(attach PythonBridge to a 15-minute chart for historical warmup)"
+            )
 
-        # 5. Connect order/fill WebSocket
-        self.ws_orders = TradovateWebSocket(
-            url=self.config.ws_orders_url,
-            access_token=master_session.access_token,
-            name="orders",
-            on_message=self._on_order_message,
-        )
-        await self.ws_orders.connect()
-        await self._wait_connected(self.ws_orders, "Orders")
+        # 5. Connect order/fill WebSocket (Tradovate mode only; NT mode uses TCP bridge)
+        if not self.config.nt:
+            self.ws_orders = TradovateWebSocket(
+                url=self.config.ws_orders_url,
+                access_token=master_session.access_token,
+                name="orders",
+                on_message=self._on_order_message,
+                on_reconnect=self._on_orders_reconnect,
+            )
+            await self.ws_orders.connect()
+            await self._wait_connected(self.ws_orders, "Orders")
 
-        # Subscribe to user sync for real-time fill notifications
-        await self.ws_orders.subscribe("user/syncrequest", {
-            "users": [master_session.user_id],
-        })
+            await self.ws_orders.subscribe("user/syncrequest", {
+                "users": [master_session.user_id],
+            })
+
+        # Wire token renewal → propagate fresh tokens to market data WS
+        self.auth.on_token_renewed = self._on_token_renewed
 
         # 6. Start risk manager
         self.risk_manager.start_eod_timer()
@@ -199,6 +252,99 @@ class TradovateExecutor:
             await asyncio.sleep(0.1)
         logger.warning(f"{name} WebSocket connection timeout — will retry in background")
 
+    @staticmethod
+    def _is_placeholder_nt_value(value: Optional[str]) -> bool:
+        return not value or str(value).strip().startswith("REPLACE_")
+
+    def _is_nt_only_mode(self) -> bool:
+        """True when NinjaTrader is configured and no Tradovate accounts are present."""
+        return bool(self.config.nt and not self.config.accounts)
+
+    def _build_nt_only_master_session(self) -> Optional[AuthSession]:
+        """Build a synthetic local session for true NT-only operation."""
+        if not self.config.nt or not self.config.nt.accounts:
+            return None
+
+        account_name = next(iter(self.config.nt.accounts.keys()))
+        account_config = AccountConfig(
+            name=account_name,
+            username="",
+            password="",
+            device_id="nt-only",
+            is_master=True,
+        )
+        return AuthSession(
+            account_config=account_config,
+            access_token="nt-only",
+            md_access_token="nt-only",
+            is_authenticated=True,
+        )
+
+    def _get_master_session(self) -> Optional[AuthSession]:
+        """Return the active master session for both Tradovate and NT-only modes."""
+        return self._master_session or self.auth.get_master_session()
+
+    def _resolve_nt_account(self, master_name: str):
+        """Find the exact NinjaTrader account mapping for the authenticated master account."""
+        if not self.config.nt or not self.config.nt.accounts:
+            logger.error("No NinjaTrader accounts configured in ninjatrader config — cannot start")
+            return None
+
+        nt_acct = self.config.nt.accounts.get(master_name)
+        if nt_acct:
+            return nt_acct
+
+        configured_names = list(self.config.nt.accounts.keys())
+        if any(self._is_placeholder_nt_value(name) for name in configured_names):
+            logger.error(
+                "NinjaTrader config still contains placeholder account names. "
+                "Replace the REPLACE_* entries in config.json with the exact case-sensitive "
+                "names from the NinjaTrader Accounts tab before starting."
+            )
+        else:
+            logger.error(
+                f"NT account '{master_name}' not found in ninjatrader config. "
+                f"Exact case-sensitive match required. Configured names: {configured_names}"
+            )
+        return None
+
+    def _validate_nt_account(self, account_name: str, nt_acct) -> bool:
+        """Reject placeholder or obviously invalid NinjaTrader bridge targets."""
+        if self._is_placeholder_nt_value(account_name) or self._is_placeholder_nt_value(nt_acct.host):
+            logger.error(
+                "NinjaTrader config for '%s' still contains placeholder values. "
+                "Update the exact account name and VM IPv4 host in config.json before starting.",
+                account_name,
+            )
+            return False
+
+        if nt_acct.port <= 0:
+            logger.error(
+                "NinjaTrader config for '%s' has invalid port %s. "
+                "Set the port to the PythonBridge TcpPort value in config.json.",
+                account_name,
+                nt_acct.port,
+            )
+            return False
+
+        return True
+
+    async def _wait_nt_connected(self, timeout: float = 5.0) -> bool:
+        """Wait for the NinjaTrader TCP bridge to come online before continuing startup."""
+        for _ in range(int(timeout / 0.1)):
+            if self.master_executor and getattr(self.master_executor, "connected", False):
+                logger.info("NinjaTrader bridge connected")
+                return True
+            await asyncio.sleep(0.1)
+
+        logger.error(
+            "NinjaTrader bridge connection timeout after %.1fs — startup aborted. "
+            "Verify the Windows VM is running, PythonBridge is active on a chart, "
+            "Windows Firewall allows the port, and config.json matches the VM host/port.",
+            timeout,
+        )
+        return False
+
     async def _sync_positions(self):
         """Check for existing positions from a previous session."""
         syncer = PositionSync(self.config)
@@ -208,8 +354,9 @@ class TradovateExecutor:
             logger.info(f"[Sync] StateFile found — active strategies: {active or 'none'}")
 
         all_executors = {"master": self.master_executor}
-        for name, executor in self.copy_engine.executors.items():
-            all_executors[name] = executor
+        if self.copy_engine:
+            for name, executor in self.copy_engine.executors.items():
+                all_executors[name] = executor
 
         summaries = await syncer.sync_all(all_executors, self.signal_engine, saved_state)
         for s in summaries:
@@ -254,6 +401,38 @@ class TradovateExecutor:
                     close=float(c),
                     volume=int(v),
                 )
+
+    async def _on_nt_market_message(self, data: dict):
+        """Process market data streamed from NinjaTrader over TCP."""
+        if not isinstance(data, dict):
+            return
+
+        msg_type = data.get("type")
+        if msg_type == "market":
+            price = data.get("price")
+            volume = data.get("volume", 0)
+            if price is None:
+                return
+            ts = self._parse_timestamp(data.get("timestamp"))
+            await self.market_data.on_tick(float(price), int(volume), ts)
+            return
+
+        if msg_type == "bar":
+            o = data.get("open")
+            h = data.get("high")
+            l = data.get("low")
+            c = data.get("close")
+            if None in (o, h, l, c):
+                return
+            ts = self._parse_timestamp(data.get("timestamp"))
+            await self.market_data.ingest_historical_bar(
+                timestamp=ts,
+                open_=float(o),
+                high=float(h),
+                low=float(l),
+                close=float(c),
+                volume=int(data.get("volume", 0)),
+            )
 
     def _parse_timestamp(self, ts_str) -> datetime:
         """Parse Tradovate timestamp or fall back to now."""
@@ -313,8 +492,13 @@ class TradovateExecutor:
             signal, signal.contracts
         )
 
-        if record and record.status.value in ("filled", "working"):
+        if record and record.order_id and record.status.value != "rejected":
             self.signal_engine.mark_filled(signal.strategy, signal.side)
+            if record.status.value == "working":
+                logger.warning(
+                    f"[{signal.strategy}] Fill unconfirmed after timeout — "
+                    f"marking position entered. Bracket at signal price. Verify manually."
+                )
 
             # Determine actual fill price
             fill_px = record.fill_price if record.fill_price else open_price
@@ -330,7 +514,7 @@ class TradovateExecutor:
             # Log entry
             entry = TradeEntry(
                 strategy=signal.strategy,
-                account=self.auth.get_master_session().name,
+                account=self._get_master_session().name,
                 side=signal.side.value,
                 contracts=signal.contracts,
                 signal_price=signal.signal_price,
@@ -465,6 +649,98 @@ class TradovateExecutor:
             logger.debug("Position update: FLAT")
 
     # ==================================================================
+    # NT EXIT HANDLER (NinjaTrader mode — replaces WebSocket fill path)
+    # ==================================================================
+    async def _on_nt_exit(self, record: OrderRecord, exit_type: str, fill_price: float):
+        """
+        Called by NinjaTraderBridge when NT reports a bracket exit (SL, TP, EOD, etc.).
+        Mirrors the SL/TP branch of _handle_fill for the Tradovate path.
+        """
+        strategy    = record.strategy
+        entry_price = record.fill_price or 0.0
+
+        if record.side == "Buy":
+            pnl = (fill_price - entry_price) * POINT_VALUE * record.qty
+        else:
+            pnl = (entry_price - fill_price) * POINT_VALUE * record.qty
+
+        bars_held = self.signal_engine.positions.get(
+            strategy, type("", (), {"bars_held": 0})()
+        ).bars_held
+
+        self.risk_manager.record_trade_pnl(pnl, strategy)
+
+        self.trade_log.log_exit(
+            strategy=strategy,
+            account=record.account_name,
+            exit_price=fill_price,
+            exit_reason=exit_type,
+            bars_held=bars_held,
+            daily_pnl=self.risk_manager.daily_pnl,
+            monthly_pnl=self.risk_manager.monthly_pnl,
+        )
+
+        self.signal_engine.mark_flat(strategy)
+        if self.master_executor:
+            self.master_executor.clear_strategy(strategy)
+
+        self._save_state()
+
+        logger.info(
+            f"[NT] Exit logged: {strategy} {exit_type} "
+            f"entry={entry_price:.2f} exit={fill_price:.2f} pnl={pnl:+.2f}"
+        )
+
+    # ==================================================================
+    # RECONNECT & TOKEN RENEWAL HANDLERS
+    # ==================================================================
+    def _on_token_renewed(self, session):
+        """Push fresh tokens to live WS clients after auth_manager renews."""
+        master = self._get_master_session()
+        if master and session.name == master.name:
+            if self.ws_market:
+                self.ws_market.update_token(session.md_access_token or session.access_token)
+            if self.ws_orders:  # None in NT mode
+                self.ws_orders.update_token(session.access_token)
+            logger.info(f"[{session.name}] WS tokens updated after renewal")
+
+    async def _on_md_reconnect(self):
+        """Re-subscribe to market data after a WS reconnect."""
+        logger.info("Market data WS reconnected — re-subscribing")
+        try:
+            await self.ws_market.subscribe("md/subscribeQuote", {"symbol": self.config.symbol})
+            await self.ws_market.subscribe(
+                "md/getChart",
+                {
+                    "symbol": self.config.symbol,
+                    "chartDescription": {
+                        "underlyingType": "MinuteBar",
+                        "elementSize": 15,
+                        "elementSizeUnit": "UnderlyingUnits",
+                        "withHistogram": False,
+                    },
+                    "timeRange": {
+                        "asFarAsTimestamp": datetime.now(ET).strftime("%Y-%m-%dT00:00:00"),
+                    },
+                },
+            )
+            logger.info(f"Re-subscribed to {self.config.symbol} after reconnect")
+        except Exception as e:
+            logger.error(f"Re-subscription failed: {e}")
+
+    async def _on_orders_reconnect(self):
+        """Re-subscribe and re-sync positions after an order WS reconnect."""
+        logger.warning("Order WS reconnected — re-syncing positions and re-subscribing")
+        master = self._get_master_session()
+        try:
+            if master:
+                await self.ws_orders.subscribe("user/syncrequest", {"users": [master.user_id]})
+            await self._sync_positions()
+            logger.info("Position re-sync complete after order WS reconnect")
+        except Exception as e:
+            logger.error(f"Re-sync after reconnect failed: {e}")
+
+    # ==================================================================
     # FLATTEN ALL
     # ==================================================================
     async def _flatten_all(self):
@@ -515,7 +791,7 @@ class TradovateExecutor:
 
         if self.ws_market:
             await self.ws_market.disconnect()
-        if self.ws_orders:
+        if self.ws_orders:  # None in NT mode
             await self.ws_orders.disconnect()
         if self.master_executor:
             await self.master_executor.shutdown()
@@ -557,7 +833,7 @@ def main():
 
     def handle_sig(sig, frame):
         logger.warning(f"Signal {sig} received — shutting down...")
-        loop.call_soon_threadsafe(lambda: asyncio.ensure_future(app.shutdown()))
+        loop.call_soon_threadsafe(loop.create_task, app.shutdown())
 
     signal.signal(signal.SIGINT, handle_sig)
     signal.signal(signal.SIGTERM, handle_sig)
@@ -565,7 +841,9 @@ def main():
     try:
         loop.run_until_complete(app.start())
     except KeyboardInterrupt:
-        loop.run_until_complete(app.shutdown())
+        # SIGINT handler already scheduled shutdown via call_soon_threadsafe;
+        # avoid calling shutdown a second time here.
+        pass
     finally:
         loop.close()
 

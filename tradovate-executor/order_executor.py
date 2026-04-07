@@ -168,23 +168,29 @@ class OrderExecutor:
         # Step 2: Wait for fill
         fill_price = await self._wait_for_fill(record)
 
-        # Use lock to prevent WS fill callback from racing with REST poll
+        # Use lock to prevent WS fill callback from racing with REST poll.
+        # NOTE: early return only if bracket is ALREADY placed — the WS fast-path
+        # confirms the fill but does NOT place the bracket, so we must not skip here.
         async with record._bracket_lock:
-            if record.fill_confirmed:
-                # WS fill callback already placed the bracket
+            if record.bracket is not None:
+                # Bracket was already placed by a concurrent path
                 return record
-            record.fill_confirmed = True
+            if not record.fill_confirmed:
+                record.fill_confirmed = True
 
-            if fill_price is not None:
-                record.fill_price = fill_price
-                record.fill_time = time.time()
+            # Prefer fill_price from WS (stored in record.fill_price) over REST poll
+            effective_fill = record.fill_price if record.fill_price else fill_price
+
+            if effective_fill is not None:
+                record.fill_price = effective_fill
+                record.fill_time = record.fill_time or time.time()
                 record.status = OrderStatus.FILLED
                 logger.info(
                     f"[{self.session.name}][{signal.strategy}] "
-                    f"FILLED @ {fill_price:.2f} | slippage: {record.slippage_pts:.2f} pts"
+                    f"FILLED @ {effective_fill:.2f} | slippage: {record.slippage_pts:.2f} pts"
                 )
                 # Step 3: Bracket at real fill price
-                await self._place_bracket_at_fill(signal, contracts, fill_price, record)
+                await self._place_bracket_at_fill(signal, contracts, effective_fill, record)
             else:
                 logger.error(
                     f"[{self.session.name}][{signal.strategy}] "

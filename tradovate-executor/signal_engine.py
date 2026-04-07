@@ -116,7 +116,7 @@ class SignalEngine:
             pos.tick_bar()
 
         # No new entries after cutoff
-        cutoff = dt_time(16, 30)
+        cutoff = dt_time.fromisoformat(self.session.no_new_entries_after)
         allow_new_entries = now.time() < cutoff
 
         # Check for max-hold flattens (these generate exit signals)
@@ -214,6 +214,7 @@ class SignalEngine:
         if side is None:
             return None
 
+        self._ib_traded_today = True  # Max 1 IB signal per day — set at signal time, not fill time
         logger.info(f"[IB] Signal: {side.value} — {reason}")
         return Signal(
             strategy="IB",

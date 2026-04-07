@@ -44,7 +44,7 @@ def get_account_status(name: str, trades: list[dict] | None = None) -> dict:
             max_dd = dd
 
     current_dd = equity - peak
-    dd_remaining = max_drawdown - current_dd  # Both negative, so remaining = limit - current
+    dd_remaining = current_dd - max_drawdown  # positive = headroom remaining, 0 = at limit, negative = breached
     dd_pct_used = (abs(current_dd) / abs(max_drawdown) * 100) if max_drawdown != 0 else 0.0
 
     # Profit target progress
@@ -58,13 +58,11 @@ def get_account_status(name: str, trades: list[dict] | None = None) -> dict:
     daily_pnl = sum(t["pnl_total"] for t in today_exits)
     trades_today = len(today_exits)
 
-    # Status
+    # Status — LucidFlex has no daily loss limit, only max drawdown
     if abs(max_drawdown) > 0 and current_dd <= max_drawdown:
         status = "breached"
     elif profit_target > 0 and total_pnl >= profit_target:
         status = "eval_passed"
-    elif daily_pnl <= -3000:
-        status = "daily_limit_hit"
     else:
         status = "active"
 

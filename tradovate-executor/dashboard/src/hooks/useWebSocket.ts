@@ -1,7 +1,8 @@
 import { useEffect, useRef, useState, useCallback } from "react";
 import type { Position, PnL, Signal, Trade, EngineStatus, EquityPoint, WSData, Bar } from "../types";
+import { api } from "../api/client";
 
-export function useWebSocket(): WSData {
+export function useWebSocket(): WSData & { refreshStatus: () => Promise<void> } {
   const wsRef = useRef<WebSocket | null>(null);
   const reconnectRef = useRef<ReturnType<typeof setTimeout>>(undefined);
   const [connected, setConnected] = useState(false);
@@ -12,6 +13,18 @@ export function useWebSocket(): WSData {
   const [trades, setTrades] = useState<Trade[]>([]);
   const [equityHistory, setEquityHistory] = useState<EquityPoint[]>([]);
   const [bars, setBars] = useState<Bar[]>([]);
+
+  const refreshStatus = useCallback(async () => {
+    try {
+      const nextStatus = await api.getStatus();
+      setStatus(nextStatus);
+      if (nextStatus.positions) {
+        setPositions(nextStatus.positions);
+      }
+    } catch {
+      // Ignore transient refresh failures; websocket state will catch up.
+    }
+  }, []);
 
   const connect = useCallback(() => {
     const protocol = window.location.protocol === "https:" ? "wss:" : "ws:";
@@ -50,7 +63,11 @@ export function useWebSocket(): WSData {
     };
   }, []);
 
-  useEffect(() => { connect(); return () => { clearTimeout(reconnectRef.current); wsRef.current?.close(); }; }, [connect]);
+  useEffect(() => {
+    refreshStatus();
+    connect();
+    return () => { clearTimeout(reconnectRef.current); wsRef.current?.close(); };
+  }, [connect, refreshStatus]);
 
-  return { connected, status, positions, pnl, signals, trades, equityHistory, bars };
+  return { connected, status, positions, pnl, signals, trades, equityHistory, bars, refreshStatus };
 }

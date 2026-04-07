@@ -5,6 +5,9 @@ on:
   push:
     tags: ['v*']
 
+permissions:
+  contents: write
+
 defaults:
   run:
     working-directory: tradovate-executor
@@ -22,6 +25,8 @@ jobs:
       - uses: actions/setup-node@v4
         with:
           node-version: "20"
+          cache: "npm"
+          cache-dependency-path: tradovate-executor/dashboard/package-lock.json
 
       - name: Install Python dependencies
         run: pip install -r requirements.txt pywebview pyinstaller
@@ -29,14 +34,18 @@ jobs:
       - name: Build dashboard
         run: cd dashboard && npm ci && npm run build
 
-      - name: Build .exe
-        run: pyinstaller HTFExecutorWin.spec --clean --noconfirm
+      - name: Build Windows app
+        run: pyinstaller HTFExecutor_windows.spec --clean --noconfirm
+
+      - name: Package Windows zip
+        run: Compress-Archive -Path dist\HTFExecutor\* -DestinationPath dist\HTFExecutor_windows.zip
+        shell: powershell
 
       - name: Upload Windows artifact
         uses: actions/upload-artifact@v4
         with:
           name: HTFExecutor-Windows
-          path: tradovate-executor/dist/HTFExecutor.exe
+          path: tradovate-executor/dist/HTFExecutor_windows.zip
 
   build-macos:
     runs-on: macos-latest
@@ -50,6 +59,8 @@ jobs:
       - uses: actions/setup-node@v4
         with:
           node-version: "20"
+          cache: "npm"
+          cache-dependency-path: tradovate-executor/dashboard/package-lock.json
 
       - name: Install Python dependencies
         run: pip install -r requirements.txt pywebview pyinstaller
@@ -72,3 +83,27 @@ jobs:
         with:
           name: HTFExecutor-macOS
           path: tradovate-executor/dist/HTFExecutor-macOS.dmg
+
+  release:
+    if: startsWith(github.ref, 'refs/tags/v')
+    needs: [build-windows, build-macos]
+    runs-on: ubuntu-latest
+    steps:
+      - name: Download Windows artifact
+        uses: actions/download-artifact@v4
+        with:
+          name: HTFExecutor-Windows
+          path: dist/windows
+
+      - name: Download macOS artifact
+        uses: actions/download-artifact@v4
+        with:
+          name: HTFExecutor-macOS
+          path: dist/macos
+
+      - name: Publish release assets
+        uses: softprops/action-gh-release@v2
+        with:
+          files: |
+            dist/windows/HTFExecutor_windows.zip
+            dist/macos/HTFExecutor-macOS.dmg

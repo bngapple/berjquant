@@ -1,42 +1,31 @@
 {
-  "environment": "demo",
-  "symbol": "MNQM6",
-  "accounts": [
-    {
-      "name": "copy-150k-2",
-      "username": "YOUR_USERNAME_2",
-      "password": "enc:gAAAAABpx0tltEPGnAsB0Y5a6jYTEl-6BGmTkymTZom4NYANWXZkfjWCgXYoWZYarTkSvlkD69TK07mTSXB9gJrkUg4Pye4n8A==",
-      "device_id": "unique-device-id-2",
-      "app_id": "HTFSwing",
-      "app_version": "1.0.0",
-      "cid": 0,
-      "sec": "",
-      "is_master": false,
-      "sizing_mode": "mirror",
-      "account_size": 150000,
-      "fixed_sizes": {
-        "RSI": 3,
-        "IB": 3,
-        "MOM": 3
+  "environment": "live",
+  "symbol": "MNQU6",
+  "session": {
+    "monthly_loss_limit": -1000.0
+  },
+  "rsi": {
+    "contracts": 1
+  },
+  "ib": {
+    "contracts": 1
+  },
+  "mom": {
+    "contracts": 1
+  },
+  "accounts": [],
+  "ninjatrader": {
+    "_setup_instructions": "Account names must match the NinjaTrader Accounts tab exactly (case-sensitive). Set each host to the Windows VM host-only network IPv4 \u2014 run 'ipconfig' in the VM to find it. Port must match TcpPort in your PythonBridge NinjaScript strategy.",
+    "accounts": {
+      "LTT07T22GBH": {
+        "host": "172.16.47.129",
+        "port": 6000
       }
     },
-    {
-      "name": "copy-150k-3",
-      "username": "YOUR_USERNAME_3",
-      "password": "enc:gAAAAABpx0tlxrFFtCLaOdf1GlKJQAUuNH5ZLlh5-oNSx4FBN6Lzv7Dm6oOHSuIiY9VrZiQR17ij3HnxBUJhP8mitqAu7U-VLw==",
-      "device_id": "unique-device-id-3",
-      "app_id": "HTFSwing",
-      "app_version": "1.0.0",
-      "cid": 0,
-      "sec": "",
-      "is_master": false,
-      "sizing_mode": "mirror",
-      "account_size": 150000,
-      "fixed_sizes": {
-        "RSI": 3,
-        "IB": 3,
-        "MOM": 3
-      }
-    }
-  ]
+    "default_atm_template": "MNQ_2R",
+    "order_timeout_seconds": 10,
+    "status_timeout_seconds": 15,
+    "reconnect_max_backoff_seconds": 30,
+    "symbol": "MNQU6"
+  }
 }
