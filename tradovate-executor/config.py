@@ -17,7 +17,7 @@ import os
 @dataclass(frozen=True)
 class NTAccountConfig:
     """Connection parameters for one NinjaTrader account."""
-    host: str = "127.0.0.1"   # NinjaTrader VM IP (host-only network adapter IPv4)
+    host: str = "127.0.0.1"   # Same Windows PC = 127.0.0.1, VM = host-only adapter IPv4
     port: int = 6000            # Must match TcpPort in PythonBridge strategy
 
 
@@ -258,8 +258,9 @@ class AppConfig:
             data["ninjatrader"] = {
                 "_setup_instructions": (
                     "Account names must match the NinjaTrader Accounts tab exactly. "
-                    "Set each host to the Windows VM's host-only network IPv4 address "
-                    "(run 'ipconfig' in the VM to find it)."
+                    "For same-PC Windows deployment use 127.0.0.1. "
+                    "For VM deployment set each host to the Windows VM's host-only "
+                    "network IPv4 address (run 'ipconfig' in the VM to find it)."
                 ),
                 "accounts": {
                     name: {"host": acct.host, "port": acct.port}

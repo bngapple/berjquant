@@ -269,10 +269,11 @@ class NinjaTraderBridge:
                 logger.warning(
                     f"[NT] Cannot reach NinjaTrader at {self._nt_host}:{self._nt_port} ({e}). "
                     f"Check that: "
-                    f"(1) the Windows VM is running, "
+                    f"(1) NinjaTrader is running on the same Windows PC or VM, "
                     f"(2) PythonBridge strategy is active on a chart in NinjaTrader, "
                     f"(3) Windows Firewall allows inbound TCP on port {self._nt_port}, "
-                    f"(4) host IP in config matches the VM's ipconfig IPv4 address."
+                    f"(4) host in config matches 127.0.0.1 for same-PC deployment "
+                    f"or the VM's ipconfig IPv4 address."
                 )
             except asyncio.CancelledError:
                 break

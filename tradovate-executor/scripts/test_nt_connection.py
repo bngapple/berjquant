@@ -79,7 +79,7 @@ async def test_account(name: str, host: str, port: int) -> bool:
 
     except asyncio.TimeoutError:
         print(f"TIMEOUT (>{CONNECT_TIMEOUT}s)")
-        print(f"         Check: VM running? PythonBridge strategy active on a chart?")
+        print("         Check: NinjaTrader running? PythonBridge strategy active on a chart?")
         return False
 
     except ConnectionRefusedError:
@@ -89,7 +89,7 @@ async def test_account(name: str, host: str, port: int) -> bool:
 
     except OSError as e:
         print(f"ERROR — {e}")
-        print(f"         Check: is {host!r} the VM's 'ipconfig' IPv4 address?")
+        print(f"         Check: use '127.0.0.1' on the same Windows PC, or the VM IPv4 if using a VM.")
         return False
 
 
@@ -117,11 +117,12 @@ async def main():
         print(f"Result: {passed}/{len(results)} reachable — FAILED: {', '.join(failed)}")
         print()
         print("Troubleshooting checklist:")
-        print("  1. Windows VM is running (check VMware Fusion / Parallels)")
+        print("  1. NinjaTrader is running on the same Windows PC or in the Windows VM")
         print("  2. NinjaTrader is open with the PythonBridge strategy active on a chart")
         print("  3. Windows Firewall has an inbound rule allowing TCP on the configured port")
-        print("  4. Host IP in config.json matches the VM's ipconfig IPv4 address")
-        print("     To find it: open Command Prompt in the VM and run:")
+        print("  4. Host in config.json is correct")
+        print("     Same-PC deployment: 127.0.0.1")
+        print("     VM deployment: use the VM IPv4 from:")
         print("       ipconfig | findstr IPv4")
 
     sys.exit(0 if all_ok else 1)
