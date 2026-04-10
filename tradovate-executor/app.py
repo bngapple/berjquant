@@ -104,36 +104,6 @@ class TradovateExecutor:
         self._shutdown_event = asyncio.Event()
         self._master_session: Optional[AuthSession] = None
 
-    def _single_account_policy_enabled(self) -> bool:
-        """Apply the netted single-account execution constraint in NinjaTrader mode."""
-        return bool(self.config.nt)
-
-    def _current_execution_exposure(self) -> tuple[bool, Optional[Side], bool]:
-        """
-        Return current live execution exposure implied by filled strategy positions.
-
-        Canonical signal generation remains per-strategy, but in NT mode we only accept
-        a new entry when the account is effectively flat.
-        """
-        active_sides = {
-            pos.side
-            for pos in self.signal_engine.positions.values()
-            if not pos.is_flat and pos.side is not None
-        }
-
-        if not active_sides:
-            return False, None, False
-
-        if len(active_sides) > 1:
-            logger.warning(
-                "Single-account policy detected mixed live sides %s; "
-                "blocking new entries until fully flat.",
-                [side.value for side in active_sides],
-            )
-            return True, None, True
-
-        return True, next(iter(active_sides)), False
-
     # ==================================================================
     # STARTUP
     # ==================================================================
@@ -512,26 +482,6 @@ class TradovateExecutor:
         if not self.risk_manager.can_trade():
             logger.info(f"SKIPPED (halted): {signal.strategy} {signal.side.value}")
             return
-
-        if self._single_account_policy_enabled():
-            has_position, current_side, mixed_sides = self._current_execution_exposure()
-            if has_position:
-                if mixed_sides:
-                    logger.info(
-                        f"SKIPPED (single-account mixed-state): {signal.strategy} "
-                        f"{signal.side.value} blocked until account is fully flat"
-                    )
-                elif current_side == signal.side:
-                    logger.info(
-                        f"SKIPPED (single-account no-adds): {signal.strategy} "
-                        f"{signal.side.value} blocked while account already {current_side.value}"
-                    )
-                else:
-                    logger.info(
-                        f"SKIPPED (single-account opposite-side): {signal.strategy} "
-                        f"{signal.side.value} blocked while account already {current_side.value}"
-                    )
-                return
 
         logger.info(
             f"EXECUTING: {signal.strategy} {signal.side.value} "
