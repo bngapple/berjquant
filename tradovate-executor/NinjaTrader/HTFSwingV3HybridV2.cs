@@ -42,6 +42,7 @@ namespace NinjaTrader.NinjaScript.Strategies
         private const double DefaultPointValueUsd = 2.0;
         private const int MaxHistoryBars = 500;
         private const string RiskStateFileName = "HTFSwingV3HybridV2.risk";
+        private const int RegularTradingHoursEnd = 160000;
 
         private class ClosedBar
         {
@@ -353,9 +354,9 @@ namespace NinjaTrader.NinjaScript.Strategies
                 RealtimeErrorHandling        = RealtimeErrorHandling.StopCancelClose;
 
                 SessionStart                 = 93000;
-                NoNewEntriesAfter            = 163000;
+                NoNewEntriesAfter            = 160000;
                 EodFlattenTime               = 164500;
-                OnePositionAtATime           = false;
+                OnePositionAtATime           = true;
                 PersistRiskState             = true;
                 UseLucidFlexPresets          = true;
                 LucidFlexAccountSizeK        = 25;
@@ -435,11 +436,13 @@ namespace NinjaTrader.NinjaScript.Strategies
                 HandleBarTransition(Time[0]);
             }
 
-            if (State != State.Historical && !_eodFlattened && ToTime(Time[0]) >= EodFlattenTime && HasAnyOpenPosition())
+            if (State != State.Historical && !_eodFlattened && ToTime(Time[0]) >= EodFlattenTime)
             {
                 _eodFlattened = true;
                 Print(string.Format("[HTF] EOD flatten triggered at {0:HH:mm:ss}", Time[0]));
-                FlattenAllStrategies("EOD");
+                if (HasAnyOpenPosition())
+                    FlattenAllStrategies("EOD");
+                ClearPendingSignals("EOD flatten");
             }
         }
 
@@ -526,10 +529,10 @@ namespace NinjaTrader.NinjaScript.Strategies
         {
             CheckForCalendarResets(openBarTime);
 
+            ProcessCompletedBarIfNeeded(openBarTime);
+
             if (State != State.Historical)
                 ExecutePendingSignals(openBarTime);
-
-            ProcessCompletedBarIfNeeded(openBarTime);
         }
 
         private void ProcessCompletedBarIfNeeded(DateTime openBarTime)
@@ -550,9 +553,15 @@ namespace NinjaTrader.NinjaScript.Strategies
                 Volume = Convert.ToInt64(Volume[1], CultureInfo.InvariantCulture),
             };
 
+            if (!IsRegularTradingHoursBar(closedBarTime))
+                return;
+
             IngestClosedBar(bar);
 
             if (State == State.Historical)
+                return;
+
+            if (closedBarTime.Date != openBarTime.Date)
                 return;
 
             AdvanceHeldBars();
@@ -561,28 +570,23 @@ namespace NinjaTrader.NinjaScript.Strategies
             if (!CanTradeAt(openBarTime))
                 return;
 
-            if (OnePositionAtATime && HasAnyOpenPosition())
-                return;
-
             PendingSignal signal = EvaluateRsi(bar);
             if (signal != null)
             {
-                QueueSignal(signal);
-                if (OnePositionAtATime)
+                if (TryQueueSignal(signal))
                     return;
             }
 
             signal = EvaluateIb(bar);
             if (signal != null)
             {
-                QueueSignal(signal);
-                if (OnePositionAtATime)
+                if (TryQueueSignal(signal))
                     return;
             }
 
             signal = EvaluateMomentum(bar);
             if (signal != null)
-                QueueSignal(signal);
+                TryQueueSignal(signal);
         }
 
         private void IngestClosedBar(ClosedBar bar)
@@ -600,6 +604,12 @@ namespace NinjaTrader.NinjaScript.Strategies
             TrimSeries(_volumes);
 
             UpdateIndicators();
+        }
+
+        private bool IsRegularTradingHoursBar(DateTime barTime)
+        {
+            int timeValue = ToTime(barTime);
+            return timeValue >= SessionStart && timeValue < RegularTradingHoursEnd;
         }
 
         private void UpdateIbState(ClosedBar bar)
@@ -704,6 +714,15 @@ namespace NinjaTrader.NinjaScript.Strategies
             _pendingSignals.Clear();
         }
 
+        private void ClearPendingSignals(string reason)
+        {
+            if (_pendingSignals.Count == 0)
+                return;
+
+            Print(string.Format("[HTF] Clearing {0} pending signal(s): {1}", _pendingSignals.Count, reason));
+            _pendingSignals.Clear();
+        }
+
         // ----------------------------------------------------------------
         // Strategy evaluations
         // ----------------------------------------------------------------
@@ -768,7 +787,7 @@ namespace NinjaTrader.NinjaScript.Strategies
             int contracts = GetEffectiveContractsPerStrategy();
             PendingSignal signal = null;
 
-            if (bar.Close > _todayIb.High)
+            if (bar.High > _todayIb.High)
             {
                 signal = BuildSignal(
                     "IB",
@@ -777,11 +796,11 @@ namespace NinjaTrader.NinjaScript.Strategies
                     IbStopLossPts,
                     IbTakeProfitPts,
                     IbMaxHoldBars,
-                    string.Format(CultureInfo.InvariantCulture, "IB Breakout UP — close {0:F2} > IB high {1:F2}", bar.Close, _todayIb.High),
+                    string.Format(CultureInfo.InvariantCulture, "IB Breakout UP — high {0:F2} > IB high {1:F2}", bar.High, _todayIb.High),
                     bar
                 );
             }
-            else if (bar.Close < _todayIb.Low)
+            else if (bar.Low < _todayIb.Low)
             {
                 signal = BuildSignal(
                     "IB",
@@ -790,13 +809,10 @@ namespace NinjaTrader.NinjaScript.Strategies
                     IbStopLossPts,
                     IbTakeProfitPts,
                     IbMaxHoldBars,
-                    string.Format(CultureInfo.InvariantCulture, "IB Breakout DOWN — close {0:F2} < IB low {1:F2}", bar.Close, _todayIb.Low),
+                    string.Format(CultureInfo.InvariantCulture, "IB Breakout DOWN — low {0:F2} < IB low {1:F2}", bar.Low, _todayIb.Low),
                     bar
                 );
             }
-
-            if (signal != null)
-                _ibTradedToday = true;
 
             return signal;
         }
@@ -891,15 +907,29 @@ namespace NinjaTrader.NinjaScript.Strategies
             };
         }
 
-        private void QueueSignal(PendingSignal signal)
+        private bool TryQueueSignal(PendingSignal signal)
         {
+            if (HasOpenPositionOppositeTo(signal.Side))
+            {
+                Print(string.Format(
+                    "[HTF] SKIPPED: {0} {1} because an opposite-direction position is already open",
+                    signal.Strategy,
+                    signal.Side == MarketPosition.Long ? "Buy" : "Sell"
+                ));
+                return false;
+            }
+
             _pendingSignals.Add(signal);
+            if (signal.Strategy.Equals("IB", StringComparison.OrdinalIgnoreCase))
+                _ibTradedToday = true;
+
             Print(string.Format(
                 "[HTF] QUEUED: {0} {1} {2} — execute next bar open",
                 signal.Strategy,
                 signal.Side == MarketPosition.Long ? "Buy" : "Sell",
                 signal.Quantity
             ));
+            return true;
         }
 
         // ----------------------------------------------------------------
@@ -966,6 +996,29 @@ namespace NinjaTrader.NinjaScript.Strategies
                     return true;
             }
             return false;
+        }
+
+        private bool HasOpenPositionOppositeTo(MarketPosition side)
+        {
+            if (HasLiveNetPositionOppositeTo(side))
+                return true;
+
+            foreach (StrategyPosition pos in _positions.Values)
+            {
+                if (!pos.IsFlat && pos.Side != side)
+                    return true;
+            }
+
+            return false;
+        }
+
+        private bool HasLiveNetPositionOppositeTo(MarketPosition side)
+        {
+            if (Position == null)
+                return false;
+
+            MarketPosition liveSide = Position.MarketPosition;
+            return liveSide != MarketPosition.Flat && liveSide != side;
         }
 
         private int GetMaxHoldBars(string strategy)
