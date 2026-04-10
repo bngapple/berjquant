@@ -1,0 +1,57 @@
+{
+  "environment": "live",
+  "symbol": "MNQU6",
+  "session": {
+    "session_start": "09:30",
+    "no_new_entries_after": "16:30",
+    "flatten_time": "16:45",
+    "monthly_loss_limit": -4500.0,
+    "daily_loss_limit": null,
+    "timezone": "US/Eastern"
+  },
+  "rsi": {
+    "period": 5,
+    "oversold": 35.0,
+    "overbought": 65.0,
+    "contracts": 3,
+    "stop_loss_pts": 10.0,
+    "take_profit_pts": 100.0,
+    "max_hold_bars": 5
+  },
+  "ib": {
+    "ib_start": "09:30",
+    "ib_end": "10:00",
+    "contracts": 3,
+    "stop_loss_pts": 10.0,
+    "take_profit_pts": 120.0,
+    "max_hold_bars": 15,
+    "ib_range_lookback": 50,
+    "ib_range_pct_low": 25.0,
+    "ib_range_pct_high": 75.0
+  },
+  "mom": {
+    "atr_period": 14,
+    "ema_period": 21,
+    "vol_sma_period": 20,
+    "contracts": 3,
+    "stop_loss_pts": 15.0,
+    "take_profit_pts": 100.0,
+    "max_hold_bars": 5
+  },
+  "accounts": [],
+  "ninjatrader": {
+    "_setup_instructions": "Rename REPLACE_WITH_NT_ACCOUNT_NAME to exactly match the NinjaTrader Accounts tab. Same-PC Windows deployment uses 127.0.0.1.",
+    "accounts": {
+      "REPLACE_WITH_NT_ACCOUNT_NAME": {
+        "host": "127.0.0.1",
+        "port": 6000
+      }
+    },
+    "default_atm_template": "MNQ_2R",
+    "order_timeout_seconds": 10,
+    "status_timeout_seconds": 5,
+    "reconnect_max_backoff_seconds": 30,
+    "symbol": "MNQU6"
+  },
+  "log_dir": "logs"
+}
